@@ -3,7 +3,6 @@ package net.peakgames.common.bitmaps {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Graphics;
-	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
@@ -19,6 +18,7 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.DisplayObjectContainer;
 	import net.peakgames.components.flatflash.Image;
 	import net.peakgames.components.flatflash.DisplayObjectFactory;
+	import net.peakgames.components.flatflash.MovieClip;
 	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
@@ -62,7 +62,7 @@ package net.peakgames.common.bitmaps {
 		
 		private var doc:DisplayObjectContainer;
 		private var i1:Image;
-		private var i2:Image;
+		private var i2:MovieClip;
 		
 		private var tf:TextField;
 		
@@ -79,7 +79,7 @@ package net.peakgames.common.bitmaps {
 		}
 		
 		private function handleKeyDown(e:KeyboardEvent):void {
-			trace("............ " + e.keyCode)
+			//trace("............ " + e.keyCode)
 			if (this.i1) {
 				if (e.keyCode == Keyboard.LEFT) {
 					this.i1.x -= 10;
@@ -89,6 +89,18 @@ package net.peakgames.common.bitmaps {
 					this.i1.y += 10;
 				} else if (e.keyCode == Keyboard.UP) {
 					this.i1.y -= 10;
+				}
+			}
+			
+			if (this.i2) {
+				if (e.keyCode == Keyboard.SPACE) {
+					this.i2.stop();
+				} else if (e.keyCode == Keyboard.ENTER) {
+					this.i2.play();
+				} else if (e.keyCode == Keyboard.F1) {
+					this.i2.gotoAndPlay(10);
+				} else if (e.keyCode == Keyboard.F2) {
+					this.i2.gotoAndStop(300);
 				}
 			}
 		}
@@ -126,10 +138,15 @@ package net.peakgames.common.bitmaps {
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0010")
 			this.doc.addChild(this.i1);
 			
-			/*
-			var test:MovieClip = new MovieClip();
-			test.prev
-			*/
+			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
+			this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
+			this.doc.addChild(this.i2);
+			this.i2.play();
+			
+			this.doc.swapChildren(this.i1, this.i2);
+			
+			trace(this.doc.getChildAt(1).name)
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -246,7 +263,7 @@ package net.peakgames.common.bitmaps {
 		  
 			//populate(bitmapData2, 1);
 			//populate(bitmapData2, 1000);
-			populateFromSlices(bitmapData1);
+			//populateFromSlices(bitmapData1);
 			if (this.i1) {
 				if (this.i1.x > this.stage.stageWidth) {
 					this.i1.x = 0;
@@ -263,7 +280,7 @@ package net.peakgames.common.bitmaps {
 			++frames;
 			  
 			if (currentTime > 1) {
-				trace("...... frames " + frames)
+				//trace("...... frames " + frames)
 				this.tf.text = frames.toString();
 				
 				startTime = getTimer();

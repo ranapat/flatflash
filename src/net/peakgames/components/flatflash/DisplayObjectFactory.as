@@ -18,6 +18,27 @@ package net.peakgames.components.flatflash {
 			}
 			return null;
 		}
+		
+		public static function getMovieClipFromAll(spritesheet:BitmapData, spritesheetId:String, regions:Vector.<Region>):MovieClip {
+			return new MovieClip(spritesheet, spritesheetId, regions);
+		}
+		
+		public static function getMovieClipByMinMaxIndexes(spritesheet:BitmapData, spritesheetId:String, regions:Vector.<Region>, minIndex:uint, maxIndex:uint):MovieClip {
+			return new MovieClip(spritesheet, spritesheetId, regions.slice(minIndex, maxIndex));
+		}
+		
+		public static function getMovieClipByMinMaxNames(spritesheet:BitmapData, spritesheetId:String, regions:Vector.<Region>, minName:String, maxName:String):MovieClip {
+			var regionsToPick:Vector.<Region> = new Vector.<Region>();
+			var length:uint = regions.length;
+			for (var i:uint = 0; i < length; ++i) {
+				var region:Region = regions[i];
+				if (region.name >= minName && region.name <= maxName) {
+					regionsToPick.push(region);
+				}
+			}
+			
+			return new MovieClip(spritesheet, spritesheetId, regionsToPick);
+		}
 	}
 
 }

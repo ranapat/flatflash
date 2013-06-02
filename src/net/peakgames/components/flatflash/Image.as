@@ -11,6 +11,8 @@ package net.peakgames.components.flatflash {
 			
 			this._spritesheetRegion = spritesheetRegion;
 			
+			this.name = spritesheetRegion.name;
+			
 			this.width = spritesheetRegion.width;
 			this.height = spritesheetRegion.height;
 		}

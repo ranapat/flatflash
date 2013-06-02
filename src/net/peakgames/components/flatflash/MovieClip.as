@@ -1,4 +1,5 @@
 package net.peakgames.components.flatflash {
+	import flash.display.BitmapData;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class MovieClip extends DisplayObject {
@@ -14,7 +15,7 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public override function get spritesheetRegion():Region {
-			return this._spritesheetRegions? this._spritesheetRegions[this._currentFrame];
+			return this._spritesheetRegions? this._spritesheetRegions[this._currentFrame] : null;
 		}
 		
 		public function get currentFrame():uint {
@@ -22,10 +23,16 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function set currentFrame(value:uint):void {
-			this._currentFrame = (
+			if (
 				this._spritesheetRegions
 				&& this._spritesheetRegions.length > value
-				&& value >= 0)? value : this._currentFrame;
+				&& value >= 0
+			) {
+				this._currentFrame = value;
+				
+				this.width = this._spritesheetRegions[this._currentFrame].width;
+				this.height = this._spritesheetRegions[this._currentFrame].height;
+			}
 		}
 		
 		public function get playing():Boolean {
@@ -33,37 +40,66 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function play():void {
-			
+			this._playing = true;
 		}
 		
 		public function stop():void {
-			
+			this._playing = false;
 		}
 		
 		public function gotoAndStop(frame:uint):void {
-			
+			this.currentFrame = frame;
+			this.stop();
 		}
 		
 		public function gotoAndPlay(frame:uint):void {
-			
+			this.currentFrame = frame;
+			this.play();
 		}
 		
 		public function nextFrame():void {
-			
+			this.gotoNextFrame();
+			this.stop();
 		}
 		
 		public function prevFrame():void {
-			
+			this.previousFrame();
+		}
+		
+		public function previousFrame():void {
+			this.gotoPreviousFrame();
+			this.stop();
 		}
 		
 		public override function hop():void {
 			super.hop();
 			
-			this._currentFrame
+			if (this.playing) {
+				this.gotoNextFrame();
+			}
+		}
+		
+		public override function get changed():Boolean {
+			return this._playing? true : super.changed;
+		}
+		
+		public override function get name():String {
+			super.name = !super.name && this._spritesheetRegions && this._spritesheetRegions.length > this.currentFrame?
+				this._spritesheetRegions[this.currentFrame].name : super.name;
+			
+			return super.name;
 		}
 		
 		private function gotoNextFrame():void {
-			
+			this.currentFrame = this._spritesheetRegions?
+				((this.currentFrame + 1 >= this._spritesheetRegions.length)? 0 : this.currentFrame + 1)
+				: 0;
+		}
+		
+		private function gotoPreviousFrame():void {
+			this.currentFrame = this._spritesheetRegions?
+				(this.currentFrame > 0? this.currentFrame - 1 : this._spritesheetRegions.length)
+				: 0;
 		}
 	}
 

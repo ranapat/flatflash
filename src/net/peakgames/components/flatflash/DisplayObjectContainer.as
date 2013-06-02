@@ -32,9 +32,33 @@ package net.peakgames.components.flatflash {
 			if (child) {
 				child.x = 0;
 				child.y = 0;
+				child.z = this.children.length + 1;
 				
 				this.children.push(child);
 			}
+		}
+		
+		public function swapChildren(childA:DisplayObject, childB:DisplayObject):void {
+			if (childA && childB) {
+				var tmp:Number = childA.z;
+				childA.z = childB.z;
+				childB.z = tmp;
+			}
+		}
+		
+		public function getChildAt(index:uint):DisplayObject {
+			return index >= 0 && index < this.children.length? this.children[index] : null;
+		}
+		
+		public function getChildByName(name:String):DisplayObject {
+			var length:uint = this.children.length;
+			for (var i:uint = 0; i < length; ++i) {
+				var child:DisplayObject = this.children[i];
+				if (child.name == name) {
+					return this.getChildAt(i);
+				}
+			}
+			return null;
 		}
 		
 		public function redraw():void {

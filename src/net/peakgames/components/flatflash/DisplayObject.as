@@ -11,13 +11,13 @@ package net.peakgames.components.flatflash {
 		private var _z:Number;
 		private var _width:Number;
 		private var _height:Number;
+		private var _name:String;
 		private var _changed:Boolean;
 		
 		private var _parent:DisplayObject;
 		private var _weakHolder:Dictionary;
 		
 		private var _spritesheetId:String;
-		
 		
 		public function DisplayObject(spritesheet:BitmapData = null, spritesheetId:String = null) {
 			this._weakHolder = new Dictionary(true);
@@ -68,6 +68,14 @@ package net.peakgames.components.flatflash {
 			return this._height;
 		}
 		
+		public function set name(value:String):void {
+			this._name = value;
+		}
+		
+		public function get name():String {
+			return this._name;
+		}
+		
 		public function get changed():Boolean {
 			return this._changed;
 		}
@@ -108,6 +116,10 @@ package net.peakgames.components.flatflash {
 		
 		public function get spritesheetRegion():Region {
 			return null;
+		}
+		
+		public function markChanged():void {
+			this._changed = true;
 		}
 	}
 
