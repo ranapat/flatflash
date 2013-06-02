@@ -99,10 +99,14 @@ package net.peakgames.components.flatflash {
 					}
 				}
 				
-				this.latestSpritesheet = latestSpritesheet;
-				this.latestSpritesheetId = latestSpritesheetId;
-				this.latestSlicer = latestSlicer;
-				this.latestSlicerType = latestSlicerType;
+				if (this.latestSpritesheetId != latestSpritesheetId) {
+					this.latestSpritesheet = latestSpritesheet;
+					this.latestSpritesheetId = latestSpritesheetId;
+				}
+				if (this.latestSlicerType != latestSlicerType) {
+					this.latestSlicer = latestSlicer;
+					this.latestSlicerType = latestSlicerType;
+				}
 				
 				bitmapData.unlock();
 			}
