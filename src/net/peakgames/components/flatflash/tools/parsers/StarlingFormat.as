@@ -10,6 +10,9 @@ package net.peakgames.components.flatflash.tools.parsers {
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.xml.XMLNode;
+	import net.peakgames.components.flatflash.tools.EngineTypes;
+	import net.peakgames.components.flatflash.tools.regions.Region;
+	import net.peakgames.components.flatflash.tools.regions.StarlingRegion;
 	
 	public class StarlingFormat extends EventDispatcher implements IParser {
 		private var xml:XML;
@@ -63,7 +66,7 @@ package net.peakgames.components.flatflash.tools.parsers {
 		}
 		
 		private function handleLoaderComplete(e:Event):void {
-			var result:ParseResult = new ParseResult(ParserTypes.TYPE_STARLING);
+			var result:ParseResult = new ParseResult(EngineTypes.TYPE_STARLING);
 			var regions:Vector.<StarlingRegion> = new Vector.<StarlingRegion>();
 			
 			var xml:XML = new XML(this.loader.data);

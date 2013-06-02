@@ -7,11 +7,17 @@ package net.peakgames.common.bitmaps {
 	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.PressAndTapGestureEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.text.TextField;
+	import flash.ui.Keyboard;
 	import flash.utils.getTimer
+	import net.peakgames.components.flatflash.DisplayObjectContainer;
+	import net.peakgames.components.flatflash.Image;
+	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
@@ -19,10 +25,11 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
 	import net.peakgames.components.flatflash.tools.parsers.ParseResult;
-	import net.peakgames.components.flatflash.tools.parsers.ParserTypes;
 	import net.peakgames.components.flatflash.tools.parsers.StarlingFormat;
+	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
+	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="60")]
+	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="59")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -48,6 +55,15 @@ package net.peakgames.common.bitmaps {
 		
 		private var assetsLoader:AssetsLoader;
 		
+		private var parseResult:ParseResult;
+		private var slicer:ISlicer;
+		
+		private var doc:DisplayObjectContainer;
+		private var i1:Image;
+		private var i2:Image;
+		
+		private var tf:TextField;
+		
 		[Embed(source="../../../../../assets/img1.png")]
 		private var Img1:Class;
 		[Embed(source="../../../../../assets/img2.png")]
@@ -56,22 +72,56 @@ package net.peakgames.common.bitmaps {
 		public function Main():void {
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
+			
+			
+		}
+		
+		private function handleKeyDown(e:KeyboardEvent):void {
+			trace("............ " + e.keyCode)
+			if (this.i1) {
+				if (e.keyCode == Keyboard.LEFT) {
+					this.i1.x -= 10;
+				} else if (e.keyCode == Keyboard.RIGHT) {
+					this.i1.x += 10;
+				} else if (e.keyCode == Keyboard.DOWN) {
+					this.i1.y += 10;
+				} else if (e.keyCode == Keyboard.UP) {
+					this.i1.y -= 10;
+				}
+			}
 		}
 		
 		private function init(e:Event = null):void {
+			this.stage.addEventListener(KeyboardEvent.KEY_DOWN, handleKeyDown);
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			this.assetsLoader = new AssetsLoader(ParserTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
 			
 			doSomething2();
+			
+			this.tf = new TextField();
+			this.tf.textColor = 0xffffff;
+			this.addChild(this.tf);
 		}
 		
 		private function handleAssetsLoaderComplete(e:LoaderEvent):void {
 			trace("............ loaded :: " + e.result.type + " .. " + e.result.bitmapData)
-			trace("???????????? " + AssetsKeeper.instance.keep(e.result.bitmapData));
+			trace("+++ " + e.result.regions)
+			
+			var spritesheetId:String = AssetsKeeper.instance.keep(e.result.bitmapData);
+			trace("???????????? " + spritesheetId);
+			
+			this.parseResult = e.result;
+			this.slicer = SlicerFactory.get(e.result.type);
+			
+			this.doc = new DisplayObjectContainer();
+			this.addChild(this.doc);
+			
+			this.i1 = new Image(e.result.bitmapData, spritesheetId, e.result.regions[0]);
+			this.doc.addChild(this.i1);
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -138,6 +188,29 @@ package net.peakgames.common.bitmaps {
 		}
 		
 		private function populateFromSlices(bitmapData:BitmapData):void {
+			if (this.parseResult) {
+				bitmapData.lock();
+				
+				bitmapData.fillRect(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight), 0x00000000);
+				
+				for (var p:uint = 0; p < 1; ++p ) {
+					for (var i:uint = 0; i < 6; ++i ) {
+						this.point.x = i * 100 + p;
+						for (var j:uint = 0; j < 4; ++j ) {
+							this.point.y = j * 100 + p;
+							
+							this.slicer.copyPixels(
+								this.parseResult.bitmapData, bitmapData,
+								this.parseResult.regions[slicesIndex], this.point
+							);
+						}
+					}
+				}
+				
+				slicesIndex = slicesIndex < this.parseResult.regions.length - 1? ++slicesIndex : 0;
+				
+				bitmapData.unlock();
+			}
 			/*
 			if (slices) {
 				bitmapData.fillRect(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight), 0x00000000);
@@ -163,14 +236,27 @@ package net.peakgames.common.bitmaps {
 		private function handleEnterFrame(e:Event):void {
 			var currentTime:Number = (getTimer() - startTime) / 1000;
 		  
-			populate(bitmapData2, 1);
+			//populate(bitmapData2, 1);
 			//populate(bitmapData2, 1000);
-			//populateFromSlices(bitmapData1);
+			populateFromSlices(bitmapData1);
+			if (this.i1) {
+				if (this.i1.x > this.stage.stageWidth) {
+					this.i1.x = 0;
+				} else {
+					this.i1.x += 1;
+				}
+				if (this.i1.y > this.stage.stageHeight) {
+					this.i1.y = 0;
+				} else {
+					this.i1.y += 1;
+				}
+			}
 			
 			++frames;
 			  
 			if (currentTime > 1) {
 				trace("...... frames " + frames)
+				this.tf.text = frames.toString();
 				
 				startTime = getTimer();
 				frames = 0;

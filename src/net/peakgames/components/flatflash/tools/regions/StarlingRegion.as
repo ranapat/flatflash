@@ -1,4 +1,6 @@
-package net.peakgames.components.flatflash.tools.parsers {
+package net.peakgames.components.flatflash.tools.regions {
+	import flash.geom.Rectangle;
+	import net.peakgames.components.flatflash.tools.EngineTypes;
 	
 	public class StarlingRegion extends Region {
 		public var frameX:Number = 0;
@@ -13,12 +15,13 @@ package net.peakgames.components.flatflash.tools.parsers {
 		) {
 			super(name, x, y, width, height);
 			
+			this._type = EngineTypes.TYPE_STARLING;
+			
 			this.frameX = frameX;
 			this.frameY = frameY;
 			this.frameWidth = frameWidth;
 			this.frameHeight = frameHeight;
 		}
-		
 	}
 
 }

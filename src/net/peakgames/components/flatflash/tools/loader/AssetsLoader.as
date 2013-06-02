@@ -3,11 +3,11 @@ package net.peakgames.components.flatflash.tools.loader {
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
 	import net.peakgames.components.flatflash.tools.parsers.ParseResult;
 	import net.peakgames.components.flatflash.tools.parsers.ParserFactory;
-	import net.peakgames.components.flatflash.tools.parsers.ParserTypes;
 	
 	[Event(name = "LoadComplete", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
 	[Event(name = "LoadFail", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
@@ -21,7 +21,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var parseResult:ParseResult;
 		
 		public function AssetsLoader(type:String, config:String, path:String) {
-			this.type = ParserTypes.validate(type);
+			this.type = EngineTypes.validate(type);
 			this.config = config;
 			this.path = path;
 			
@@ -84,7 +84,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function handleLoaderComplete(e:ResourceLoaderEvent):void {
-			if (this.type == ParserTypes.TYPE_STARLING) {
+			if (this.type == EngineTypes.TYPE_STARLING) {
 				this.handleImageBasedAssets(e);
 			}
 		}

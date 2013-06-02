@@ -1,5 +1,6 @@
 package net.peakgames.components.flatflash.tools.parsers {
 	import flash.display.BitmapData;
+	import net.peakgames.components.flatflash.tools.regions.Region;
 	public class ParseResult {
 		public var type:String;
 		public var path:String;

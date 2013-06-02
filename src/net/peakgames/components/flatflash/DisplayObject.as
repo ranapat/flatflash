@@ -3,10 +3,9 @@ package net.peakgames.components.flatflash {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
+	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class DisplayObject {
-		private var _weakHolder:Dictionary;
-		
 		private var _x:Number;
 		private var _y:Number;
 		private var _z:Number;
@@ -15,11 +14,19 @@ package net.peakgames.components.flatflash {
 		private var _changed:Boolean;
 		
 		private var _parent:DisplayObject;
+		private var _weakHolder:Dictionary;
 		
-		public function DisplayObject(spritesheet:BitmapData = null) {
+		private var _spritesheetId:String;
+		private var _spritesheetRegion:Region;
+		
+		public function DisplayObject(spritesheet:BitmapData = null, spritesheetId:String = null, spritesheetRegion:Region = null) {
 			this._weakHolder = new Dictionary(true);
 			
-			this.spritesheet = spritesheet;
+			this._weakHolder[spritesheet] = 1;
+			this._spritesheetId = spritesheetId;
+			this._spritesheetRegion = spritesheetRegion;
+			
+			this._changed = true;
 		}
 		
 		public function set x(value:Number):void {
@@ -89,17 +96,20 @@ package net.peakgames.components.flatflash {
 			this._changed = false;
 		}
 		
-		protected function get spritesheet():BitmapData {
+		public function get spritesheet():BitmapData {
 			for (var spritesheet:Object in this._weakHolder) {
-				return spritesheet;
+				return BitmapData(spritesheet);
 			}
 			return null;
 		}
 		
-		protected function set spritesheet(value:BitmapData):void {
-			this._weakHolder[value] = 1;
+		public function get spritesheetId():String {
+			return this._spritesheetId;
 		}
 		
+		public function get spritesheetRegion():Region {
+			return this._spritesheetRegion;
+		}
 	}
 
 }
