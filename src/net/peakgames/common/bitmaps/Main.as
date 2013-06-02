@@ -14,15 +14,12 @@ package net.peakgames.common.bitmaps {
 	import flash.utils.getTimer
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
-	import net.peakgames.components.flatflash.tools.parsers.BitmapDataRegion;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
-	import net.peakgames.components.flatflash.tools.parsers.IRegion;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
 	import net.peakgames.components.flatflash.tools.parsers.ParseResult;
 	import net.peakgames.components.flatflash.tools.parsers.ParserTypes;
 	import net.peakgames.components.flatflash.tools.parsers.StarlingFormat;
-	import net.peakgames.components.flatflash.tools.slicer.ImageSlicer;
 	
 	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="60")]
 	public class Main extends Sprite {
@@ -45,7 +42,6 @@ package net.peakgames.common.bitmaps {
 		private var spareBitmap2:Bitmap;
 		
 		private var slicesIndex:uint;
-		private var slices:Vector.<IRegion>;
 		
 		private var parser:IParser;
 		
@@ -66,15 +62,14 @@ package net.peakgames.common.bitmaps {
 			// entry point
 			
 			this.assetsLoader = new AssetsLoader(ParserTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
-			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
-			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
+			//this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
+			//this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
 			
 			doSomething2();
 		}
 		
 		private function handleAssetsLoaderComplete(e:LoaderEvent):void {
 			trace("............ loaded :: " + e.result.regions)
-			this.slices = e.result.regions;
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -141,6 +136,7 @@ package net.peakgames.common.bitmaps {
 		}
 		
 		private function populateFromSlices(bitmapData:BitmapData):void {
+			/*
 			if (slices) {
 				bitmapData.fillRect(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight), 0x00000000);
 				
@@ -158,6 +154,7 @@ package net.peakgames.common.bitmaps {
 				
 				slicesIndex = slicesIndex < slices.length - 1? ++slicesIndex : 0;
 			}
+			*/
 
 		}
 		

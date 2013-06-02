@@ -64,13 +64,19 @@ package net.peakgames.components.flatflash.tools.parsers {
 		
 		private function handleLoaderComplete(e:Event):void {
 			var result:ParseResult = new ParseResult();
-			result.regions = new Vector.<IRegion>();
+			var regions:Vector.<StarlingRegion> = new Vector.<StarlingRegion>();
 			
 			var xml:XML = new XML(this.loader.data);
 			result.path = xml.@imagePath;
-			for each (var subTexture:XML in xml.SubTexture){
-				result.regions.push(new BitmapDataRegion(Number(subTexture.@x), Number(subTexture.@y), Number(subTexture.@width), Number(subTexture.@height), subTexture.@name));
+			for each (var subTexture:XML in xml.SubTexture) {
+				regions.push(new StarlingRegion(
+					subTexture.@name,
+					Number(subTexture.@x), Number(subTexture.@y), Number(subTexture.@width), Number(subTexture.@height),
+					Number(subTexture.@frameX), Number(subTexture.@frameY), Number(subTexture.@frameWidth), Number(subTexture.@frameHeight)
+				));
 			}
+			
+			result.regions = Vector.<Region>(regions);
 			
 			this.dispatchEvent(new ParseEvent(ParseEvent.PARSE_COMPLETE, result));
 			

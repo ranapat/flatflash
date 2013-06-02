@@ -59,12 +59,12 @@ package net.peakgames.components.flatflash.tools.loader {
 				
 				this.progress = new Vector.<uint>();
 			} else {
-				throw new Error("Use static ::instance getter instead");
+				throw new Error("Use static ResourceLoader::instance getter instead");
 			}
 		}
 		
 		public function destroy():void {
-			++ResourceLoader._instances;
+			--ResourceLoader._instances;
 			
 			if (ResourceLoader._instances == 0) {
 				this.timeoutTimer.removeEventListener(TimerEvent.TIMER, this.handleTimeoutTimer);
@@ -78,7 +78,11 @@ package net.peakgames.components.flatflash.tools.loader {
 				this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, this.handleLoaderError);
 				this.loader.contentLoaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, this.handleLoaderError);
 				
-				this.loader.close();
+				if (this.loader.content) {
+					this.loader.unloadAndStop(true);
+				} else {
+					this.loader.close();
+				}
 				this.loader = null;
 				
 				this.queue = new Vector.<String>();
@@ -119,37 +123,43 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function handleTimeoutTimer(e:TimerEvent):void {
+			var length:uint = this.progress.length;
+			
 			this.progress[this.progress.length - 1] = ResourceLoader.TIMEOUT;
+			this.tryLoadNext();
+			
 			this.dispatchEvent(new ResourceLoaderEvent(
 				ResourceLoaderEvent.RESOURCE_FAIL,
-				this.progress.length - 1
+				length - 1
 			));
-			
-			this.tryLoadNext();
 		}
 		
 		private function handleLoaderComplete(e:Event):void {
+			var length:uint = this.progress.length;
+			
 			this.progress[this.progress.length - 1] = ResourceLoader.COMPLETE;
+			this.timeoutTimer.stop();
+			this.tryLoadNext();
+			
 			this.dispatchEvent(new ResourceLoaderEvent(
 				ResourceLoaderEvent.RESOURCE_COMPLETE,
-				this.progress.length - 1,
+				length - 1,
 				e.target,
 				e.target.applicationDomain
 			));
-			
-			this.timeoutTimer.stop();
-			this.tryLoadNext();
 		}
 		
 		private function handleLoaderError(e:IOErrorEvent):void {
-			this.progress[this.progress.length - 1] = ResourceLoader.ERROR;
-			this.dispatchEvent(new ResourceLoaderEvent(
-				ResourceLoaderEvent.RESOURCE_FAIL,
-				this.progress.length - 1
-			));
+			var length:uint = this.progress.length;
 			
+			this.progress[this.progress.length - 1] = ResourceLoader.ERROR;
 			this.timeoutTimer.stop();
 			this.tryLoadNext();
+			
+			this.dispatchEvent(new ResourceLoaderEvent(
+				ResourceLoaderEvent.RESOURCE_FAIL,
+				length - 1
+			));
 		}
 		
 	}

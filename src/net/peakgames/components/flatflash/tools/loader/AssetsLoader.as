@@ -3,14 +3,11 @@ package net.peakgames.components.flatflash.tools.loader {
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import net.peakgames.components.flatflash.tools.parsers.BitmapDataRegion;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
-	import net.peakgames.components.flatflash.tools.parsers.IRegion;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
 	import net.peakgames.components.flatflash.tools.parsers.ParseResult;
 	import net.peakgames.components.flatflash.tools.parsers.ParserFactory;
 	import net.peakgames.components.flatflash.tools.parsers.ParserTypes;
-	import net.peakgames.components.flatflash.tools.slicer.ImageSlicer;
 	
 	[Event(name = "LoadComplete", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
 	[Event(name = "LoadFail", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
@@ -46,11 +43,14 @@ package net.peakgames.components.flatflash.tools.loader {
 				this.loader.removeEventListener(ResourceLoaderEvent.RESOURCE_FAIL, this.handleLoaderFail);
 				
 				this.loader.destroy();
+				
+				this.loader = null;
 			}
 		}
 		
 		private function prepapre():void {
 			this.parser = ParserFactory.get(this.type, this.config);
+			
 			this.parser.addEventListener(ParseEvent.PARSE_COMPLETE, this.handleParserComplete);
 			this.parser.addEventListener(ParseEvent.PARSE_FAIL, this.handleParserFail);
 		}
@@ -58,13 +58,12 @@ package net.peakgames.components.flatflash.tools.loader {
 		private function handleImageBasedAssets(e:ResourceLoaderEvent):void {
 			var bitmap:Bitmap = Bitmap((e.postTarget.loader as Loader).content);
 			
-			var regions:Vector.<BitmapDataRegion> = Vector.<BitmapDataRegion>(this.parseResult.regions);
-			ImageSlicer.slice(bitmap.bitmapData, regions);
-			this.parseResult.regions = Vector.<IRegion>(regions);
+			trace("................");
 		}
 		
 		private function handleParserComplete(e:ParseEvent):void {
 			this.loader = ResourceLoader.instance;
+			
 			this.loader.addEventListener(ResourceLoaderEvent.RESOURCE_COMPLETE, this.handleLoaderComplete);
 			this.loader.addEventListener(ResourceLoaderEvent.RESOURCE_FAIL, this.handleLoaderFail);
 			
