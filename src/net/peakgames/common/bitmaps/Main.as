@@ -12,6 +12,7 @@ package net.peakgames.common.bitmaps {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer
+	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
@@ -62,14 +63,15 @@ package net.peakgames.common.bitmaps {
 			// entry point
 			
 			this.assetsLoader = new AssetsLoader(ParserTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
-			//this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
-			//this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
+			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
+			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
 			
 			doSomething2();
 		}
 		
 		private function handleAssetsLoaderComplete(e:LoaderEvent):void {
-			trace("............ loaded :: " + e.result.regions)
+			trace("............ loaded :: " + e.result.type + " .. " + e.result.bitmapData)
+			trace("???????????? " + AssetsKeeper.instance.keep(e.result.bitmapData));
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -121,8 +123,8 @@ package net.peakgames.common.bitmaps {
 			bitmapData.fillRect(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight), 0x00000000);
 			
 			for (var i:uint = 0; i < count; ++i) {
-				point.x = Math.random() * 500;
-				point.y = Math.random() * 300;
+				//point.x = Math.random() * 500;
+				//point.y = Math.random() * 300;
 				
 				bitmapData.copyPixels(Math.random() > .5? pic1BitmapData : pic2BitmapData, rectangle, point, null, null, true);
 			}
@@ -161,9 +163,9 @@ package net.peakgames.common.bitmaps {
 		private function handleEnterFrame(e:Event):void {
 			var currentTime:Number = (getTimer() - startTime) / 1000;
 		  
-			//populate(bitmapData1, 100);
+			populate(bitmapData2, 1);
 			//populate(bitmapData2, 1000);
-			populateFromSlices(bitmapData1);
+			//populateFromSlices(bitmapData1);
 			
 			++frames;
 			  

@@ -1,6 +1,7 @@
 package net.peakgames.components.flatflash {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.geom.Rectangle;
 	public class DisplayObjectContainer extends Bitmap {
 		private var children:Vector.<DisplayObject>;
 		

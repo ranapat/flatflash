@@ -55,10 +55,16 @@ package net.peakgames.components.flatflash.tools.loader {
 			this.parser.addEventListener(ParseEvent.PARSE_FAIL, this.handleParserFail);
 		}
 		
-		private function handleImageBasedAssets(e:ResourceLoaderEvent):void {
-			var bitmap:Bitmap = Bitmap((e.postTarget.loader as Loader).content);
+		private function prepareToDestroyLoadComplete():void {
+			this.dispatchEvent(new LoaderEvent(LoaderEvent.LOAD_COMPLETE, this.parseResult));
 			
-			trace("................");
+			this.destroy();
+		}
+		
+		private function handleImageBasedAssets(e:ResourceLoaderEvent):void {
+			this.parseResult.bitmapData = Bitmap((e.postTarget.loader as Loader).content).bitmapData;
+			
+			this.prepareToDestroyLoadComplete();
 		}
 		
 		private function handleParserComplete(e:ParseEvent):void {
@@ -81,10 +87,6 @@ package net.peakgames.components.flatflash.tools.loader {
 			if (this.type == ParserTypes.TYPE_STARLING) {
 				this.handleImageBasedAssets(e);
 			}
-			
-			this.dispatchEvent(new LoaderEvent(LoaderEvent.LOAD_COMPLETE, this.parseResult));
-			
-			this.destroy();
 		}
 		
 		private function handleLoaderFail(e:ResourceLoaderEvent):void {

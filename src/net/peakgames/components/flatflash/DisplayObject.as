@@ -2,8 +2,11 @@ package net.peakgames.components.flatflash {
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.Dictionary;
 	
 	public class DisplayObject {
+		private var _weakHolder:Dictionary;
+		
 		private var _x:Number;
 		private var _y:Number;
 		private var _z:Number;
@@ -13,8 +16,10 @@ package net.peakgames.components.flatflash {
 		
 		private var _parent:DisplayObject;
 		
-		public function DisplayObject() {
+		public function DisplayObject(spritesheet:BitmapData = null) {
+			this._weakHolder = new Dictionary(true);
 			
+			this.spritesheet = spritesheet;
 		}
 		
 		public function set x(value:Number):void {
@@ -82,6 +87,17 @@ package net.peakgames.components.flatflash {
 		
 		public function hop():void {
 			this._changed = false;
+		}
+		
+		protected function get spritesheet():BitmapData {
+			for (var spritesheet:Object in this._weakHolder) {
+				return spritesheet;
+			}
+			return null;
+		}
+		
+		protected function set spritesheet(value:BitmapData):void {
+			this._weakHolder[value] = 1;
 		}
 		
 	}

@@ -79,7 +79,7 @@ package net.peakgames.components.flatflash.tools.loader {
 				this.loader.contentLoaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, this.handleLoaderError);
 				
 				if (this.loader.content) {
-					this.loader.unloadAndStop(true);
+					this.loader.unloadAndStop(false);
 				} else {
 					this.loader.close();
 				}

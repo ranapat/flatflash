@@ -63,7 +63,7 @@ package net.peakgames.components.flatflash.tools.parsers {
 		}
 		
 		private function handleLoaderComplete(e:Event):void {
-			var result:ParseResult = new ParseResult();
+			var result:ParseResult = new ParseResult(ParserTypes.TYPE_STARLING);
 			var regions:Vector.<StarlingRegion> = new Vector.<StarlingRegion>();
 			
 			var xml:XML = new XML(this.loader.data);
