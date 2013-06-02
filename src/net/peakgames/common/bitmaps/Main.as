@@ -3,6 +3,7 @@ package net.peakgames.common.bitmaps {
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Graphics;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.StageDisplayState;
 	import flash.display.StageScaleMode;
@@ -17,6 +18,7 @@ package net.peakgames.common.bitmaps {
 	import flash.utils.getTimer
 	import net.peakgames.components.flatflash.DisplayObjectContainer;
 	import net.peakgames.components.flatflash.Image;
+	import net.peakgames.components.flatflash.DisplayObjectFactory;
 	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
@@ -116,12 +118,18 @@ package net.peakgames.common.bitmaps {
 			
 			this.parseResult = e.result;
 			this.slicer = SlicerFactory.get(e.result.type);
-			
+		
 			this.doc = new DisplayObjectContainer();
 			this.addChild(this.doc);
 			
-			this.i1 = new Image(e.result.bitmapData, spritesheetId, e.result.regions[0]);
+			this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, spritesheetId, e.result.regions[10]);
+			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0010")
 			this.doc.addChild(this.i1);
+			
+			/*
+			var test:MovieClip = new MovieClip();
+			test.prev
+			*/
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -193,7 +201,7 @@ package net.peakgames.common.bitmaps {
 				
 				bitmapData.fillRect(new Rectangle(0, 0, stage.stageWidth, stage.stageHeight), 0x00000000);
 				
-				for (var p:uint = 0; p < 1; ++p ) {
+				for (var p:uint = 0; p < 32; ++p ) {
 					for (var i:uint = 0; i < 6; ++i ) {
 						this.point.x = i * 100 + p;
 						for (var j:uint = 0; j < 4; ++j ) {

@@ -29,10 +29,12 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function addChild(child:DisplayObject):void {
-			child.x = 0;
-			child.y = 0;
-			
-			this.children.push(child);
+			if (child) {
+				child.x = 0;
+				child.y = 0;
+				
+				this.children.push(child);
+			}
 		}
 		
 		public function redraw():void {
@@ -52,22 +54,25 @@ package net.peakgames.components.flatflash {
 				var displayObject:DisplayObject;
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
-					displayObject.hop();
 					
-					if (latestSpritesheetId != displayObject.spritesheetId) {
-						latestSpritesheet = displayObject.spritesheet;
-						latestSpritesheetId = displayObject.spritesheetId;
+					if (displayObject.spritesheetRegion) {
+						displayObject.hop();
+						
+						if (latestSpritesheetId != displayObject.spritesheetId) {
+							latestSpritesheet = displayObject.spritesheet;
+							latestSpritesheetId = displayObject.spritesheetId;
+						}
+						
+						if (latestSlicerType != displayObject.spritesheetRegion.type) {
+							latestSlicerType = displayObject.spritesheetRegion.type;
+							latestSlicer = SlicerFactory.get(latestSlicerType);
+						}
+						
+						latestSlicer.copyPixels(
+							latestSpritesheet, bitmapData,
+							displayObject.spritesheetRegion, displayObject.position
+						);
 					}
-					
-					if (latestSlicerType != displayObject.spritesheetRegion.type) {
-						latestSlicerType = displayObject.spritesheetRegion.type;
-						latestSlicer = SlicerFactory.get(latestSlicerType);
-					}
-					
-					latestSlicer.copyPixels(
-						latestSpritesheet, bitmapData,
-						displayObject.spritesheetRegion, displayObject.position
-					);
 				}
 				
 				this.latestSpritesheet = latestSpritesheet;

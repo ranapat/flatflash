@@ -17,14 +17,13 @@ package net.peakgames.components.flatflash {
 		private var _weakHolder:Dictionary;
 		
 		private var _spritesheetId:String;
-		private var _spritesheetRegion:Region;
 		
-		public function DisplayObject(spritesheet:BitmapData = null, spritesheetId:String = null, spritesheetRegion:Region = null) {
+		
+		public function DisplayObject(spritesheet:BitmapData = null, spritesheetId:String = null) {
 			this._weakHolder = new Dictionary(true);
 			
 			this._weakHolder[spritesheet] = 1;
 			this._spritesheetId = spritesheetId;
-			this._spritesheetRegion = spritesheetRegion;
 			
 			this._changed = true;
 		}
@@ -108,7 +107,7 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function get spritesheetRegion():Region {
-			return this._spritesheetRegion;
+			return null;
 		}
 	}
 
