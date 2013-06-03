@@ -31,7 +31,7 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="59")]
+	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="24")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -61,7 +61,7 @@ package net.peakgames.common.bitmaps {
 		private var slicer:ISlicer;
 		
 		private var doc:DisplayObjectContainer;
-		private var i1:Image;
+		private var i1:MovieClip;
 		private var i2:MovieClip;
 		
 		private var tf:TextField;
@@ -110,7 +110,7 @@ package net.peakgames.common.bitmaps {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-1.xml", "../assets/");
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
 			
@@ -134,15 +134,104 @@ package net.peakgames.common.bitmaps {
 			this.doc = new DisplayObjectContainer();
 			this.addChild(this.doc);
 			
-			this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, spritesheetId, e.result.regions[10]);
+			this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, spritesheetId, e.result.regions[10]);
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0010")
+			this.i1.play();
 			this.doc.addChild(this.i1);
 			
-			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
-			this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
 			this.doc.addChild(this.i2);
 			this.i2.play();
+			
+			var p:uint;
+			var tt:MovieClip;
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 2 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 3 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 4 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 4 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 5 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 6 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 5 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 6 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 7 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
+			for (p = 0; p < 500; ++p) {
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt.x = 8 * 70 + p;
+				tt.y = p;
+				this.doc.addChild(tt);
+				tt.play();
+			}
 			
 			this.doc.swapChildren(this.i1, this.i2);
 			

@@ -13,8 +13,6 @@ package net.peakgames.components.flatflash {
 		private var latestSlicer:ISlicer;
 		private var latestSlicerType:String;
 		
-		public var backgroundColor:uint;
-		
 		public function DisplayObjectContainer() {
 			this.children = new Vector.<DisplayObject>();
 			
@@ -30,8 +28,8 @@ package net.peakgames.components.flatflash {
 		
 		public function addChild(child:DisplayObject):void {
 			if (child) {
-				child.x = 0;
-				child.y = 0;
+				child.x = isNaN(child.x)? 0 : child.x;
+				child.y = isNaN(child.y)? 0 : child.y;
 				child.z = this.children.length + 1;
 				
 				this.children.push(child);
@@ -43,7 +41,13 @@ package net.peakgames.components.flatflash {
 				var tmp:Number = childA.z;
 				childA.z = childB.z;
 				childB.z = tmp;
+				
+				this.reorder();
 			}
+		}
+		
+		public function reorder():void {
+			this.children = this.reorderedChildren;
 		}
 		
 		public function getChildAt(index:uint):DisplayObject {
@@ -71,9 +75,9 @@ package net.peakgames.components.flatflash {
 				
 				bitmapData.lock();
 				
-				bitmapData.fillRect(new Rectangle(0, 0, this.stage.stageWidth, this.stage.stageHeight), this.backgroundColor);
+				bitmapData.fillRect(bitmapData.rect, 0);
 				
-				var children:Vector.<DisplayObject> = this.reorderedChildren;
+				var children:Vector.<DisplayObject> = this.children;
 				var length:uint = this.children.length;
 				var displayObject:DisplayObject;
 				for (var i:uint = 0; i < length; ++i) {
@@ -145,7 +149,7 @@ package net.peakgames.components.flatflash {
 		private function handleAddedToStage(e:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
 			
-			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, this.backgroundColor);
+			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
 		}
 		
 		private function handleRemovedFromStage(e:Event):void {
