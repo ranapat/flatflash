@@ -110,7 +110,7 @@ package net.peakgames.common.bitmaps {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-1.xml", "../assets/");
+			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
 			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
 			
@@ -134,17 +134,17 @@ package net.peakgames.common.bitmaps {
 			this.doc = new DisplayObjectContainer();
 			this.addChild(this.doc);
 			
-			this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
 			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, spritesheetId, e.result.regions[10]);
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0010")
-			this.i1.play();
-			this.doc.addChild(this.i1);
+			//this.i1.play();
+			//this.doc.addChild(this.i1);
 			
-			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
-			this.doc.addChild(this.i2);
-			this.i2.play();
+			//this.doc.addChild(this.i2);
+			//this.i2.play();
 			
 			var p:uint;
 			var tt:MovieClip;
@@ -233,9 +233,9 @@ package net.peakgames.common.bitmaps {
 				tt.play();
 			}
 			
-			this.doc.swapChildren(this.i1, this.i2);
+			//this.doc.swapChildren(this.i1, this.i2);
 			
-			trace(this.doc.getChildAt(1).name)
+			//trace(this.doc.getChildAt(1).name)
 		}
 		
 		private function handleAssetsLoaderFail(e:LoaderEvent):void {
@@ -278,7 +278,7 @@ package net.peakgames.common.bitmaps {
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
 			//stage.fullScreenSourceRect = new Rectangle(0,0,320,240); 
-			stage.displayState = StageDisplayState.FULL_SCREEN; 	
+			//stage.displayState = StageDisplayState.FULL_SCREEN; 	
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 		}

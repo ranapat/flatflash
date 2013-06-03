@@ -92,7 +92,7 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function get rectangle():Rectangle {
-			return new Rectangle(0, 0, this.width, this.height);
+			return new Rectangle(this.x, this.y, this.width, this.height);
 		}
 		
 		public function get position():Point {
