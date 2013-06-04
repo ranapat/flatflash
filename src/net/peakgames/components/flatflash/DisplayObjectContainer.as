@@ -79,53 +79,29 @@ package net.peakgames.components.flatflash {
 				
 				bitmapData.fillRect(bitmapData.rect, 0);
 				
-				this.initializeEmptyMask();
-				
 				var children:Vector.<DisplayObject> = this.children;
 				var length:uint = this.children.length;
 				var displayObject:DisplayObject;
-				var visibleObjects:Vector.<Boolean> = new Vector.<Boolean>(length, true);
-				for (var ii:int = length - 1; ii >= 0; --ii) {
-					displayObject = children[ii];
-					displayObject.hop();
-
-					if (displayObject.spritesheetRegion) {
-						visibleObjects[ii] = this.markObjectInMask(displayObject.rectangle);
-					} else {
-						visibleObjects[ii] = false;
-					}
-				}
-				
-				var countOfDropped:uint = 0;
-				
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
 					
 					if (displayObject.spritesheetRegion) {
-						if (visibleObjects[i]) {
-							if (latestSpritesheetId != displayObject.spritesheetId) {
-								latestSpritesheet = displayObject.spritesheet;
-								latestSpritesheetId = displayObject.spritesheetId;
-							}
-							
-							if (latestSlicerType != displayObject.spritesheetRegion.type) {
-								latestSlicerType = displayObject.spritesheetRegion.type;
-								latestSlicer = SlicerFactory.get(latestSlicerType);
-							}
-							
-							latestSlicer.copyPixels(
-								latestSpritesheet, bitmapData,
-								displayObject.spritesheetRegion, displayObject.position
-							);
-						} else {
-							++countOfDropped;
+						if (latestSpritesheetId != displayObject.spritesheetId) {
+							latestSpritesheet = displayObject.spritesheet;
+							latestSpritesheetId = displayObject.spritesheetId;
 						}
+						
+						if (latestSlicerType != displayObject.spritesheetRegion.type) {
+							latestSlicerType = displayObject.spritesheetRegion.type;
+							latestSlicer = SlicerFactory.get(latestSlicerType);
+						}
+						
+						latestSlicer.copyPixels(
+							latestSpritesheet, bitmapData,
+							displayObject.spritesheetRegion, displayObject.position
+						);
 					}
 				}
-				
-				trace(".......... count of dropped " + countOfDropped + " .. " + (length - countOfDropped))
-				//this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
-				//return;
 				
 				if (this.latestSpritesheetId != latestSpritesheetId) {
 					this.latestSpritesheet = latestSpritesheet;
@@ -138,37 +114,6 @@ package net.peakgames.components.flatflash {
 				
 				bitmapData.unlock();
 			}
-		}
-		
-		private function initializeEmptyMask():void {
-			this.objectsMask = new Vector.<uint>(this.stage.stageWidth + this.stage.stageHeight, true);
-			/*
-			for (var pp:uint = 0; pp < this.stage.stageWidth; ++pp) {
-				for (var jj:uint = 0; jj < this.stage.stageHeight; ++jj) {
-					//objectsMask[pp + jj] = 0;
-				}
-			}
-			*/
-		}
-		
-		private function markObjectInMask(rectangle:Rectangle):Boolean {
-			var visible:Boolean;
-			
-			var objectsMask:Vector.<uint> = this.objectsMask;
-			var objectsMaskLength:uint = objectsMask.length;
-			var stageWidth:uint = this.stage.stageWidth;
-			var stageHeight:uint = this.stage.stageHeight;
-			
-			for (var i:uint = int(rectangle.x); rectangle.x + i < stageWidth; ++i) {
-				for (var j:uint = int(rectangle.y); rectangle.y + j < stageHeight; ++j) {
-					if (!this.objectsMask[rectangle.x + i + rectangle.y + j]) {
-						visible = true;
-					}
-					this.objectsMask[rectangle.x + i + rectangle.y + j] = 1;
-				}
-			}
-			
-			return visible;
 		}
 		
 		private function get shallRedraw():Boolean {
