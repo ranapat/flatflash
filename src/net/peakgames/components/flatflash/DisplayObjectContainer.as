@@ -84,6 +84,7 @@ package net.peakgames.components.flatflash {
 				var displayObject:DisplayObject;
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
+					displayObject.hop();
 					
 					if (displayObject.spritesheetRegion) {
 						if (latestSpritesheetId != displayObject.spritesheetId) {
