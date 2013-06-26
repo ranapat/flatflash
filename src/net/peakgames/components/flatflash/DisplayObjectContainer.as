@@ -68,7 +68,7 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function redraw():void {
-			if (this.stage && this.shallRedraw && this.bitmapData) {
+			if (this.stage && this.bitmapData && this.shallRedraw) {
 				var bitmapData:BitmapData = this.bitmapData;
 				var latestSpritesheet:BitmapData = this.latestSpritesheet;
 				var latestSpritesheetId:String = this.latestSpritesheetId;
