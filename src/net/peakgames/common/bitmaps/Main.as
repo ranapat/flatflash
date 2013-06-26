@@ -23,6 +23,8 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
+	import net.peakgames.components.flatflash.tools.loader.ResourceLoader;
+	import net.peakgames.components.flatflash.tools.loader.ResourceLoaderEvent;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
@@ -65,6 +67,8 @@ package net.peakgames.common.bitmaps {
 		private var i2:MovieClip;
 		
 		private var tf:TextField;
+		
+		private var loadRequestId:uint = -1;
 		
 		[Embed(source="../../../../../assets/img1.png")]
 		private var Img1:Class;
@@ -119,14 +123,31 @@ package net.peakgames.common.bitmaps {
 			this.tf = new TextField();
 			this.tf.textColor = 0xffffff;
 			this.addChild(this.tf);
+			
+			var loader:ResourceLoader = ResourceLoader.instance;
+			loader.addEventListener(ResourceLoaderEvent.RESOURCE_COMPLETE, this.handleResourceLoaderComplete);
+		}
+		
+		private function handleResourceLoaderComplete(e:ResourceLoaderEvent):void {
+			if (e.id == loadRequestId) {
+				
+				if (e.applicationDomain) {
+					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_1_Animation") as Class;
+
+					var tt:flash.display.MovieClip = new ClassDefinition();
+					tt.x = 200;
+					tt.y = 200;
+					
+					this.addChild(tt);
+					tt.play();
+				}
+				
+				
+			}
 		}
 		
 		private function handleAssetsLoaderComplete(e:LoaderEvent):void {
-			trace("............ loaded :: " + e.result.type + " .. " + e.result.bitmapData)
-			trace("+++ " + e.result.regions)
-			
 			var spritesheetId:String = AssetsKeeper.instance.keep(e.result.bitmapData);
-			trace("???????????? " + spritesheetId);
 			
 			this.parseResult = e.result;
 			this.slicer = SlicerFactory.get(e.result.type);
@@ -140,12 +161,13 @@ package net.peakgames.common.bitmaps {
 			//this.i1.play();
 			//this.doc.addChild(this.i1);
 			
-			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
-			//this.doc.addChild(this.i2);
-			//this.i2.play();
+			this.doc.addChild(this.i2);
+			this.i2.play();
 			
+			/*
 			var p:uint;
 			var tt:MovieClip;
 			for (p = 0; p < 500; ++p) {
@@ -232,6 +254,7 @@ package net.peakgames.common.bitmaps {
 				this.doc.addChild(tt);
 				tt.play();
 			}
+			*/
 			
 			//this.doc.swapChildren(this.i1, this.i2);
 			
@@ -347,6 +370,7 @@ package net.peakgames.common.bitmaps {
 
 		}
 		
+		private var frameNumber:Number = 0;
 		private function handleEnterFrame(e:Event):void {
 			var currentTime:Number = (getTimer() - startTime) / 1000;
 		  
@@ -366,9 +390,20 @@ package net.peakgames.common.bitmaps {
 				}
 			}
 			
+			if (++frameNumber == 4) {
+				/*
+				this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+				this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
+				this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
+				*/
+				
+				var loader:ResourceLoader = ResourceLoader.instance;
+				loadRequestId = loader.load("../assets/Untitled-n.swf");
+			}
+			
 			++frames;
 			  
-			if (currentTime > 1) {
+			if (currentTime > 50) {
 				//trace("...... frames " + frames)
 				this.tf.text = frames.toString();
 				

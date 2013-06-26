@@ -20,6 +20,8 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var loader:ResourceLoader;
 		private var parseResult:ParseResult;
 		
+		private var loaderRequestId:uint;
+		
 		public function AssetsLoader(type:String, config:String, path:String) {
 			this.type = EngineTypes.validate(type);
 			this.config = config;
@@ -74,7 +76,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this.loader.addEventListener(ResourceLoaderEvent.RESOURCE_FAIL, this.handleLoaderFail);
 			
 			this.parseResult = e.result;
-			this.loader.load(this.path + e.result.path);
+			this.loaderRequestId = this.loader.load(this.path + e.result.path);
 		}
 		
 		private function handleParserFail(e:ParseEvent):void {
@@ -84,7 +86,10 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function handleLoaderComplete(e:ResourceLoaderEvent):void {
-			if (this.type == EngineTypes.TYPE_STARLING) {
+			if (
+				this.type == EngineTypes.TYPE_STARLING
+				&& this.loaderRequestId == e.id
+			) {
 				this.handleImageBasedAssets(e);
 			}
 		}

@@ -6,10 +6,10 @@ package net.peakgames.components.flatflash.tools.loader {
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
 	import flash.events.UncaughtErrorEvent;
-	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
-	import flash.utils.Timer;
 	import flash.system.ApplicationDomain;
+	import flash.net.URLRequest;
+	import flash.utils.Timer;
 	
 	[Event(name = "ResourceComplete", type = "net.peakgames.components.flatflash.tools.loader.ResourceLoaderEvent")]
 	[Event(name = "ResourceFail", type = "net.peakgames.components.flatflash.tools.loader.ResourceLoaderEvent")]
@@ -19,7 +19,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		public static const ERROR:uint = 2;
 		public static const TIMEOUT:uint = 3;
 		
-		private static const TIMEOUT_INTERVAL:int = 60 * 1000;
+		private static const TIMEOUT_INTERVAL:uint = 60 * 1000;
 		
 		private static var _instance:ResourceLoader;
 		private static var _allowInstance:Boolean;
@@ -95,7 +95,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			}
 		}
 		
-		public function load(url:String):int {
+		public function load(url:String):uint {
 			this.queue.push(url);
 			this.tryLoadNext();
 			
@@ -137,29 +137,29 @@ package net.peakgames.components.flatflash.tools.loader {
 		private function handleLoaderComplete(e:Event):void {
 			var length:uint = this.progress.length;
 			
-			this.progress[this.progress.length - 1] = ResourceLoader.COMPLETE;
-			this.timeoutTimer.stop();
-			this.tryLoadNext();
-			
 			this.dispatchEvent(new ResourceLoaderEvent(
 				ResourceLoaderEvent.RESOURCE_COMPLETE,
 				length - 1,
 				e.target,
 				e.target.applicationDomain
 			));
+			
+			this.progress[this.progress.length - 1] = ResourceLoader.COMPLETE;
+			this.timeoutTimer.stop();
+			this.tryLoadNext();
 		}
 		
 		private function handleLoaderError(e:IOErrorEvent):void {
 			var length:uint = this.progress.length;
 			
-			this.progress[this.progress.length - 1] = ResourceLoader.ERROR;
-			this.timeoutTimer.stop();
-			this.tryLoadNext();
-			
 			this.dispatchEvent(new ResourceLoaderEvent(
 				ResourceLoaderEvent.RESOURCE_FAIL,
 				length - 1
 			));
+			
+			this.progress[this.progress.length - 1] = ResourceLoader.ERROR;
+			this.timeoutTimer.stop();
+			this.tryLoadNext();
 		}
 		
 	}
