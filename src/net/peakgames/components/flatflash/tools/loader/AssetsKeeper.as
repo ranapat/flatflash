@@ -45,9 +45,6 @@ package net.peakgames.components.flatflash.tools.loader {
 		
 		public function removeAll():void {
 			this._storage = new Dictionary();
-			this._storage = null;
-			
-			this._storage = new Dictionary();
 		}
 		
 	}
