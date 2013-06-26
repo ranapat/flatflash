@@ -90,6 +90,10 @@ package net.peakgames.components.flatflash {
 			return super.name;
 		}
 		
+		public override function get shareSpritesheetInUse():Boolean {
+			return true;
+		}
+		
 		private function gotoNextFrame():void {
 			this.currentFrame = this._spritesheetRegions?
 				((this.currentFrame + 1 >= this._spritesheetRegions.length)? 0 : this.currentFrame + 1)

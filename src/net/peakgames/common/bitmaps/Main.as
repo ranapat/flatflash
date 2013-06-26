@@ -20,11 +20,14 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.DisplayObjectFactory;
 	import net.peakgames.components.flatflash.MovieClip;
 	import net.peakgames.components.flatflash.tools.EngineTypes;
+	import net.peakgames.components.flatflash.tools.joiners.BitmapDataVectorJoiner;
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
-	import net.peakgames.components.flatflash.tools.loader.AssetsLoader;
+	import net.peakgames.components.flatflash.tools.loader.AtlasLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
 	import net.peakgames.components.flatflash.tools.loader.ResourceLoader;
 	import net.peakgames.components.flatflash.tools.loader.ResourceLoaderEvent;
+	import net.peakgames.components.flatflash.tools.math.RectangleSize;
+	import net.peakgames.components.flatflash.tools.math.RectangleSizeCalculator;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.IParser;
 	import net.peakgames.components.flatflash.tools.parsers.ParseEvent;
@@ -57,7 +60,7 @@ package net.peakgames.common.bitmaps {
 		
 		private var parser:IParser;
 		
-		private var assetsLoader:AssetsLoader;
+		private var atlasLoader:AtlasLoader;
 		
 		private var parseResult:ParseResult;
 		private var slicer:ISlicer;
@@ -114,9 +117,9 @@ package net.peakgames.common.bitmaps {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
-			this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
-			this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
+			this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+			this.atlasLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAtlasLoaderComplete);
+			this.atlasLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAtlasLoaderFail);
 			
 			doSomething2();
 			
@@ -134,19 +137,51 @@ package net.peakgames.common.bitmaps {
 				if (e.applicationDomain) {
 					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_1_Animation") as Class;
 
-					var tt:flash.display.MovieClip = new ClassDefinition();
+					tt = new ClassDefinition();
 					tt.x = 200;
 					tt.y = 200;
 					
 					this.addChild(tt);
-					tt.play();
+					tt.gotoAndStop(1);
+					
+					ttt = new Vector.<BitmapData>();
+					
+					tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
 				}
 				
 				
 			}
 		}
+		private var tt:flash.display.MovieClip;
 		
-		private function handleAssetsLoaderComplete(e:LoaderEvent):void {
+		private var ttt:Vector.<BitmapData>;
+		private var frame:uint = 0;
+		private function handleTTEnterFrame(e:Event):void {
+			var clip:flash.display.MovieClip = e.target as flash.display.MovieClip;
+			
+			trace("............. " + clip.currentFrame + " .. " + clip.totalFrames + " .. " + frame)
+			if (clip.currentFrame <= clip.totalFrames) {
+				if (frame != clip.currentFrame) {
+					frame = clip.currentFrame;
+					trace("++++++ " + frame)
+				
+					var tttt:BitmapData = new BitmapData(clip.width, clip.height);
+					tttt.draw(clip);
+					ttt.push(tttt);
+					
+					clip.nextFrame();
+				} else {
+					clip.removeEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
+				
+					trace("we are here...................... " + ttt.length)
+					
+					var tt:BitmapDataVectorJoiner = new BitmapDataVectorJoiner();
+					tt.toAtlas(
+				}
+			}
+		}
+		
+		private function handleAtlasLoaderComplete(e:LoaderEvent):void {
 			var spritesheetId:String = AssetsKeeper.instance.keep(e.result.bitmapData);
 			
 			this.parseResult = e.result;
@@ -261,7 +296,7 @@ package net.peakgames.common.bitmaps {
 			//trace(this.doc.getChildAt(1).name)
 		}
 		
-		private function handleAssetsLoaderFail(e:LoaderEvent):void {
+		private function handleAtlasLoaderFail(e:LoaderEvent):void {
 			
 		}
 		
@@ -391,12 +426,6 @@ package net.peakgames.common.bitmaps {
 			}
 			
 			if (++frameNumber == 4) {
-				/*
-				this.assetsLoader = new AssetsLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
-				this.assetsLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAssetsLoaderComplete);
-				this.assetsLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAssetsLoaderFail);
-				*/
-				
 				var loader:ResourceLoader = ResourceLoader.instance;
 				loadRequestId = loader.load("../assets/Untitled-n.swf");
 			}

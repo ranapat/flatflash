@@ -11,7 +11,7 @@ package net.peakgames.components.flatflash.tools.loader {
 	
 	[Event(name = "LoadComplete", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
 	[Event(name = "LoadFail", type = "net.peakgames.components.flatflash.tools.loader.LoaderEvent")]
-	public class AssetsLoader extends EventDispatcher {
+	public class AtlasLoader extends EventDispatcher {
 		public var type:String;
 		public var config:String;
 		public var path:String;
@@ -22,7 +22,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		
 		private var loaderRequestId:uint;
 		
-		public function AssetsLoader(type:String, config:String, path:String) {
+		public function AtlasLoader(type:String, config:String, path:String) {
 			this.type = EngineTypes.validate(type);
 			this.config = config;
 			this.path = path;

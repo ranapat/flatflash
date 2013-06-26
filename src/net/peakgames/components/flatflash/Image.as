@@ -20,6 +20,10 @@ package net.peakgames.components.flatflash {
 		public override function get spritesheetRegion():Region {
 			return this._spritesheetRegion;
 		}
+		
+		public override function get shareSpritesheetInUse():Boolean {
+			return true;
+		}
 	}
 
 }

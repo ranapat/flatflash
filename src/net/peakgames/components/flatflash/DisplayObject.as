@@ -118,6 +118,10 @@ package net.peakgames.components.flatflash {
 			return null;
 		}
 		
+		public function get shareSpritesheetInUse():Boolean {
+			return false;
+		}
+		
 		public function markChanged():void {
 			this._changed = true;
 		}
