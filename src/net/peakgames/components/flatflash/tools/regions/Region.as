@@ -6,10 +6,10 @@ package net.peakgames.components.flatflash.tools.regions {
 		protected var _type:String;
 		private var _name:String;
 		
-		public function Region(name:String, x:Number = 0, y:Number = 0, width:Number = 0, height:Number = 0) {
+		public function Region(name:String, x:Number = 0, y:Number = 0, width:Number = 0, height:Number = 0, type:String = EngineTypes.TYPE_UNDEFINED) {
 			super(x, y, width, height);
 			
-			this._type = EngineTypes.TYPE_UNDEFINED;
+			this._type = type;
 			this._name = name;
 		}
 		

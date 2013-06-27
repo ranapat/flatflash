@@ -20,12 +20,13 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var loader:ResourceLoader;
 		private var parseResult:ParseResult;
 		
-		private var loaderRequestId:uint;
+		private var loaderRequestId:int;
 		
 		public function AtlasLoader(type:String, config:String, path:String) {
 			this.type = EngineTypes.validate(type);
 			this.config = config;
 			this.path = path;
+			this.loaderRequestId = -1;
 			
 			this.prepapre();
 		}

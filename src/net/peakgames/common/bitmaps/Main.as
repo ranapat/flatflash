@@ -1,6 +1,7 @@
 package net.peakgames.common.bitmaps {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.BlendMode;
 	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.display.Sprite;
@@ -9,6 +10,7 @@ package net.peakgames.common.bitmaps {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.PressAndTapGestureEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -21,6 +23,7 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.MovieClip;
 	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.joiners.BitmapDataVectorJoiner;
+	import net.peakgames.components.flatflash.tools.joiners.JoinResult;
 	import net.peakgames.components.flatflash.tools.loader.AssetsKeeper;
 	import net.peakgames.components.flatflash.tools.loader.AtlasLoader;
 	import net.peakgames.components.flatflash.tools.loader.LoaderEvent;
@@ -36,7 +39,7 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="24")]
+	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="60")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -71,7 +74,7 @@ package net.peakgames.common.bitmaps {
 		
 		private var tf:TextField;
 		
-		private var loadRequestId:uint = -1;
+		private var loadRequestId:int = -1;
 		
 		[Embed(source="../../../../../assets/img1.png")]
 		private var Img1:Class;
@@ -147,6 +150,16 @@ package net.peakgames.common.bitmaps {
 					ttt = new Vector.<BitmapData>();
 					
 					tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
+					
+					/*
+					for (var i:uint = 0; i < 500; ++i) {
+						tt = new ClassDefinition();
+						tt.x = 200 + i;
+						tt.y = 200 + i;
+						
+						this.addChild(tt);
+					}
+					*/
 				}
 				
 				
@@ -159,24 +172,43 @@ package net.peakgames.common.bitmaps {
 		private function handleTTEnterFrame(e:Event):void {
 			var clip:flash.display.MovieClip = e.target as flash.display.MovieClip;
 			
-			trace("............. " + clip.currentFrame + " .. " + clip.totalFrames + " .. " + frame)
 			if (clip.currentFrame <= clip.totalFrames) {
 				if (frame != clip.currentFrame) {
 					frame = clip.currentFrame;
-					trace("++++++ " + frame)
 				
-					var tttt:BitmapData = new BitmapData(clip.width, clip.height);
+					var tttt:BitmapData = new BitmapData(clip.width, clip.height, true, 0);
 					tttt.draw(clip);
+					
+					this.doc.bitmapData.copyPixels(tttt, new Rectangle(0, 0, tttt.width, tttt.height), new Point(0, 200), null, null, true);
+					
 					ttt.push(tttt);
 					
 					clip.nextFrame();
 				} else {
 					clip.removeEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
 				
-					trace("we are here...................... " + ttt.length)
-					
 					var tt:BitmapDataVectorJoiner = new BitmapDataVectorJoiner();
-					tt.toAtlas(
+					var f:JoinResult = tt.toAtlas(ttt);
+					trace(f.bitmapData)
+					trace(f.regions)
+					
+					var key:String = AssetsKeeper.instance.keep(f.bitmapData);
+					/*
+					var newMovie:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+					newMovie.x = 400;
+					newMovie.y = 200;
+					newMovie.play();
+					this.doc.addChild(newMovie);
+					*/
+					
+					for (var i:uint = 0; i < 15; ++i) {
+						trace("..........")
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						newMovieN.x = 400 + i;
+						newMovieN.y = 200 + i;
+						newMovieN.play();
+						this.doc.addChild(newMovieN);
+					}
 				}
 			}
 		}
@@ -432,7 +464,7 @@ package net.peakgames.common.bitmaps {
 			
 			++frames;
 			  
-			if (currentTime > 50) {
+			if (currentTime > 1) {
 				//trace("...... frames " + frames)
 				this.tf.text = frames.toString();
 				
