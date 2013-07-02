@@ -17,6 +17,7 @@ package net.peakgames.common.bitmaps {
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer
+	import net.hires.debug.Stats;
 	import net.peakgames.components.flatflash.DisplayObjectContainer;
 	import net.peakgames.components.flatflash.Image;
 	import net.peakgames.components.flatflash.DisplayObjectFactory;
@@ -39,7 +40,7 @@ package net.peakgames.common.bitmaps {
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="640", height="480", backgroundColor="0x000000", frameRate="60")]
+	[SWF(width="1920", height="1200", backgroundColor="0x000000", frameRate="60")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -132,6 +133,8 @@ package net.peakgames.common.bitmaps {
 			
 			var loader:ResourceLoader = ResourceLoader.instance;
 			loader.addEventListener(ResourceLoaderEvent.RESOURCE_COMPLETE, this.handleResourceLoaderComplete);
+			
+			addChild(new Stats());
 		}
 		
 		private function handleResourceLoaderComplete(e:ResourceLoaderEvent):void {
@@ -140,6 +143,24 @@ package net.peakgames.common.bitmaps {
 				if (e.applicationDomain) {
 					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_1_Animation") as Class;
 
+					/*
+					for (var j:uint = 0; j < 2; ++j) {
+						for (var i:uint = 0; i < 750; ++i) {
+							tt = new ClassDefinition();
+							tt.x = 200 + j * 100 + i;
+							tt.y = 200 + i;
+							
+							this.addChild(tt);
+							//tt.gotoAndStop(1);
+							tt.play();
+							
+							//ttt = new Vector.<BitmapData>();
+							
+							//tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
+						}
+					}
+					*/
+					
 					tt = new ClassDefinition();
 					tt.x = 200;
 					tt.y = 200;
@@ -150,6 +171,7 @@ package net.peakgames.common.bitmaps {
 					ttt = new Vector.<BitmapData>();
 					
 					tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
+					
 					
 					/*
 					for (var i:uint = 0; i < 500; ++i) {
@@ -201,10 +223,42 @@ package net.peakgames.common.bitmaps {
 					this.doc.addChild(newMovie);
 					*/
 					
-					for (var i:uint = 0; i < 15; ++i) {
-						trace("..........")
+					for (var i:uint = 0; i < 750; ++i) {
+						//trace("..........")
 						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
 						newMovieN.x = 400 + i;
+						newMovieN.y = 200 + i;
+						newMovieN.play();
+						this.doc.addChild(newMovieN);
+					}
+					for (var i:uint = 0; i < 750; ++i) {
+						//trace("..........")
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						newMovieN.x = 800 + i;
+						newMovieN.y = 200 + i;
+						newMovieN.play();
+						this.doc.addChild(newMovieN);
+					}
+					for (var i:uint = 0; i < 750; ++i) {
+						//trace("..........")
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						newMovieN.x = 100 + i;
+						newMovieN.y = 200 + i;
+						newMovieN.play();
+						this.doc.addChild(newMovieN);
+					}
+					for (var i:uint = 0; i < 750; ++i) {
+						//trace("..........")
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						newMovieN.x = 200 + i;
+						newMovieN.y = 200 + i;
+						newMovieN.play();
+						this.doc.addChild(newMovieN);
+					}
+					for (var i:uint = 0; i < 750; ++i) {
+						//trace("..........")
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						newMovieN.x = 300 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
@@ -231,8 +285,8 @@ package net.peakgames.common.bitmaps {
 			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
-			this.doc.addChild(this.i2);
-			this.i2.play();
+			//this.doc.addChild(this.i2);
+			//this.i2.play();
 			
 			/*
 			var p:uint;
@@ -367,8 +421,8 @@ package net.peakgames.common.bitmaps {
 			
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
-			//stage.fullScreenSourceRect = new Rectangle(0,0,320,240); 
-			//stage.displayState = StageDisplayState.FULL_SCREEN; 	
+			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
+			stage.displayState = StageDisplayState.FULL_SCREEN; 	
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 		}
