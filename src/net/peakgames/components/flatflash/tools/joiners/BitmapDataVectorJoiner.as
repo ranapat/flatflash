@@ -7,12 +7,9 @@ package net.peakgames.components.flatflash.tools.joiners {
 	import net.peakgames.components.flatflash.tools.math.RectangleSizeCalculator;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
-	public class BitmapDataVectorJoiner implements IJoiner
-	{
-		
-		public function BitmapDataVectorJoiner() {
-			
-		}
+	public class BitmapDataVectorJoiner implements IJoiner {
+		private static const MAX_WIDTH:Number = 2000;
+		private static const MAX_HEIGHT:Number = 2000;
 		
 		public function toAtlas(...args):JoinResult {
 			var result:JoinResult;
@@ -21,38 +18,45 @@ package net.peakgames.components.flatflash.tools.joiners {
 				var bitmaps:Vector.<BitmapData> = args[0] as Vector.<BitmapData>;
 				if (bitmaps && bitmaps.length) {
 					var rectangleSize:RectangleSize = RectangleSizeCalculator.getSize(bitmaps.length);
-					var bitmapData:BitmapData = new BitmapData(rectangleSize.columns * bitmaps[0].width, rectangleSize.rows * bitmaps[0].height, true, 0);
-					var regions:Vector.<Region> = new Vector.<Region>();
 					
-					var length:uint = bitmaps.length;
-					var tmp:BitmapData;
-					var row:uint = 0;
-					var column:uint = 0;
-					for (var i:uint = 0; i < length; ++i) {
-						tmp = bitmaps[i];
-						bitmapData.copyPixels(
-							tmp,
-							new Rectangle(0, 0, tmp.width, tmp.height),
-							new Point(column * tmp.width, row * tmp.height),
-							null, null,
-							true
-						);
-						regions.push(new Region(
-							"region-" + i,
-							column * tmp.width, row * tmp.height,
-							tmp.width, tmp.height,
-							EngineTypes.TYPE_STARLING
-						));
+					var width:Number = rectangleSize.columns * bitmaps[0].width;
+					var height:Number = rectangleSize.rows * bitmaps[0].height;
+					
+					if (width < BitmapDataVectorJoiner.MAX_WIDTH && height < BitmapDataVectorJoiner.MAX_HEIGHT) {
+						var bitmapData:BitmapData = new BitmapData(rectangleSize.columns * bitmaps[0].width, rectangleSize.rows * bitmaps[0].height, true, 0);
+						var regions:Vector.<Region> = new Vector.<Region>();
 						
-						if (column < rectangleSize.columns - 1) {
-							++column;
-						} else {
-							column = 0;
-							++row;
+						var tmp:BitmapData;
+						var row:uint = 0;
+						var column:uint = 0;
+						var i:uint;
+						var length:uint = bitmaps.length;
+						for (i = 0; i < length; ++i) {
+							tmp = bitmaps[i];
+							bitmapData.copyPixels(
+								tmp,
+								new Rectangle(0, 0, tmp.width, tmp.height),
+								new Point(column * tmp.width, row * tmp.height),
+								null, null,
+								true
+							);
+							regions.push(new Region(
+								"region-" + i,
+								column * tmp.width, row * tmp.height,
+								tmp.width, tmp.height,
+								EngineTypes.TYPE_STARLING
+							));
+							
+							if (column < rectangleSize.columns - 1) {
+								++column;
+							} else {
+								column = 0;
+								++row;
+							}
 						}
+						
+						result = new JoinResult(bitmapData, regions);
 					}
-					
-					result = new JoinResult(bitmapData, regions);
 				}
 			}
 			

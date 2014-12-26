@@ -6,9 +6,6 @@ package net.peakgames.components.flatflash.tools.slicers {
 	
 	public class StarlingSlicer implements ISlicer {
 		
-		public function StarlingSlicer() {
-		}
-		
 		public function copyPixels(
 			source:BitmapData, destination:BitmapData,
 			sourceRegion:Region, destinationPoint:Point,

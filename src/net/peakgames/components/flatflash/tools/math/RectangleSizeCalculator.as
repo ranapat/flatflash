@@ -2,10 +2,6 @@ package net.peakgames.components.flatflash.tools.math {
 	
 	public class RectangleSizeCalculator {
 		
-		public function RectangleSizeCalculator() {
-			
-		}
-		
 		public static function getSize(items:uint):RectangleSize {
 			var prevX:uint = 1;
 			var prevY:uint = items;

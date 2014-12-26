@@ -6,8 +6,8 @@ package net.peakgames.components.flatflash {
 	public class Image extends DisplayObject {
 		private var _spritesheetRegion:Region;
 		
-		public function Image(spritesheet:BitmapData = null, spritesheetId:String = null, spritesheetRegion:Region = null) {
-			super(spritesheet, spritesheetId);
+		public function Image(spritesheet:BitmapData = null, spritesheetRegion:Region = null) {
+			super(spritesheet);
 			
 			this._spritesheetRegion = spritesheetRegion;
 			
@@ -19,10 +19,6 @@ package net.peakgames.components.flatflash {
 		
 		public override function get spritesheetRegion():Region {
 			return this._spritesheetRegion;
-		}
-		
-		public override function get shareSpritesheetInUse():Boolean {
-			return true;
 		}
 	}
 

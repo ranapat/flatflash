@@ -8,8 +8,8 @@ package net.peakgames.components.flatflash {
 		private var _currentFrame:uint;
 		private var _playing:Boolean;
 		
-		public function MovieClip(spritesheet:BitmapData = null, spritesheetId:String = null, spritesheetRegions:Vector.<Region> = null) {
-			super(spritesheet, spritesheetId);
+		public function MovieClip(spritesheet:BitmapData = null, spritesheetRegions:Vector.<Region> = null) {
+			super(spritesheet);
 			
 			this._spritesheetRegions = spritesheetRegions;
 		}
@@ -90,20 +90,18 @@ package net.peakgames.components.flatflash {
 			return super.name;
 		}
 		
-		public override function get shareSpritesheetInUse():Boolean {
-			return true;
-		}
-		
 		private function gotoNextFrame():void {
 			this.currentFrame = this._spritesheetRegions?
 				((this.currentFrame + 1 >= this._spritesheetRegions.length)? 0 : this.currentFrame + 1)
-				: 0;
+				: 0
+			;
 		}
 		
 		private function gotoPreviousFrame():void {
 			this.currentFrame = this._spritesheetRegions?
 				(this.currentFrame > 0? this.currentFrame - 1 : this._spritesheetRegions.length)
-				: 0;
+				: 0
+			;
 		}
 	}
 

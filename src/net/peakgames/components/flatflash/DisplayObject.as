@@ -3,34 +3,38 @@ package net.peakgames.components.flatflash {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
+	
+	import net.peakgames.components.flatflash.tools.Tools;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class DisplayObject {
 		private var _x:Number;
 		private var _y:Number;
-		private var _z:Number;
+		private var _depth:Number;
 		private var _width:Number;
 		private var _height:Number;
 		private var _name:String;
 		private var _changed:Boolean;
 		
-		private var _parent:DisplayObject;
+		private var _parent:DisplayObjectContainer;
 		private var _weakHolder:Dictionary;
+		private var _strongHolder:BitmapData;
 		
-		private var _spritesheetId:String;
-		
-		public function DisplayObject(spritesheet:BitmapData = null, spritesheetId:String = null) {
+		public function DisplayObject(spritesheet:BitmapData = null) {
+			Tools.ensureAbstractClass(this, DisplayObject);
+			
 			this._weakHolder = new Dictionary(true);
-			
 			this._weakHolder[spritesheet] = 1;
-			this._spritesheetId = spritesheetId;
 			
-			this._changed = true;
+			this._strongHolder = null;
+			
+			this.markChanged();
 		}
 		
 		public function set x(value:Number):void {
 			this._x = value;
-			this._changed = true;
+			
+			this.markChanged();
 		}
 		public function get x():Number {
 			return this._x;
@@ -38,23 +42,26 @@ package net.peakgames.components.flatflash {
 		
 		public function set y(value:Number):void {
 			this._y = value;
-			this._changed = true;
+			
+			this.markChanged();
 		}
 		public function get y():Number {
 			return this._y;
 		}
 		
-		public function set z(value:Number):void {
-			this._z = value;
-			this._changed = true;
+		public function set depth(value:Number):void {
+			this._depth = value;
+			
+			this.markChanged();
 		}
-		public function get z():Number {
-			return this._z;
+		public function get depth():Number {
+			return this._depth;
 		}
 		
 		public function set width(value:Number):void {
 			this._width = value;
-			this._changed = true;
+			
+			this.markChanged();
 		}
 		public function get width():Number {
 			return this._width;
@@ -62,7 +69,8 @@ package net.peakgames.components.flatflash {
 		
 		public function set height(value:Number):void {
 			this._height = value;
-			this._changed = true;
+			
+			this.markChanged();
 		}
 		public function get height():Number {
 			return this._height;
@@ -80,10 +88,10 @@ package net.peakgames.components.flatflash {
 			return this._changed;
 		}
 		
-		public function set parent(value:DisplayObject):void {
+		public function set parent(value:DisplayObjectContainer):void {
 			this._parent = value;
 		}
-		public function get parent():DisplayObject {
+		public function get parent():DisplayObjectContainer {
 			return this._parent;
 		}
 		
@@ -110,19 +118,15 @@ package net.peakgames.components.flatflash {
 			return null;
 		}
 		
-		public function get spritesheetId():String {
-			return this._spritesheetId;
-		}
-		
 		public function get spritesheetRegion():Region {
 			return null;
 		}
 		
-		public function get shareSpritesheetInUse():Boolean {
-			return false;
+		public function set keepSpritesheet(value:Boolean):void {
+			this._strongHolder = value? this.spritesheet : null;
 		}
 		
-		public function markChanged():void {
+		protected function markChanged():void {
 			this._changed = true;
 		}
 	}

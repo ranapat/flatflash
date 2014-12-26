@@ -1,6 +1,7 @@
 package net.peakgames.components.flatflash.tools.loader {
 	import flash.display.BitmapData;
 	import flash.utils.Dictionary;
+	
 	public class AssetsKeeper {
 		private static var _instance:AssetsKeeper;
 		private static var _allowInstance:Boolean;

@@ -5,11 +5,10 @@ package net.peakgames.components.flatflash {
 	import flash.geom.Rectangle;
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
+	
 	public class DisplayObjectContainer extends Bitmap {
 		private var children:Vector.<DisplayObject>;
 		
-		private var latestSpritesheet:BitmapData;
-		private var latestSpritesheetId:String;
 		private var latestSlicer:ISlicer;
 		private var latestSlicerType:String;
 		
@@ -20,7 +19,6 @@ package net.peakgames.components.flatflash {
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
 			this.addEventListener(Event.ENTER_FRAME, this.handleEnterFrame, false, 0, true);
-			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
 		}
 		
 		public function destroy():void {
@@ -32,7 +30,8 @@ package net.peakgames.components.flatflash {
 			if (child) {
 				child.x = isNaN(child.x)? 0 : child.x;
 				child.y = isNaN(child.y)? 0 : child.y;
-				child.z = this.children.length + 1;
+				child.depth = this.children.length;
+				child.parent = this;
 				
 				this.children.push(child);
 			}
@@ -40,9 +39,9 @@ package net.peakgames.components.flatflash {
 		
 		public function swapChildren(childA:DisplayObject, childB:DisplayObject):void {
 			if (childA && childB) {
-				var tmp:Number = childA.z;
-				childA.z = childB.z;
-				childB.z = tmp;
+				var tmp:Number = childA.depth;
+				childA.depth = childB.depth;
+				childB.depth = tmp;
 				
 				this.reorder();
 			}
@@ -70,8 +69,6 @@ package net.peakgames.components.flatflash {
 		public function redraw():void {
 			if (this.stage && this.bitmapData && this.shallRedraw) {
 				var bitmapData:BitmapData = this.bitmapData;
-				var latestSpritesheet:BitmapData = this.latestSpritesheet;
-				var latestSpritesheetId:String = this.latestSpritesheetId;
 				var latestSlicer:ISlicer = this.latestSlicer;
 				var latestSlicerType:String = this.latestSlicerType;
 				
@@ -87,27 +84,22 @@ package net.peakgames.components.flatflash {
 					displayObject.hop();
 					
 					if (displayObject.spritesheetRegion) {
-						if (latestSpritesheetId != displayObject.spritesheetId) {
-							latestSpritesheet = displayObject.spritesheet;
-							latestSpritesheetId = displayObject.spritesheetId;
-						}
-						
 						if (latestSlicerType != displayObject.spritesheetRegion.type) {
 							latestSlicerType = displayObject.spritesheetRegion.type;
 							latestSlicer = SlicerFactory.get(latestSlicerType);
 						}
 						
-						latestSlicer.copyPixels(
-							latestSpritesheet, bitmapData,
-							displayObject.spritesheetRegion, displayObject.position
-						);
+						try {
+							latestSlicer.copyPixels(
+								displayObject.spritesheet, bitmapData,
+								displayObject.spritesheetRegion, displayObject.position
+							);
+						} catch (e:Error) {
+							//
+						}
 					}
 				}
 				
-				if (this.latestSpritesheetId != latestSpritesheetId) {
-					this.latestSpritesheet = latestSpritesheet;
-					this.latestSpritesheetId = latestSpritesheetId;
-				}
 				if (this.latestSlicerType != latestSlicerType) {
 					this.latestSlicer = latestSlicer;
 					this.latestSlicerType = latestSlicerType;
@@ -138,9 +130,9 @@ package net.peakgames.components.flatflash {
 		}
 		
 		private function sortByZ(objA:DisplayObject, objB:DisplayObject):int {
-			if (objA.z > objB.z) {
+			if (objA.depth > objB.depth) {
 				return 1;
-			} else if (objA.z < objB.z) {
+			} else if (objA.depth < objB.depth) {
 				return -1;
 			} else {
 				return 1;
@@ -150,15 +142,16 @@ package net.peakgames.components.flatflash {
 		private function handleAddedToStage(e:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
 			
+			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
+			
 			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
 		}
 		
 		private function handleRemovedFromStage(e:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage);
+			
 			this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
 			
-			this.latestSpritesheet = null;
-			this.latestSpritesheetId = null;
 			this.latestSlicer = null;
 			this.latestSlicerType = null;
 			

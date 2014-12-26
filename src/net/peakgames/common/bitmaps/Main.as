@@ -2,7 +2,6 @@ package net.peakgames.common.bitmaps {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.BlendMode;
-	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.display.Sprite;
 	import flash.display.StageDisplayState;
@@ -16,12 +15,18 @@ package net.peakgames.common.bitmaps {
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
-	import flash.utils.getTimer
+	import flash.utils.getTimer;
+	import net.peakgames.components.flatflash.tools.loader.SwfTracer;
+	import net.peakgames.components.flatflash.tools.loader.SwfTracerEvent;
+	
 	import net.hires.debug.Stats;
+	
+	import net.peakgames.components.flatflash.DisplayObject;
 	import net.peakgames.components.flatflash.DisplayObjectContainer;
-	import net.peakgames.components.flatflash.Image;
 	import net.peakgames.components.flatflash.DisplayObjectFactory;
+	import net.peakgames.components.flatflash.Image;
 	import net.peakgames.components.flatflash.MovieClip;
+	
 	import net.peakgames.components.flatflash.tools.EngineTypes;
 	import net.peakgames.components.flatflash.tools.joiners.BitmapDataVectorJoiner;
 	import net.peakgames.components.flatflash.tools.joiners.JoinResult;
@@ -70,7 +75,7 @@ package net.peakgames.common.bitmaps {
 		private var slicer:ISlicer;
 		
 		private var doc:DisplayObjectContainer;
-		private var i1:MovieClip;
+		private var i1:DisplayObject;
 		private var i2:MovieClip;
 		
 		private var tf:TextField;
@@ -129,6 +134,7 @@ package net.peakgames.common.bitmaps {
 			
 			this.tf = new TextField();
 			this.tf.textColor = 0xffffff;
+			this.tf.x = 100
 			this.addChild(this.tf);
 			
 			var loader:ResourceLoader = ResourceLoader.instance;
@@ -137,15 +143,33 @@ package net.peakgames.common.bitmaps {
 			addChild(new Stats());
 		}
 		
+		private var _ClassDefinition:Class;
 		private function handleResourceLoaderComplete(e:ResourceLoaderEvent):void {
 			if (e.id == loadRequestId) {
 				
 				if (e.applicationDomain) {
-					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_1_Animation") as Class;
+					SwfTracer.instance.stage = this.stage;
+					SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, this.handleSwfTracerComplete, false, 0, true);
+					SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, this.handleSwfTracerFail, false, 0, true);
+					
+					
+					SwfTracer.instance.get(e.applicationDomain, "Test_Image");
+					SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
+					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
+					SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
+					SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
+					
+					
+					
+					return;
+					var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Resize_Animation") as Class;
+					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
+					_ClassDefinition = ClassDefinition;
+					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Serhat_1") as Class;
 
 					/*
-					for (var j:uint = 0; j < 2; ++j) {
-						for (var i:uint = 0; i < 750; ++i) {
+					for (var j:uint = 0; j < 1; ++j) {
+						for (var i:uint = 0; i < 200; ++i) {
 							tt = new ClassDefinition();
 							tt.x = 200 + j * 100 + i;
 							tt.y = 200 + i;
@@ -172,7 +196,6 @@ package net.peakgames.common.bitmaps {
 					
 					tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
 					
-					
 					/*
 					for (var i:uint = 0; i < 500; ++i) {
 						tt = new ClassDefinition();
@@ -187,6 +210,29 @@ package net.peakgames.common.bitmaps {
 				
 			}
 		}
+		
+		private function handleSwfTracerFail(e:SwfTracerEvent):void 
+		{
+			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error)
+		}
+		
+		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
+			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
+				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
+				newMovie.keepSpritesheet = true;
+				newMovie.x = 400 + Math.random() * 100 * 5;
+				newMovie.y = 200;
+				newMovie.play();
+				this.doc.addChild(newMovie);
+			} else if (e.resultType == SwfTracer.TYPE_SPRITE) {
+				var newImage:Image = new Image(e.result.bitmapData, e.result.regions[0]);
+				newImage.keepSpritesheet = true;
+				newImage.x = 400;
+				newImage.y = 200;
+				this.doc.addChild(newImage);
+			}
+		}
+		
 		private var tt:flash.display.MovieClip;
 		
 		private var ttt:Vector.<BitmapData>;
@@ -209,28 +255,40 @@ package net.peakgames.common.bitmaps {
 				} else {
 					clip.removeEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
 				
+					trace("total frames... " + ttt.length)
+					
 					var tt:BitmapDataVectorJoiner = new BitmapDataVectorJoiner();
 					var f:JoinResult = tt.toAtlas(ttt);
 					trace(f.bitmapData)
 					trace(f.regions)
 					
-					var key:String = AssetsKeeper.instance.keep(f.bitmapData);
-					/*
-					var newMovie:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+					//AssetsKeeper.instance.keep(f.bitmapData);
+					
+					var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
 					newMovie.x = 400;
 					newMovie.y = 200;
 					newMovie.play();
 					this.doc.addChild(newMovie);
-					*/
 					
-					for (var i:uint = 0; i < 750; ++i) {
+					
+					/**/
+					for (var i:uint = 0; i < 1; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
+						newMovieN.keepSpritesheet = true;
 						newMovieN.x = 400 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
+						
+						var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
+						newnewMovieN.x = 600 + i;
+						newnewMovieN.y = 200 + i;
+						newnewMovieN.play();
+						this.addChild(newnewMovieN);
 					}
+					
+					/*
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
 						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
@@ -263,12 +321,13 @@ package net.peakgames.common.bitmaps {
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
 					}
+					*/
 				}
 			}
 		}
 		
 		private function handleAtlasLoaderComplete(e:LoaderEvent):void {
-			var spritesheetId:String = AssetsKeeper.instance.keep(e.result.bitmapData);
+			AssetsKeeper.instance.keep(e.result.bitmapData);
 			
 			this.parseResult = e.result;
 			this.slicer = SlicerFactory.get(e.result.type);
@@ -276,15 +335,15 @@ package net.peakgames.common.bitmaps {
 			this.doc = new DisplayObjectContainer();
 			this.addChild(this.doc);
 			
-			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
-			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, spritesheetId, e.result.regions[10]);
-			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0010")
+			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, e.result.regions[10]);
+			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, e.result.regions, "Item_8_Animation0010")
 			//this.i1.play();
 			//this.doc.addChild(this.i1);
 			
-			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
-			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, spritesheetId, e.result.regions, 1, 3);
-			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, spritesheetId, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
+			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, e.result.regions, 1, 3);
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
 			//this.doc.addChild(this.i2);
 			//this.i2.play();
 			
@@ -292,84 +351,84 @@ package net.peakgames.common.bitmaps {
 			var p:uint;
 			var tt:MovieClip;
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 2 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 3 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 4 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 4 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 5 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 6 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 5 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 6 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 7 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
 				tt.play();
 			}
 			for (p = 0; p < 500; ++p) {
-				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, spritesheetId, e.result.regions);
+				tt = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 				tt.x = 8 * 70 + p;
 				tt.y = p;
 				this.doc.addChild(tt);
@@ -446,6 +505,7 @@ package net.peakgames.common.bitmaps {
 		}
 		
 		private function populateFromSlices(bitmapData:BitmapData):void {
+			return;
 			if (this.parseResult) {
 				bitmapData.lock();
 				
@@ -520,7 +580,7 @@ package net.peakgames.common.bitmaps {
 			  
 			if (currentTime > 1) {
 				//trace("...... frames " + frames)
-				this.tf.text = frames.toString();
+				this.tf.text = "frames: " + frames.toString();
 				
 				startTime = getTimer();
 				frames = 0;
