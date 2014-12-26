@@ -17,7 +17,7 @@ package net.peakgames.components.flatflash {
 			this.height = spritesheetRegion.height;
 		}
 		
-		public override function get spritesheetRegion():Region {
+		override public function get spritesheetRegion():Region {
 			return this._spritesheetRegion;
 		}
 	}

@@ -9,13 +9,15 @@ package net.peakgames.components.flatflash.tools.loader {
 		public var id:uint;
 		public var postTarget:Object;
 		public var applicationDomain:ApplicationDomain;
+		public var fps:uint;
 		
-		public function ResourceLoaderEvent(type:String, id:uint = 0, target:Object = null, applicationDomain:ApplicationDomain = null) {
+		public function ResourceLoaderEvent(type:String, id:uint = 0, target:Object = null, applicationDomain:ApplicationDomain = null, fps:uint = 0) {
 			super(type);
 			
 			this.id = id;
 			this.postTarget = target;
 			this.applicationDomain = applicationDomain;
+			this.fps = fps;
 		}
 		
 	}

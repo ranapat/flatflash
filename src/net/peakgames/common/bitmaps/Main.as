@@ -146,22 +146,21 @@ package net.peakgames.common.bitmaps {
 		private var _ClassDefinition:Class;
 		private function handleResourceLoaderComplete(e:ResourceLoaderEvent):void {
 			if (e.id == loadRequestId) {
-				
 				if (e.applicationDomain) {
 					SwfTracer.instance.stage = this.stage;
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, this.handleSwfTracerComplete, false, 0, true);
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, this.handleSwfTracerFail, false, 0, true);
 					
 					
-					SwfTracer.instance.get(e.applicationDomain, "Test_Image");
-					SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
-					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
-					SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
-					SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Image", e.fps);
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2", e.fps);
+					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps);
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation", e.fps);
+					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING", e.fps);
 					
 					
 					
-					return;
+					//return;
 					var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Resize_Animation") as Class;
 					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
 					_ClassDefinition = ClassDefinition;
@@ -213,12 +212,15 @@ package net.peakgames.common.bitmaps {
 		
 		private function handleSwfTracerFail(e:SwfTracerEvent):void 
 		{
-			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error)
+			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + e.fps)
 		}
 		
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
+			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + e.fps)
+			
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
+				newMovie.fps = e.fps;
 				newMovie.keepSpritesheet = true;
 				newMovie.x = 400 + Math.random() * 100 * 5;
 				newMovie.y = 200;
@@ -272,7 +274,7 @@ package net.peakgames.common.bitmaps {
 					
 					
 					/**/
-					for (var i:uint = 0; i < 1; ++i) {
+					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
 						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
 						newMovieN.keepSpritesheet = true;
@@ -281,11 +283,13 @@ package net.peakgames.common.bitmaps {
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
 						
+						/**/
 						var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
 						newnewMovieN.x = 600 + i;
 						newnewMovieN.y = 200 + i;
 						newnewMovieN.play();
 						this.addChild(newnewMovieN);
+						/**/
 					}
 					
 					/*

@@ -91,6 +91,7 @@ package net.peakgames.components.flatflash {
 		public function set parent(value:DisplayObjectContainer):void {
 			this._parent = value;
 		}
+		
 		public function get parent():DisplayObjectContainer {
 			return this._parent;
 		}

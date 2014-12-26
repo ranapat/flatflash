@@ -3,6 +3,7 @@ package net.peakgames.components.flatflash {
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import flash.utils.getTimer;
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
@@ -14,11 +15,24 @@ package net.peakgames.components.flatflash {
 		
 		private var objectsMask:Vector.<uint>;
 		
+		private var enterFrameStartTime:Number;
+		private var totalFrames:uint;
+		private var latestTotalFrames:uint;
+		
 		public function DisplayObjectContainer() {
 			this.children = new Vector.<DisplayObject>();
+			this.enterFrameStartTime = 0;
+			this.latestTotalFrames = 0;
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
-			this.addEventListener(Event.ENTER_FRAME, this.handleEnterFrame, false, 0, true);
+		}
+		
+		public function get fps():uint {
+			return this.latestTotalFrames;
+		}
+		
+		public function get tfp():Number {
+			return this.enterFrameStartTime;
 		}
 		
 		public function destroy():void {
@@ -143,6 +157,7 @@ package net.peakgames.components.flatflash {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
 			
 			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
+			this.addEventListener(Event.ENTER_FRAME, this.handleEnterFrame, false, 0, true);
 			
 			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
 		}
@@ -160,6 +175,16 @@ package net.peakgames.components.flatflash {
 		
 		private function handleEnterFrame(e:Event):void {
 			this.redraw();
+			
+			/*
+			++this.totalFrames;
+			if ((getTimer() - this.enterFrameStartTime) / 1000 > 1) {
+				this.latestTotalFrames = this.totalFrames;
+				
+				this.enterFrameStartTime = getTimer();
+				this.totalFrames = 0;
+			}
+			*/
 		}
 		
 	}

@@ -31,6 +31,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var _currentType:String;
 		private var _currentTraced:DisplayObjectContainer;
 		private var _currentTracedBitmaps:Vector.<BitmapData>;
+		private var _currentTracedFps:uint;
 		private var _currentTargetPreviousFrame:uint;
 		
 		private var _totalFramesCopiesThisFrame:uint;
@@ -66,15 +67,15 @@ package net.peakgames.components.flatflash.tools.loader {
 			
 		}
 
-		public function get(applicationDomain:ApplicationDomain, className:String):uint {
-			this.enqueue(++this._index, applicationDomain, className);
+		public function get(applicationDomain:ApplicationDomain, className:String, fps:uint):uint {
+			this.enqueue(++this._index, applicationDomain, className, fps);
 			this.tryToDequeue();
 			
 			return this._index;
 		}
 		
-		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String):void {
-			this._queue.push(new QueueObject(key, applicationDomain, className));
+		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String, fps:uint):void {
+			this._queue.push(new QueueObject(key, applicationDomain, className, fps));
 		}
 		
 		private function tryToDequeue():void {
@@ -84,6 +85,7 @@ package net.peakgames.components.flatflash.tools.loader {
 				var item:QueueObject = this._queue.shift();
 				
 				this._currentKey = item.key;
+				this._currentTracedFps = item.fps;
 
 				try {
 					var ClassDefinition:Class = item.applicationDomain.getDefinition(item.className) as Class;
@@ -115,7 +117,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function failCurrentTask(e:Error):void {
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, e));
+			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, this._currentTracedFps, e));
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -125,13 +127,14 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTraced = null;
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
+			this._currentTracedFps = 0;
 			this._currentTargetPreviousFrame = 0;
 			
 			this.tryToDequeue();
 		}
 		
 		private function finalizeCurrentTask():void {
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, this._currentType, this._bitmapDataJoiner.toAtlas(this._currentTracedBitmaps), null));
+			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, this._currentType, this._bitmapDataJoiner.toAtlas(this._currentTracedBitmaps), this._currentTracedFps, null));
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -141,6 +144,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTraced = null;
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
+			this._currentTracedFps = 0;
 			this._currentTargetPreviousFrame = 0;
 			
 			this.tryToDequeue();
@@ -183,11 +187,13 @@ class QueueObject {
 	public var key:uint;
 	public var applicationDomain:ApplicationDomain;
 	public var className:String;
+	public var fps:uint;
 	
-	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String) {
+	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String, fps:uint) {
 		this.key = key;
 		this.applicationDomain = applicationDomain;
 		this.className = className;
+		this.fps = fps;
 	}
 	
 }

@@ -135,13 +135,16 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function handleLoaderComplete(e:Event):void {
+			var fps:uint;
+			try { fps = this.loader.contentLoaderInfo.frameRate; } catch (e:Error) { fps = 0; }
 			var length:uint = this.progress.length;
 			
 			this.dispatchEvent(new ResourceLoaderEvent(
 				ResourceLoaderEvent.RESOURCE_COMPLETE,
 				length - 1,
 				e.target,
-				e.target.applicationDomain
+				e.target.applicationDomain,
+				fps
 			));
 			
 			this.progress[this.progress.length - 1] = ResourceLoader.COMPLETE;
