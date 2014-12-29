@@ -2,7 +2,7 @@ package net.peakgames.components.flatflash.tools {
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 	
-	public final class Tools {
+	final public class Tools {
 		
 		public static function ensureAbstractClass(instance:Object, _class:Class):void {
 			var className:String = getQualifiedClassName(instance);

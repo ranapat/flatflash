@@ -3,7 +3,7 @@ package net.peakgames.components.flatflash {
 	import net.peakgames.components.flatflash.Image;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
-	public class DisplayObjectFactory {
+	final public class DisplayObjectFactory {
 		
 		public static function getImageByRegion(spritesheet:BitmapData, region:Region):Image {
 			return new Image(spritesheet, region);

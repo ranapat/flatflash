@@ -1,5 +1,6 @@
 package net.peakgames.components.flatflash.tools {
-	public class EngineTypes {
+	
+	final public class EngineTypes {
 		public static const TYPE_UNDEFINED:String = "undefined";
 		public static const TYPE_STARLING:String = "starling";
 		
