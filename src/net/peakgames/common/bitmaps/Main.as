@@ -156,8 +156,8 @@ package net.peakgames.common.bitmaps {
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
 					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
-					for (var i:uint = 1; i <= 160; ++i) {
-						SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", "Item_8_Animation");
+					for (var i:uint = 1; i <= 1; ++i) {
+						SwfTracer.instance.get(e.applicationDomain, "FixedAnimationSequence", "Shit");
 					}
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
@@ -221,12 +221,14 @@ package net.peakgames.common.bitmaps {
 		
 		private var totalLoaded:uint;
 		private var yOffset:uint;
+		private var fps:uint = 0;
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
 			//trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + totalLoaded + " .. " + yOffset)
 			
 			/**/
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
+				newMovie.fps = ++this.fps;
 				newMovie.keepSpritesheet = true;
 				newMovie.x = 400 + (100 * totalLoaded);
 				newMovie.y = 200 + yOffset;
@@ -279,34 +281,34 @@ package net.peakgames.common.bitmaps {
 					
 					//AssetsKeeper.instance.keep(f.bitmapData);
 					
-					var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
-					newMovie.x = 400;
-					newMovie.y = 200;
-					newMovie.play();
-					this.doc.addChild(newMovie);
+					//var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
+					//newMovie.x = 400;
+					//newMovie.y = 200;
+					//newMovie.play();
+					//this.doc.addChild(newMovie);
 					
 					
-					/*
-					for (var i:uint = 0; i < 750; ++i) {
+					/**/
+					for (var i:uint = 0; i < 0; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
-						newMovieN.keepSpritesheet = true;
-						newMovieN.x = 400 + i;
-						newMovieN.y = 200 + i;
-						newMovieN.play();
-						this.doc.addChild(newMovieN);
+						//var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
+						//newMovieN.keepSpritesheet = true;
+						//newMovieN.x = 400 + i;
+						//newMovieN.y = 200 + i;
+						//newMovieN.play();
+						//this.doc.addChild(newMovieN);
 						
 						if (i % 2 == 0 || i % 3 == 0 || i % 4 == 0) {
 							//this.doc.removeChild(newMovieN);
 						}
 						
-						//var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
-						//newnewMovieN.x = 600 + i;
-						//newnewMovieN.y = 200 + i;
-						//newnewMovieN.play();
-						//this.addChild(newnewMovieN);
+						var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
+						newnewMovieN.x = 600 + i;
+						newnewMovieN.y = 200 + i;
+						newnewMovieN.play();
+						this.addChild(newnewMovieN);
 					}
-					*/
+					/**/
 					trace("count after cleanup is " + this.doc.numChildren)
 					
 					/*
@@ -353,7 +355,7 @@ package net.peakgames.common.bitmaps {
 			this.parseResult = e.result;
 			this.slicer = SlicerFactory.get(e.result.type);
 		
-			this.doc = new DisplayObjectContainer();
+			this.doc = new DisplayObjectContainer(2);
 			this.addChild(this.doc);
 			
 			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);

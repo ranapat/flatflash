@@ -114,7 +114,7 @@ package net.peakgames.components.flatflash {
 			return new Point(this.x, this.y);
 		}
 		
-		public function hop():void {
+		public function hop(timer:int):void {
 			this._changed = false;
 		}
 		

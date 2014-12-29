@@ -3,17 +3,30 @@ package net.peakgames.components.flatflash {
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	import flash.utils.clearTimeout;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
 	import net.peakgames.components.flatflash.tools.slicers.SlicerFactory;
 	
 	public class DisplayObjectContainer extends Bitmap {
+		private var render:uint;
+		
 		private var children:Vector.<DisplayObject>;
 		
 		private var latestSlicer:ISlicer;
 		private var latestSlicerType:String;
 		
-		public function DisplayObjectContainer() {
+		private var _fps:uint;
+		private var _cfps:uint;
+		
+		private var startTime:int;
+		private var frames:uint;
+		private var loopTimeout:uint;
+		
+		public function DisplayObjectContainer(render:uint = 0) {
+			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
+			
 			this.children = new Vector.<DisplayObject>();
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
@@ -97,7 +110,7 @@ package net.peakgames.components.flatflash {
 				var displayObject:DisplayObject;
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
-					displayObject.hop();
+					displayObject.hop(getTimer() - this.startTime);
 					
 					if (displayObject.spritesheetRegion) {
 						if (latestSlicerType != displayObject.spritesheetRegion.type) {
@@ -127,6 +140,18 @@ package net.peakgames.components.flatflash {
 		
 		public function get numChildren():uint {
 			return this.children.length;
+		}
+		
+		public function set fps(value:uint):void {
+			this._fps = value;
+		}
+		
+		public function get fps():uint {
+			return this._fps;
+		}
+		
+		public function get cfps():uint {
+			return this._cfps;
 		}
 		
 		private function get shallRedraw():Boolean {
@@ -159,11 +184,44 @@ package net.peakgames.components.flatflash {
 			}
 		}
 		
+		private function loop():void {
+			this.calculateFPS();
+			
+			this.loopTimeout = setTimeout(this.loop, 1000 / this.fps);
+			
+			this.redraw();
+		}
+		
+		private function initFPSCounter():void {
+			this.startTime = getTimer();
+			this.frames = 1;
+			this._cfps = this.fps;
+		}
+		
+		private function calculateFPS():void {
+			if ((getTimer() - startTime) / 1000 > 1) {
+				this._cfps = this.frames;
+				this.startTime = getTimer();
+				this.frames = 1;
+			} else {
+				++this.frames;
+			}
+		}
+		
 		private function handleAddedToStage(e:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
 			
 			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
-			this.addEventListener(Event.ENTER_FRAME, this.handleEnterFrame, false, 0, true);
+			
+			this.fps = this.stage.frameRate;
+			
+			this.initFPSCounter();
+			
+			if (this.render == Settings.RENDER_TYPE_ENTER_FRAME) {
+				this.addEventListener(Event.ENTER_FRAME, this.handleEnterFrame, false, 0, true);
+			} else if (this.render == Settings.RENDER_TYPE_LOOP) {
+				this.loopTimeout = setTimeout(this.loop, 1000 / this.fps);
+			}
 			
 			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
 		}
@@ -171,15 +229,22 @@ package net.peakgames.components.flatflash {
 		private function handleRemovedFromStage(e:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage);
 			
-			this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
+			if (this.render == Settings.RENDER_TYPE_ENTER_FRAME) {
+				this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
+			}
 			
 			this.latestSlicer = null;
 			this.latestSlicerType = null;
 			
 			this.bitmapData = null;
+			
+			clearTimeout(this.loopTimeout);
+			this.loopTimeout = 0;
 		}
 		
 		private function handleEnterFrame(e:Event):void {
+			this.calculateFPS();
+			
 			this.redraw();
 		}
 		
