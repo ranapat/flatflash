@@ -90,6 +90,12 @@ package net.peakgames.components.flatflash {
 		
 		public function set parent(value:DisplayObjectContainer):void {
 			this._parent = value;
+			
+			if (value) {
+				this.handleAddedToContainer();
+			} else {
+				this.handleRemovedFromContainer();
+			}
 		}
 		
 		public function get parent():DisplayObjectContainer {
@@ -129,6 +135,14 @@ package net.peakgames.components.flatflash {
 		
 		protected function markChanged():void {
 			this._changed = true;
+		}
+		
+		protected function handleAddedToContainer():void {
+			//
+		}
+		
+		protected function handleRemovedFromContainer():void {
+			//
 		}
 	}
 

@@ -13,8 +13,6 @@ package net.peakgames.components.flatflash {
 		private var latestSlicer:ISlicer;
 		private var latestSlicerType:String;
 		
-		private var objectsMask:Vector.<uint>;
-		
 		public function DisplayObjectContainer() {
 			this.children = new Vector.<DisplayObject>();
 			
@@ -22,8 +20,15 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function destroy():void {
+			var length:uint = this.children.length;
+			for (var i:uint = 0; i < length; ++i) {
+				this.children[i].parent = null;
+			}
+			
 			this.children = new Vector.<DisplayObject>();
-			this.children = null;
+			
+			this.latestSlicer = null;
+			this.latestSlicerType = null;
 		}
 		
 		public function addChild(child:DisplayObject):void {
@@ -34,6 +39,17 @@ package net.peakgames.components.flatflash {
 				child.parent = this;
 				
 				this.children.push(child);
+			}
+		}
+		
+		public function removeChild(child:DisplayObject):void {
+			if (child) {
+				var index:uint = this.children.indexOf(child);
+				if (index != -1) {
+					this.children.splice(index, 1);
+					
+					child.parent = null;
+				}
 			}
 		}
 		
@@ -107,6 +123,10 @@ package net.peakgames.components.flatflash {
 				
 				bitmapData.unlock();
 			}
+		}
+		
+		public function get numChildren():uint {
+			return this.children.length;
 		}
 		
 		private function get shallRedraw():Boolean {

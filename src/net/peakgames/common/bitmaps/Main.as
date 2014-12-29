@@ -219,6 +219,7 @@ package net.peakgames.common.bitmaps {
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
 			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
 			
+			/*
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
 				newMovie.keepSpritesheet = true;
@@ -233,6 +234,7 @@ package net.peakgames.common.bitmaps {
 				newImage.y = 200;
 				this.doc.addChild(newImage);
 			}
+			*/
 		}
 		
 		private var tt:flash.display.MovieClip;
@@ -283,12 +285,17 @@ package net.peakgames.common.bitmaps {
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
 						
+						if (i % 2 == 0 || i % 3 == 0 || i % 4 == 0) {
+							//this.doc.removeChild(newMovieN);
+						}
+						
 						//var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
 						//newnewMovieN.x = 600 + i;
 						//newnewMovieN.y = 200 + i;
 						//newnewMovieN.play();
 						//this.addChild(newnewMovieN);
 					}
+					trace("count after cleanup is " + this.doc.numChildren)
 					/**/
 					
 					/*
