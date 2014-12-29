@@ -156,7 +156,9 @@ package net.peakgames.common.bitmaps {
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
 					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
-					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps, 60);
+					for (var i:uint = 1; i <= 120; ++i) {
+						SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps, i);
+					}
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
 					
@@ -217,23 +219,31 @@ package net.peakgames.common.bitmaps {
 			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
 		}
 		
+		private var totalLoaded:uint;
+		private var yOffset:uint;
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
-			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
+			//trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + totalLoaded + " .. " + yOffset)
 			
 			/**/
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
 				newMovie.keepSpritesheet = true;
-				newMovie.x = 400 + Math.random() * 100 * 5;
-				newMovie.y = 200;
+				newMovie.x = 400 + (100 * totalLoaded);
+				newMovie.y = 200 + yOffset;
 				newMovie.play();
 				this.doc.addChild(newMovie);
 			} else if (e.resultType == SwfTracer.TYPE_SPRITE) {
 				var newImage:Image = new Image(e.result.bitmapData, e.result.regions[0]);
 				newImage.keepSpritesheet = true;
-				newImage.x = 400;
-				newImage.y = 200;
+				newImage.x = 400 + (100 * totalLoaded);
+				newImage.y = 200 + yOffset;
 				this.doc.addChild(newImage);
+			}
+			
+			++totalLoaded;
+			if (totalLoaded > 14) {
+				totalLoaded = 0;
+				yOffset += 80;
 			}
 			/**/
 		}

@@ -32,7 +32,8 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var _currentTraced:DisplayObjectContainer;
 		private var _currentTracedBitmaps:Vector.<BitmapData>;
 		private var _currentTargetPreviousFrame:uint;
-		private var _currentTargetFrameMultiplier:uint;
+		private var _currentTargetFrameMultiplier:Number;
+		private var _currentTargetFrameMultiplierSkip:Number;
 		
 		private var _totalFramesCopiesThisFrame:uint;
 		
@@ -58,6 +59,7 @@ package net.peakgames.components.flatflash.tools.loader {
 				this._totalFramesCopiesThisFrame = 0;
 				this._currentTargetPreviousFrame = 0;
 				this._currentTargetFrameMultiplier = 1;
+				this._currentTargetFrameMultiplierSkip = 0;
 			} else {
 				throw new Error("Use static SwfTracer::instance getter instead");
 			}
@@ -96,8 +98,8 @@ package net.peakgames.components.flatflash.tools.loader {
 						this._currentType = SwfTracer.TYPE_MOVIE_CLIP;
 						this._currentTargetPreviousFrame = 0;
 						
-						//
-						this._currentTargetFrameMultiplier = (item.fromFPS != 0 && item.toFPS != 0)? Math.round(item.toFPS / item.fromFPS) : 1;
+						this._currentTargetFrameMultiplier = (item.fromFPS != 0 && item.toFPS != 0)? (item.toFPS / item.fromFPS) : 1;
+						this._currentTargetFrameMultiplierSkip = 0;
 						
 						(this._currentTraced as MovieClip).gotoAndStop(1);
 						this._stage.addEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame, false, 0, true);
@@ -132,6 +134,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
 			this._currentTargetFrameMultiplier = 1;
+			this._currentTargetFrameMultiplierSkip = 0;
 			
 			this.tryToDequeue();
 		}
@@ -149,6 +152,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
 			this._currentTargetFrameMultiplier = 1;
+			this._currentTargetFrameMultiplierSkip = 0;
 			
 			this.tryToDequeue();
 		}
@@ -157,15 +161,29 @@ package net.peakgames.components.flatflash.tools.loader {
 			var length:uint = SwfTracer.FRAMES_COPY_PER_ITERATION;
 			var movieClip:MovieClip = this._currentTraced as MovieClip;
 			
-			trace(".......... " + this._currentTargetFrameMultiplier)
-			
 			while (movieClip.currentFrame <= movieClip.totalFrames && this._currentTargetPreviousFrame != movieClip.currentFrame && this._totalFramesCopiesThisFrame < length) {
 				this._currentTargetPreviousFrame = movieClip.currentFrame;
 				
 				var tmp:BitmapData = new BitmapData(movieClip.width, movieClip.height, true, 0);
 				tmp.draw(movieClip);
+
+				var multiplier:Number;
 				
-				this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
+				if (this._currentTargetFrameMultiplier >= 1) {
+					multiplier = this._currentTargetFrameMultiplier;
+				} else {
+					multiplier = this._currentTargetFrameMultiplier + this._currentTargetFrameMultiplierSkip;
+				}
+				
+				if (multiplier >= 1) {
+					multiplier = Math.ceil(multiplier);
+					for (var i:uint = 0; i < multiplier; ++i) {
+						this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
+					}
+					this._currentTargetFrameMultiplierSkip = 0;
+				} else {
+					this._currentTargetFrameMultiplierSkip += this._currentTargetFrameMultiplier;
+				}
 				
 				movieClip.nextFrame();
 				
