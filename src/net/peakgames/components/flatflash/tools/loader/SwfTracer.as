@@ -7,7 +7,9 @@ package net.peakgames.components.flatflash.tools.loader {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.system.ApplicationDomain;
+	import flash.utils.Dictionary;
 	import net.peakgames.components.flatflash.tools.joiners.BitmapDataVectorJoiner;
+	import net.peakgames.components.flatflash.tools.joiners.JoinResult;
 	
 	public class SwfTracer extends EventDispatcher {
 		private static const FRAMES_COPY_PER_ITERATION:uint = 500;
@@ -30,12 +32,15 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var _currentKey:uint;
 		private var _currentType:String;
 		private var _currentTraced:DisplayObjectContainer;
+		private var _currentTracedIdentifier:String;
 		private var _currentTracedBitmaps:Vector.<BitmapData>;
 		private var _currentTargetPreviousFrame:uint;
 		private var _currentTargetFrameMultiplier:Number;
 		private var _currentTargetFrameMultiplierSkip:Number;
 		
 		private var _totalFramesCopiesThisFrame:uint;
+		
+		private var _cache:Dictionary;
 		
 		public static function get instance():SwfTracer {
 			if (!SwfTracer._instance) {
@@ -58,8 +63,8 @@ package net.peakgames.components.flatflash.tools.loader {
 				
 				this._totalFramesCopiesThisFrame = 0;
 				this._currentTargetPreviousFrame = 0;
-				this._currentTargetFrameMultiplier = 1;
-				this._currentTargetFrameMultiplierSkip = 0;
+				
+				this._cache = new Dictionary(true);
 			} else {
 				throw new Error("Use static SwfTracer::instance getter instead");
 			}
@@ -70,15 +75,15 @@ package net.peakgames.components.flatflash.tools.loader {
 			
 		}
 
-		public function get(applicationDomain:ApplicationDomain, className:String, fromFPS:uint = 0, toFPS:uint = 0):uint {
-			this.enqueue(++this._index, applicationDomain, className, fromFPS, toFPS);
+		public function get(applicationDomain:ApplicationDomain, className:String, identifier:String = null):uint {
+			this.enqueue(++this._index, applicationDomain, className, identifier);
 			this.tryToDequeue();
 			
 			return this._index;
 		}
 		
-		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String, fromFPS:uint, toFPS:uint):void {
-			this._queue[this._queue.length] = new QueueObject(key, applicationDomain, className, fromFPS, toFPS);
+		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String, identifier:String):void {
+			this._queue[this._queue.length] = new QueueObject(key, applicationDomain, className, identifier);
 		}
 		
 		private function tryToDequeue():void {
@@ -88,35 +93,37 @@ package net.peakgames.components.flatflash.tools.loader {
 				var item:QueueObject = this._queue.shift();
 				
 				this._currentKey = item.key;
-
-				try {
-					var ClassDefinition:Class = item.applicationDomain.getDefinition(item.className) as Class;
-					this._currentTraced = new ClassDefinition();
-					this._currentTracedBitmaps = new Vector.<BitmapData>();
-					
-					if (this._currentTraced is MovieClip) {
-						this._currentType = SwfTracer.TYPE_MOVIE_CLIP;
-						this._currentTargetPreviousFrame = 0;
+				this._currentTracedIdentifier = item.identifier;
+				
+				if (this._currentTracedIdentifier && this._cache[this._currentTracedIdentifier]) {
+					this.finalizeCurrentTask();
+				} else {
+					try {
+						var ClassDefinition:Class = item.applicationDomain.getDefinition(item.className) as Class;
+						this._currentTraced = new ClassDefinition();
+						this._currentTracedBitmaps = new Vector.<BitmapData>();
 						
-						this._currentTargetFrameMultiplier = (item.fromFPS != 0 && item.toFPS != 0)? (item.toFPS / item.fromFPS) : 1;
-						this._currentTargetFrameMultiplierSkip = 0;
-						
-						(this._currentTraced as MovieClip).gotoAndStop(1);
-						this._stage.addEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame, false, 0, true);
-						
-						this.traceMovieClips();
-					} else if (this._currentTraced is Sprite) {
-						this._currentType = SwfTracer.TYPE_SPRITE;
-						
-						var tmp:BitmapData = new BitmapData(this._currentTraced.width, this._currentTraced.height, true, 0);
-						tmp.draw(this._currentTraced);
-						
-						this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
-						
-						this.finalizeCurrentTask();
+						if (this._currentTraced is MovieClip) {
+							this._currentType = SwfTracer.TYPE_MOVIE_CLIP;
+							this._currentTargetPreviousFrame = 0;
+							
+							(this._currentTraced as MovieClip).gotoAndStop(1);
+							this._stage.addEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame, false, 0, true);
+							
+							this.traceMovieClips();
+						} else if (this._currentTraced is Sprite) {
+							this._currentType = SwfTracer.TYPE_SPRITE;
+							
+							var tmp:BitmapData = new BitmapData(this._currentTraced.width, this._currentTraced.height, true, 0);
+							tmp.draw(this._currentTraced);
+							
+							this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
+							
+							this.finalizeCurrentTask();
+						}
+					} catch (e:Error) {
+						this.failCurrentTask(e);
 					}
-				} catch (e:Error) {
-					this.failCurrentTask(e);
 				}
 			}
 		}
@@ -133,14 +140,25 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
-			this._currentTargetFrameMultiplier = 1;
-			this._currentTargetFrameMultiplierSkip = 0;
 			
 			this.tryToDequeue();
 		}
 		
 		private function finalizeCurrentTask():void {
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, this._currentType, this._bitmapDataJoiner.toAtlas(this._currentTracedBitmaps), null));
+			var joined:JoinResult;
+			var type:String;
+			
+			if (this._currentTracedIdentifier && this._cache[this._currentTracedIdentifier]) {
+				type = this._cache[this._currentTracedIdentifier].type;
+				joined = this._cache[this._currentTracedIdentifier].joined;
+			} else {
+				type = this._currentType;
+				joined = this._bitmapDataJoiner.toAtlas(this._currentTracedBitmaps);
+				
+				this._cache[this._currentTracedIdentifier] = new CacheObject(type, joined);
+			}
+			
+			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, type, joined, null));
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -151,8 +169,6 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
-			this._currentTargetFrameMultiplier = 1;
-			this._currentTargetFrameMultiplierSkip = 0;
 			
 			this.tryToDequeue();
 		}
@@ -169,21 +185,7 @@ package net.peakgames.components.flatflash.tools.loader {
 
 				var multiplier:Number;
 				
-				if (this._currentTargetFrameMultiplier >= 1) {
-					multiplier = this._currentTargetFrameMultiplier;
-				} else {
-					multiplier = this._currentTargetFrameMultiplier + this._currentTargetFrameMultiplierSkip;
-				}
-				
-				if (multiplier >= 1) {
-					multiplier = Math.ceil(multiplier);
-					for (var i:uint = 0; i < multiplier; ++i) {
-						this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
-					}
-					this._currentTargetFrameMultiplierSkip = 0;
-				} else {
-					this._currentTargetFrameMultiplierSkip += this._currentTargetFrameMultiplier;
-				}
+				this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
 				
 				movieClip.nextFrame();
 				
@@ -205,21 +207,29 @@ package net.peakgames.components.flatflash.tools.loader {
 
 }
 import flash.system.ApplicationDomain;
+import net.peakgames.components.flatflash.tools.joiners.JoinResult;
 
 class QueueObject {
 	public var key:uint;
 	public var applicationDomain:ApplicationDomain;
 	public var className:String;
-	public var fromFPS:uint;
-	public var toFPS:uint;
+	public var identifier:String;
 	
-	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String, fromFPS:uint, toFPS:uint) {
+	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String, identifier:String) {
 		this.key = key;
 		this.applicationDomain = applicationDomain;
 		this.className = className;
-		this.fromFPS = fromFPS;
-		this.toFPS = toFPS;
-		
+		this.identifier = identifier;
 	}
 	
+}
+
+class CacheObject {
+	public var type:String;
+	public var joined:JoinResult;
+	
+	public function CacheObject(type:String, joined:JoinResult) {
+		this.type = type;
+		this.joined = joined;
+	}
 }

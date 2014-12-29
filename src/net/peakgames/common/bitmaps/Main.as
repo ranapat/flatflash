@@ -156,8 +156,8 @@ package net.peakgames.common.bitmaps {
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
 					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
-					for (var i:uint = 1; i <= 120; ++i) {
-						SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps, i);
+					for (var i:uint = 1; i <= 160; ++i) {
+						SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", "Item_8_Animation");
 					}
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
