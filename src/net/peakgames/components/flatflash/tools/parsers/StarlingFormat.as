@@ -72,11 +72,11 @@ package net.peakgames.components.flatflash.tools.parsers {
 			var xml:XML = new XML(this.loader.data);
 			result.path = xml.@imagePath;
 			for each (var subTexture:XML in xml.SubTexture) {
-				regions.push(new StarlingRegion(
+				regions[regions.length] = new StarlingRegion(
 					subTexture.@name,
 					Number(subTexture.@x), Number(subTexture.@y), Number(subTexture.@width), Number(subTexture.@height),
 					Number(subTexture.@frameX), Number(subTexture.@frameY), Number(subTexture.@frameWidth), Number(subTexture.@frameHeight)
-				));
+				);
 			}
 			
 			result.regions = Vector.<Region>(regions);

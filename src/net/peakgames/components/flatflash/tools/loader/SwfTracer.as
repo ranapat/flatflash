@@ -32,6 +32,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		private var _currentTraced:DisplayObjectContainer;
 		private var _currentTracedBitmaps:Vector.<BitmapData>;
 		private var _currentTargetPreviousFrame:uint;
+		private var _currentTargetFrameMultiplier:uint;
 		
 		private var _totalFramesCopiesThisFrame:uint;
 		
@@ -56,6 +57,7 @@ package net.peakgames.components.flatflash.tools.loader {
 				
 				this._totalFramesCopiesThisFrame = 0;
 				this._currentTargetPreviousFrame = 0;
+				this._currentTargetFrameMultiplier = 1;
 			} else {
 				throw new Error("Use static SwfTracer::instance getter instead");
 			}
@@ -66,15 +68,15 @@ package net.peakgames.components.flatflash.tools.loader {
 			
 		}
 
-		public function get(applicationDomain:ApplicationDomain, className:String):uint {
-			this.enqueue(++this._index, applicationDomain, className);
+		public function get(applicationDomain:ApplicationDomain, className:String, fromFPS:uint = 0, toFPS:uint = 0):uint {
+			this.enqueue(++this._index, applicationDomain, className, fromFPS, toFPS);
 			this.tryToDequeue();
 			
 			return this._index;
 		}
 		
-		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String):void {
-			this._queue.push(new QueueObject(key, applicationDomain, className));
+		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String, fromFPS:uint, toFPS:uint):void {
+			this._queue[this._queue.length] = new QueueObject(key, applicationDomain, className, fromFPS, toFPS);
 		}
 		
 		private function tryToDequeue():void {
@@ -94,6 +96,9 @@ package net.peakgames.components.flatflash.tools.loader {
 						this._currentType = SwfTracer.TYPE_MOVIE_CLIP;
 						this._currentTargetPreviousFrame = 0;
 						
+						//
+						this._currentTargetFrameMultiplier = (item.fromFPS != 0 && item.toFPS != 0)? Math.round(item.toFPS / item.fromFPS) : 1;
+						
 						(this._currentTraced as MovieClip).gotoAndStop(1);
 						this._stage.addEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame, false, 0, true);
 						
@@ -104,7 +109,7 @@ package net.peakgames.components.flatflash.tools.loader {
 						var tmp:BitmapData = new BitmapData(this._currentTraced.width, this._currentTraced.height, true, 0);
 						tmp.draw(this._currentTraced);
 						
-						this._currentTracedBitmaps.push(tmp);
+						this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
 						
 						this.finalizeCurrentTask();
 					}
@@ -126,6 +131,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
+			this._currentTargetFrameMultiplier = 1;
 			
 			this.tryToDequeue();
 		}
@@ -142,6 +148,7 @@ package net.peakgames.components.flatflash.tools.loader {
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
+			this._currentTargetFrameMultiplier = 1;
 			
 			this.tryToDequeue();
 		}
@@ -150,13 +157,15 @@ package net.peakgames.components.flatflash.tools.loader {
 			var length:uint = SwfTracer.FRAMES_COPY_PER_ITERATION;
 			var movieClip:MovieClip = this._currentTraced as MovieClip;
 			
+			trace(".......... " + this._currentTargetFrameMultiplier)
+			
 			while (movieClip.currentFrame <= movieClip.totalFrames && this._currentTargetPreviousFrame != movieClip.currentFrame && this._totalFramesCopiesThisFrame < length) {
 				this._currentTargetPreviousFrame = movieClip.currentFrame;
 				
 				var tmp:BitmapData = new BitmapData(movieClip.width, movieClip.height, true, 0);
 				tmp.draw(movieClip);
 				
-				this._currentTracedBitmaps.push(tmp);
+				this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
 				
 				movieClip.nextFrame();
 				
@@ -183,11 +192,16 @@ class QueueObject {
 	public var key:uint;
 	public var applicationDomain:ApplicationDomain;
 	public var className:String;
+	public var fromFPS:uint;
+	public var toFPS:uint;
 	
-	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String) {
+	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String, fromFPS:uint, toFPS:uint) {
 		this.key = key;
 		this.applicationDomain = applicationDomain;
 		this.className = className;
+		this.fromFPS = fromFPS;
+		this.toFPS = toFPS;
+		
 	}
 	
 }

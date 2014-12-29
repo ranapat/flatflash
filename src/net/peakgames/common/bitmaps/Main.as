@@ -156,6 +156,7 @@ package net.peakgames.common.bitmaps {
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
 					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
+					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps, 60);
 					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
 					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
 					
@@ -219,7 +220,7 @@ package net.peakgames.common.bitmaps {
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
 			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
 			
-			/*
+			/**/
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
 				newMovie.keepSpritesheet = true;
@@ -234,7 +235,7 @@ package net.peakgames.common.bitmaps {
 				newImage.y = 200;
 				this.doc.addChild(newImage);
 			}
-			*/
+			/**/
 		}
 		
 		private var tt:flash.display.MovieClip;
@@ -275,7 +276,7 @@ package net.peakgames.common.bitmaps {
 					this.doc.addChild(newMovie);
 					
 					
-					/**/
+					/*
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
 						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
@@ -295,13 +296,13 @@ package net.peakgames.common.bitmaps {
 						//newnewMovieN.play();
 						//this.addChild(newnewMovieN);
 					}
+					*/
 					trace("count after cleanup is " + this.doc.numChildren)
-					/**/
 					
 					/*
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
 						newMovieN.x = 800 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();
@@ -309,7 +310,7 @@ package net.peakgames.common.bitmaps {
 					}
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
 						newMovieN.x = 100 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();
@@ -317,7 +318,7 @@ package net.peakgames.common.bitmaps {
 					}
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
 						newMovieN.x = 200 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();
@@ -325,7 +326,7 @@ package net.peakgames.common.bitmaps {
 					}
 					for (var i:uint = 0; i < 750; ++i) {
 						//trace("..........")
-						var newMovieN:MovieClip = new MovieClip(f.bitmapData, key, f.regions);
+						var newMovieN:MovieClip = new MovieClip(f.bitmapData, f.regions);
 						newMovieN.x = 300 + i;
 						newMovieN.y = 200 + i;
 						newMovieN.play();

@@ -38,7 +38,7 @@ package net.peakgames.components.flatflash {
 				child.depth = this.children.length;
 				child.parent = this;
 				
-				this.children.push(child);
+				this.children[this.children.length] = child;
 			}
 		}
 		

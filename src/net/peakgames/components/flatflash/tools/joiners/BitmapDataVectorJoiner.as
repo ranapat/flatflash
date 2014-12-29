@@ -40,12 +40,12 @@ package net.peakgames.components.flatflash.tools.joiners {
 								null, null,
 								true
 							);
-							regions.push(new Region(
+							regions[regions.length] = new Region(
 								"region-" + i,
 								column * tmp.width, row * tmp.height,
 								tmp.width, tmp.height,
 								EngineTypes.TYPE_STARLING
-							));
+							);
 							
 							if (column < rectangleSize.columns - 1) {
 								++column;

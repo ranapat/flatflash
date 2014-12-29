@@ -96,7 +96,7 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		public function load(url:String):uint {
-			this.queue.push(url);
+			this.queue[this.queue.length] = url;
 			this.tryLoadNext();
 			
 			return this.progress.length + this.queue.length - 1;
@@ -114,7 +114,7 @@ package net.peakgames.components.flatflash.tools.loader {
 				this.timeoutTimer.reset();
 				this.timeoutTimer.start();
 				
-				this.progress.push(ResourceLoader.LOADING);
+				this.progress[this.progress.length] = ResourceLoader.LOADING;
 				this.loader.load(
 					new URLRequest(tmp),
 					new LoaderContext(false, new ApplicationDomain(ApplicationDomain.currentDomain))

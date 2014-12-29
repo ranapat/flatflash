@@ -34,7 +34,7 @@ package net.peakgames.components.flatflash {
 			for (var i:uint = 0; i < length; ++i) {
 				var region:Region = regions[i];
 				if (region.name.indexOf(name) != -1) {
-					regionsToPick.push(region);
+					regionsToPick[regionsToPick.length] = region;
 				}
 			}
 			
@@ -47,7 +47,7 @@ package net.peakgames.components.flatflash {
 			for (var i:uint = 0; i < length; ++i) {
 				var region:Region = regions[i];
 				if (region.name >= minName && region.name <= maxName) {
-					regionsToPick.push(region);
+					regionsToPick[regionsToPick.length] = region;
 				}
 			}
 			
