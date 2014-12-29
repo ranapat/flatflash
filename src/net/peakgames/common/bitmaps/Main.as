@@ -151,12 +151,13 @@ package net.peakgames.common.bitmaps {
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, this.handleSwfTracerComplete, false, 0, true);
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, this.handleSwfTracerFail, false, 0, true);
 					
+					trace("target fps is " + e.fps)
 					
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Image", e.fps);
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2", e.fps);
-					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation", e.fps);
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation", e.fps);
-					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING", e.fps);
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
+					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
+					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
+					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
 					
 					
 					
@@ -212,15 +213,14 @@ package net.peakgames.common.bitmaps {
 		
 		private function handleSwfTracerFail(e:SwfTracerEvent):void 
 		{
-			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + e.fps)
+			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
 		}
 		
 		private function handleSwfTracerComplete(e:SwfTracerEvent):void {
-			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. " + e.fps)
+			trace("trace complete.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
 			
 			if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
 				var newMovie:MovieClip = new MovieClip(e.result.bitmapData, e.result.regions);
-				newMovie.fps = e.fps;
 				newMovie.keepSpritesheet = true;
 				newMovie.x = 400 + Math.random() * 100 * 5;
 				newMovie.y = 200;
@@ -283,14 +283,13 @@ package net.peakgames.common.bitmaps {
 						newMovieN.play();
 						this.doc.addChild(newMovieN);
 						
-						/**/
-						var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
-						newnewMovieN.x = 600 + i;
-						newnewMovieN.y = 200 + i;
-						newnewMovieN.play();
-						this.addChild(newnewMovieN);
-						/**/
+						//var newnewMovieN:flash.display.MovieClip = new _ClassDefinition();
+						//newnewMovieN.x = 600 + i;
+						//newnewMovieN.y = 200 + i;
+						//newnewMovieN.play();
+						//this.addChild(newnewMovieN);
 					}
+					/**/
 					
 					/*
 					for (var i:uint = 0; i < 750; ++i) {
@@ -584,7 +583,7 @@ package net.peakgames.common.bitmaps {
 			  
 			if (currentTime > 1) {
 				//trace("...... frames " + frames)
-				this.tf.text = "frames: " + frames.toString();
+				//this.tf.text = "frames: " + frames.toString();
 				
 				startTime = getTimer();
 				frames = 0;

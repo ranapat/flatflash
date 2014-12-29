@@ -15,24 +15,10 @@ package net.peakgames.components.flatflash {
 		
 		private var objectsMask:Vector.<uint>;
 		
-		private var enterFrameStartTime:Number;
-		private var totalFrames:uint;
-		private var latestTotalFrames:uint;
-		
 		public function DisplayObjectContainer() {
 			this.children = new Vector.<DisplayObject>();
-			this.enterFrameStartTime = 0;
-			this.latestTotalFrames = 0;
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
-		}
-		
-		public function get fps():uint {
-			return this.latestTotalFrames;
-		}
-		
-		public function get tfp():Number {
-			return this.enterFrameStartTime;
 		}
 		
 		public function destroy():void {
@@ -175,16 +161,6 @@ package net.peakgames.components.flatflash {
 		
 		private function handleEnterFrame(e:Event):void {
 			this.redraw();
-			
-			/*
-			++this.totalFrames;
-			if ((getTimer() - this.enterFrameStartTime) / 1000 > 1) {
-				this.latestTotalFrames = this.totalFrames;
-				
-				this.enterFrameStartTime = getTimer();
-				this.totalFrames = 0;
-			}
-			*/
 		}
 		
 	}

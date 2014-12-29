@@ -5,7 +5,6 @@ package net.peakgames.components.flatflash {
 	public class MovieClip extends DisplayObject {
 		private var _spritesheetRegions:Vector.<Region>;
 		
-		private var _fps:uint;
 		private var _currentFrame:uint;
 		private var _playing:Boolean;
 		
@@ -25,14 +24,6 @@ package net.peakgames.components.flatflash {
 		
 		override public function get spritesheetRegion():Region {
 			return this._spritesheetRegions? this._spritesheetRegions[this._currentFrame] : null;
-		}
-		
-		public function set fps(value:uint):void {
-			this._fps = value;
-		}
-		
-		public function get fps():uint {
-			return this._fps;
 		}
 		
 		public function get currentFrame():uint {
@@ -91,7 +82,7 @@ package net.peakgames.components.flatflash {
 		override public function hop():void {
 			super.hop();
 			
-			if (this.playing/* && this.shallHopMove*/) {
+			if (this.playing) {
 				this.gotoNextFrame();
 			}
 		}
@@ -119,35 +110,6 @@ package net.peakgames.components.flatflash {
 				(this.currentFrame > 0? this.currentFrame - 1 : this._spritesheetRegions.length)
 				: 0
 			;
-		}
-		
-		private function get shallHopMove():Boolean {
-			if (this.parent) {
-				if (this.parent.tfp != this._latestParentTFP) {
-					this._latestParentTFP = this.parent.tfp;
-					this._hopsBetweenMoves = 1;
-					
-					this._hopEveryNthTime = this.parent.fps / this.currentFPS;
-				} else {
-					++this._hopsBetweenMoves;
-				}
-			}
-			
-			if (this._hopsBetweenMoves / this._hopEveryNthTime > .9) {
-				this._hopsBetweenMoves = 0;
-				
-				//trace(".... allow " + this._hopsBetweenMoves + " .. " + this._hopEveryNthTime + " .. " + this.parent.fps + " .. " + (this._hopsBetweenMoves / this._hopEveryNthTime))
-				
-				return true;
-			} else {
-				//trace(".... skip " + this._hopsBetweenMoves + " .. " + this._hopEveryNthTime + " .. this.currentFPS: " + this.currentFPS + " .. this.parent.fps: " + this.parent.fps + " .. " + (this._hopsBetweenMoves / this._hopEveryNthTime))
-				
-				return false;
-			}
-		}
-		
-		private function get currentFPS():uint {
-			return this.fps == 0? this.parent.fps : this.fps;
 		}
 	}
 
