@@ -13,7 +13,7 @@ package net.peakgames.components.flatflash {
 		private var _hopsBetweenMoves:uint;
 		private var _hopEveryNthTime:Number;
 		
-		private var _fps:uint;
+		private var _fps:int;
 		private var _timeDelta:Number;
 		private var _previousTimeOffset:uint;
 		
@@ -31,6 +31,7 @@ package net.peakgames.components.flatflash {
 			if (args.length == 2 && args[0] is BitmapData && args[1] is Vector.<Region>) {
 				super.initialize(args[0]);
 				
+				this.fps = -1;
 				this._regions = args[1];
 				this._totalFrames = this._regions.length;
 			}
@@ -65,13 +66,13 @@ package net.peakgames.components.flatflash {
 			return this._playing;
 		}
 		
-		public function set fps(value:uint):void {
+		public function set fps(value:int):void {
 			this._fps = value;
-			this._timeDelta = 1000 / value;
+			this._timeDelta = this.fps? 1000 / this.fps : 0;
 		}
 		
-		public function get fps():uint {
-			return this._fps;
+		public function get fps():int {
+			return this._fps == -1 && this.parent? this.parent.fps : this._fps == -1 && !this.parent? 0 : this._fps;
 		}
 		
 		public function play():void {
@@ -109,11 +110,11 @@ package net.peakgames.components.flatflash {
 		override public function hop(timer:int):void {
 			super.hop(timer);
 			
-			var timeOffset:uint = timer / this._timeDelta;
+			var timeOffset:uint = timer / this.timeDelta;
 			
 			var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
 			
-			//trace(timer + " .. " + this._timeDelta + " .. " + this._previousTimeOffset + " .. " + timeOffset + " .. " + this.fps + " .. " + delta);
+			//trace(timer + " .. " + this.timeDelta + " .. " + this._previousTimeOffset + " .. " + timeOffset + " .. " + this.fps + " .. " + delta);
 			
 			this._previousTimeOffset = timeOffset;
 			
@@ -152,6 +153,10 @@ package net.peakgames.components.flatflash {
 		private function offsetFrames(offset:int):void {
 			var frame:uint = this.currentFrame + offset;
 			this.currentFrame = frame < 0? this.totalFrames - frame : frame >= this.totalFrames? frame - this.totalFrames : frame;
+		}
+		
+		private function get timeDelta():Number {
+			return this._fps == -1? (1000 / this.fps) : this._timeDelta;
 		}
 	}
 

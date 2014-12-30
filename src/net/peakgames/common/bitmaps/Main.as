@@ -127,7 +127,8 @@ package net.peakgames.common.bitmaps {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+			//this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
+			this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/ATLAS/atlas.xml", "../assets/ATLAS/");
 			this.atlasLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAtlasLoaderComplete);
 			this.atlasLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAtlasLoaderFail);
 			
@@ -150,7 +151,7 @@ package net.peakgames.common.bitmaps {
 				if (e.applicationDomain) {
 					SwfTracer.instance.stage = this.stage;
 					
-					for (var i:uint = 1; i <= 14; ++i) {
+					for (var i:uint = 1; i <= 0; ++i) {
 						var m1:MovieClip = DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("Test_Serhat_1") as Class);
 						m1.fps = e.fps;
 						m1.x = 400 + i * 100;
@@ -294,13 +295,13 @@ package net.peakgames.common.bitmaps {
 					trace(f.bitmapData)
 					trace(f.regions)
 					
-					//AssetsKeeper.instance.keep(f.bitmapData);
+					AssetsKeeper.instance.keep(f.bitmapData);
 					
-					//var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
-					//newMovie.x = 400;
-					//newMovie.y = 200;
-					//newMovie.play();
-					//this.doc.addChild(newMovie);
+					var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
+					newMovie.x = 400;
+					newMovie.y = 200;
+					newMovie.play();
+					this.doc.addChild(newMovie);
 					
 					
 					/**/
@@ -384,6 +385,13 @@ package net.peakgames.common.bitmaps {
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
 			//this.doc.addChild(this.i2);
 			//this.i2.play();
+			
+			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, e.result.regions, 1, 3);
+			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
+			this.doc.addChild(this.i2);
+			this.i2.play();
+			this.i2.fps = 12;
 			
 			/*
 			var p:uint;
