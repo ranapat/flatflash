@@ -1,6 +1,5 @@
 package net.peakgames.components.flatflash {
 	import flash.display.BitmapData;
-	import net.peakgames.components.flatflash.DisplayObject;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class Image extends DisplayObject {
