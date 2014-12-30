@@ -16,6 +16,7 @@ package net.peakgames.common.bitmaps {
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
+	import net.peakgames.components.flatflash.Settings;
 	import net.peakgames.components.flatflash.tools.loader.SwfTracer;
 	import net.peakgames.components.flatflash.tools.loader.SwfTracerEvent;
 	
@@ -153,14 +154,10 @@ package net.peakgames.common.bitmaps {
 					
 					trace("target fps is " + e.fps)
 					
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Image");
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Image_2");
-					SwfTracer.instance.get(e.applicationDomain, "Item_8_Animation");
-					for (var i:uint = 1; i <= 1; ++i) {
-						SwfTracer.instance.get(e.applicationDomain, "FixedAnimationSequence", "Shit");
+					SwfTracer.instance.get(e.applicationDomain.getDefinition("Item_8_Animation") as Class);
+					for (var i:uint = 1; i <= 160; ++i) {
+						SwfTracer.instance.get(e.applicationDomain.getDefinition("FixedAnimationSequence") as Class);
 					}
-					//SwfTracer.instance.get(e.applicationDomain, "Test_Resize_Animation");
-					//SwfTracer.instance.get(e.applicationDomain, "Test_MISSING");
 					
 					
 					

@@ -6,10 +6,11 @@ package net.peakgames.components.flatflash.tools.loader {
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.system.ApplicationDomain;
 	import flash.utils.Dictionary;
+	import net.peakgames.components.flatflash.Settings;
 	import net.peakgames.components.flatflash.tools.joiners.BitmapDataVectorJoiner;
 	import net.peakgames.components.flatflash.tools.joiners.JoinResult;
+	import net.peakgames.components.flatflash.tools.Tools;
 	
 	public class SwfTracer extends EventDispatcher {
 		private static const FRAMES_COPY_PER_ITERATION:uint = 500;
@@ -75,15 +76,20 @@ package net.peakgames.components.flatflash.tools.loader {
 			
 		}
 
-		public function get(applicationDomain:ApplicationDomain, className:String, identifier:String = null):uint {
-			this.enqueue(++this._index, applicationDomain, className, identifier);
+		public function get(_class:Class, identifier:String = null):uint {
+			this.enqueue(
+				++this._index,
+				_class,
+				identifier && identifier != Settings.NO_IDENTIFIER? identifier : identifier != Settings.NO_IDENTIFIER? Tools.getFullClassName(_class) : null
+			);
+			
 			this.tryToDequeue();
 			
 			return this._index;
 		}
 		
-		private function enqueue(key:uint, applicationDomain:ApplicationDomain, className:String, identifier:String):void {
-			this._queue[this._queue.length] = new QueueObject(key, applicationDomain, className, identifier);
+		private function enqueue(key:uint, _class:Class, identifier:String):void {
+			this._queue[this._queue.length] = new QueueObject(key, _class, identifier);
 		}
 		
 		private function tryToDequeue():void {
@@ -99,8 +105,7 @@ package net.peakgames.components.flatflash.tools.loader {
 					this.finalizeCurrentTask();
 				} else {
 					try {
-						var ClassDefinition:Class = item.applicationDomain.getDefinition(item.className) as Class;
-						this._currentTraced = new ClassDefinition();
+						this._currentTraced = new item._class;
 						this._currentTracedBitmaps = new Vector.<BitmapData>();
 						
 						if (this._currentTraced is MovieClip) {
@@ -206,19 +211,17 @@ package net.peakgames.components.flatflash.tools.loader {
 	}
 
 }
-import flash.system.ApplicationDomain;
+
 import net.peakgames.components.flatflash.tools.joiners.JoinResult;
 
 class QueueObject {
 	public var key:uint;
-	public var applicationDomain:ApplicationDomain;
-	public var className:String;
+	public var _class:Class;
 	public var identifier:String;
 	
-	public function QueueObject(key:uint, applicationDomain:ApplicationDomain, className:String, identifier:String) {
+	public function QueueObject(key:uint, _class:Class, identifier:String) {
 		this.key = key;
-		this.applicationDomain = applicationDomain;
-		this.className = className;
+		this._class = _class;
 		this.identifier = identifier;
 	}
 	
