@@ -2,6 +2,7 @@ package net.peakgames.components.flatflash {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.clearTimeout;
 	import flash.utils.getTimer;
@@ -23,6 +24,9 @@ package net.peakgames.components.flatflash {
 		private var startTime:int;
 		private var frames:uint;
 		private var loopTimeout:uint;
+		
+		private var __changed:uint;
+		private var __mouseEnabled:uint;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
@@ -52,6 +56,8 @@ package net.peakgames.components.flatflash {
 				child.parent = this;
 				
 				this.children[this.children.length] = child;
+				this.__changed += child.changed? 1 : 0;
+				this.__mouseEnabled += child.mouseEnabled? 1 : 0;
 			}
 		}
 		
@@ -96,7 +102,9 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function redraw():void {
-			if (this.stage && this.bitmapData && this.shallRedraw) {
+			if (this.stage && this.bitmapData && this.__changed > 0) {
+				this.__changed = 0;
+				
 				var bitmapData:BitmapData = this.bitmapData;
 				var latestSlicer:ISlicer = this.latestSlicer;
 				var latestSlicerType:String = this.latestSlicerType;
@@ -111,8 +119,9 @@ package net.peakgames.components.flatflash {
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
 					displayObject.hop(getTimer() - this.startTime);
+					this.__changed += displayObject.visible && displayObject.changed? 1 : 0;
 					
-					if (displayObject.region) {
+					if (displayObject.visible && displayObject.region) {
 						if (latestSlicerType != displayObject.region.type) {
 							latestSlicerType = displayObject.region.type;
 							latestSlicer = SlicerFactory.get(latestSlicerType);
@@ -154,18 +163,12 @@ package net.peakgames.components.flatflash {
 			return this._cfps;
 		}
 		
-		private function get shallRedraw():Boolean {
-			var result:Boolean;
-			
-			var length:uint = this.children.length;
-			for (var i:uint = 0; i < length; ++i) {
-				if (this.children[i].changed) {
-					result = true;
-					break;
-				}
-			}
-			
-			return result;
+		public function childChanged():void {
+			++this.__changed;
+		}
+		
+		public function childMouseEnabledChanged(delta:int):void {
+			this.__mouseEnabled = this.__mouseEnabled + delta < 0? 0 : this.__mouseEnabled + delta;
 		}
 		
 		private function get reorderedChildren():Vector.<DisplayObject> {
@@ -208,10 +211,78 @@ package net.peakgames.components.flatflash {
 			}
 		}
 		
+		private function loopChildrenForMouseEvent(x:Number, y:Number, e:MouseEvent):void {
+			var length:uint = this.numChildren;
+			var child:DisplayObject;
+			for (var i:uint = 0; i < length; ++i) {
+				child = this.children[i];
+				if (child.mouseEnabled) {
+					if (
+						x >= child.x
+						&& y >= child.y
+						&& x <= child.x + child.width
+						&& y <= child.y + child.height
+					) {
+						e.localX = x;
+						e.localY = y;
+						
+						child.handleMouseEvent(e);
+					}
+				}
+			}
+		}
+		
+		private function handleClick(e:MouseEvent):void {
+			var x:Number = e.stageX - this.x;
+			var y:Number = e.stageY - this.y;
+			
+			if (this.__mouseEnabled > 0) {
+				this.loopChildrenForMouseEvent(x, y, e);
+			}
+		}
+		
+		private function handleMouseMove(e:MouseEvent):void {
+			var x:Number = e.stageX - this.x;
+			var y:Number = e.stageY - this.y;
+			
+			if (this.__mouseEnabled > 0) {
+				this.loopChildrenForMouseEvent(x, y, e);
+			}
+		}
+		
+		private function handleMouseDown(e:MouseEvent):void {
+			var x:Number = e.stageX - this.x;
+			var y:Number = e.stageY - this.y;
+			
+			if (this.__mouseEnabled > 0) {
+				this.loopChildrenForMouseEvent(x, y, e);
+			}
+		}
+		
+		private function handleMouseUp(e:MouseEvent):void {
+			var x:Number = e.stageX - this.x;
+			var y:Number = e.stageY - this.y;
+			
+			if (this.__mouseEnabled > 0) {
+				this.loopChildrenForMouseEvent(x, y, e);
+			}
+		}
+		
+		private function handleEnterFrame(e:Event):void {
+			this.calculateFPS();
+			
+			this.redraw();
+		}
+		
 		private function handleAddedToStage(e:Event):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
 			
 			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
+			
+			this.stage.addEventListener(MouseEvent.CLICK, this.handleClick, false, 0, true);
+			this.stage.addEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove, false, 0, true);
+			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown, false, 0, true);
+			this.stage.addEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp, false, 0, true);
 			
 			this.fps = this.stage.frameRate;
 			
@@ -229,6 +300,11 @@ package net.peakgames.components.flatflash {
 		private function handleRemovedFromStage(e:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage);
 			
+			this.stage.removeEventListener(MouseEvent.CLICK, this.handleClick);
+			this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove);
+			this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown);
+			this.stage.removeEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp);
+			
 			if (this.render == Settings.RENDER_TYPE_ENTER_FRAME) {
 				this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
 			}
@@ -241,13 +317,6 @@ package net.peakgames.components.flatflash {
 			clearTimeout(this.loopTimeout);
 			this.loopTimeout = 0;
 		}
-		
-		private function handleEnterFrame(e:Event):void {
-			this.calculateFPS();
-			
-			this.redraw();
-		}
-		
 	}
 
 }

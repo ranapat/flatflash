@@ -99,12 +99,16 @@ package net.peakgames.common.bitmaps {
 			//trace("............ " + e.keyCode)
 			if (this.i1) {
 				if (e.keyCode == Keyboard.LEFT) {
+					this.i1.mouseEnabled = false;
 					this.i1.x -= 10;
 				} else if (e.keyCode == Keyboard.RIGHT) {
+					this.i1.mouseEnabled = true;
 					this.i1.x += 10;
 				} else if (e.keyCode == Keyboard.DOWN) {
+					this.i1.mouseEnabled = false;
 					this.i1.y += 10;
 				} else if (e.keyCode == Keyboard.UP) {
+					this.i1.mouseEnabled = true;
 					this.i1.y -= 10;
 				}
 			}
@@ -371,14 +375,18 @@ package net.peakgames.common.bitmaps {
 			this.parseResult = e.result;
 			this.slicer = SlicerFactory.get(e.result.type);
 		
-			this.doc = new DisplayObjectContainer(2);
+			this.doc = new DisplayObjectContainer(1);
+			this.doc.x = 100;
+			this.doc.y = 100;
 			this.addChild(this.doc);
 			
-			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, e.result.regions[10]);
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, e.result.regions, "Item_8_Animation0010")
-			//this.i1.play();
-			//this.doc.addChild(this.i1);
+			(this.i1 as MovieClip).play();
+			(this.i1 as MovieClip).fps = 12;
+			this.i1.mouseEnabled = true;
+			this.doc.addChild(this.i1);
 			
 			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, e.result.regions, 1, 3);
@@ -386,12 +394,12 @@ package net.peakgames.common.bitmaps {
 			//this.doc.addChild(this.i2);
 			//this.i2.play();
 			
-			this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, e.result.regions, 1, 3);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxNames(e.result.bitmapData, e.result.regions, "Item_8_Animation0000", "Item_8_Animation0020");
-			this.doc.addChild(this.i2);
-			this.i2.play();
-			this.i2.fps = 12;
+			//this.doc.addChild(this.i2);
+			//this.i2.play();
+			//this.i2.fps = 12;
 			
 			/*
 			var p:uint;
@@ -516,15 +524,15 @@ package net.peakgames.common.bitmaps {
 			addChild(sprite);
 			*/
 
-			spareBitmap = new Bitmap(bitmapData1);
-			addChild(spareBitmap);
+			//spareBitmap = new Bitmap(bitmapData1);
+			//addChild(spareBitmap);
 			
-			spareBitmap2 = new Bitmap(bitmapData2);
-			addChild(spareBitmap2);
+			//spareBitmap2 = new Bitmap(bitmapData2);
+			//addChild(spareBitmap2);
 			
 			//populate(bitmapData2, 100);
 			
-			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
+			//addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
 			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
 			stage.displayState = StageDisplayState.FULL_SCREEN; 	
@@ -605,6 +613,7 @@ package net.peakgames.common.bitmaps {
 			//populate(bitmapData2, 1000);
 			//populateFromSlices(bitmapData1);
 			if (this.i1) {
+				this.i1.mouseEnabled = false;
 				if (this.i1.x > this.stage.stageWidth) {
 					this.i1.x = 0;
 				} else {

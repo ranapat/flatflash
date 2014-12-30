@@ -1,5 +1,6 @@
 package net.peakgames.components.flatflash {
 	import flash.display.BitmapData;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
@@ -14,6 +15,8 @@ package net.peakgames.components.flatflash {
 		private var _height:Number;
 		private var _name:String;
 		private var _changed:Boolean;
+		private var _visible:Boolean;
+		private var _mouseEnabled:Boolean;
 		
 		private var _parent:DisplayObjectContainer;
 		private var _weakHolder:Dictionary;
@@ -22,6 +25,8 @@ package net.peakgames.components.flatflash {
 		public function DisplayObject(...args) {
 			this._weakHolder = new Dictionary(true);
 			this._strongHolder = null;
+			
+			this.visible = true;
 			
 			this.initialize.apply(this, args);
 			
@@ -86,6 +91,16 @@ package net.peakgames.components.flatflash {
 			return this._height;
 		}
 		
+		public function set visible(value:Boolean):void {
+			this._visible = value;
+			
+			this.markChanged();
+		}
+		
+		public function get visible():Boolean {
+			return this._visible;
+		}
+		
 		public function set name(value:String):void {
 			this._name = value;
 		}
@@ -110,6 +125,17 @@ package net.peakgames.components.flatflash {
 		
 		public function get parent():DisplayObjectContainer {
 			return this._parent;
+		}
+		
+		public function set mouseEnabled(value:Boolean):void {
+			if (this.parent) {
+				this.parent.childMouseEnabledChanged(!this._mouseEnabled && value? 1 : this._mouseEnabled && !value? -1 : 0);
+			}
+			this._mouseEnabled = value;
+		}
+		
+		public function get mouseEnabled():Boolean {
+			return this._mouseEnabled;
 		}
 		
 		public function get bitmapData():BitmapData {
@@ -143,8 +169,15 @@ package net.peakgames.components.flatflash {
 			this._strongHolder = value? this.spritesheet : null;
 		}
 		
+		public function handleMouseEvent(e:MouseEvent):void {
+			//
+		}
+		
 		protected function markChanged():void {
 			this._changed = true;
+			if (this.visible && this.parent) {
+				this.parent.childChanged();
+			}
 		}
 		
 		protected function handleInitialized():void {
