@@ -112,16 +112,16 @@ package net.peakgames.components.flatflash {
 					displayObject = children[i];
 					displayObject.hop(getTimer() - this.startTime);
 					
-					if (displayObject.spritesheetRegion) {
-						if (latestSlicerType != displayObject.spritesheetRegion.type) {
-							latestSlicerType = displayObject.spritesheetRegion.type;
+					if (displayObject.region) {
+						if (latestSlicerType != displayObject.region.type) {
+							latestSlicerType = displayObject.region.type;
 							latestSlicer = SlicerFactory.get(latestSlicerType);
 						}
 						
 						try {
 							latestSlicer.copyPixels(
 								displayObject.spritesheet, bitmapData,
-								displayObject.spritesheetRegion, displayObject.position
+								displayObject.region, displayObject.position
 							);
 						} catch (e:Error) {
 							//

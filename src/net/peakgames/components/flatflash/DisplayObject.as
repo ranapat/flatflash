@@ -4,7 +4,6 @@ package net.peakgames.components.flatflash {
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	
-	import net.peakgames.components.flatflash.tools.Tools;
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class DisplayObject {
@@ -20,15 +19,21 @@ package net.peakgames.components.flatflash {
 		private var _weakHolder:Dictionary;
 		private var _strongHolder:BitmapData;
 		
-		public function DisplayObject(spritesheet:BitmapData = null) {
-			Tools.ensureAbstractClass(this, DisplayObject);
-			
+		public function DisplayObject(...args) {
 			this._weakHolder = new Dictionary(true);
-			this._weakHolder[spritesheet] = 1;
-			
 			this._strongHolder = null;
 			
+			this.initialize.apply(this, args);
+			
 			this.markChanged();
+		}
+		
+		public function initialize(...args):void {
+			if (args.length == 1 && args[0] is BitmapData) {
+				this._weakHolder[args[0]] = 1;
+				
+				this.handleInitialized();
+			}
 		}
 		
 		public function set x(value:Number):void {
@@ -119,13 +124,13 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function get spritesheet():BitmapData {
-			for (var spritesheet:Object in this._weakHolder) {
+			for (var spritesheet:* in this._weakHolder) {
 				return BitmapData(spritesheet);
 			}
 			return null;
 		}
 		
-		public function get spritesheetRegion():Region {
+		public function get region():Region {
 			return null;
 		}
 		
@@ -135,6 +140,10 @@ package net.peakgames.components.flatflash {
 		
 		protected function markChanged():void {
 			this._changed = true;
+		}
+		
+		protected function handleInitialized():void {
+			//
 		}
 		
 		protected function handleAddedToContainer():void {

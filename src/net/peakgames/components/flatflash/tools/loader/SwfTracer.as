@@ -15,8 +15,9 @@ package net.peakgames.components.flatflash.tools.loader {
 	public class SwfTracer extends EventDispatcher {
 		private static const FRAMES_COPY_PER_ITERATION:uint = 500;
 		
-		public static const TRACE_COMPLETE:String = "traceComplete";
-		public static const TRACE_FAIL:String = "traceFail";
+		public static const TRACE_COMPLETE:String = "swfTracerTraceComplete";
+		public static const TRACE_FAIL:String = "swfTracerTraceFail";
+		
 		public static const TYPE_SPRITE:String = "sprite";
 		public static const TYPE_MOVIE_CLIP:String = "movieClip";
 		
@@ -150,8 +151,8 @@ package net.peakgames.components.flatflash.tools.loader {
 		}
 		
 		private function finalizeCurrentTask():void {
-			var joined:JoinResult;
 			var type:String;
+			var joined:JoinResult;
 			
 			if (this._currentTracedIdentifier && this._cache[this._currentTracedIdentifier]) {
 				type = this._cache[this._currentTracedIdentifier].type;

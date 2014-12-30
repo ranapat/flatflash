@@ -3,7 +3,7 @@ package net.peakgames.components.flatflash {
 	import net.peakgames.components.flatflash.tools.regions.Region;
 	
 	public class MovieClip extends DisplayObject {
-		private var _spritesheetRegions:Vector.<Region>;
+		private var _regions:Vector.<Region>;
 		
 		private var _currentFrame:uint;
 		private var _playing:Boolean;
@@ -17,19 +17,27 @@ package net.peakgames.components.flatflash {
 		private var _timeDelta:Number;
 		private var _previousTimeOffset:uint;
 		
-		public function MovieClip(spritesheet:BitmapData = null, spritesheetRegions:Vector.<Region> = null) {
-			super(spritesheet);
+		public function MovieClip(...args) {
+			super();
 			
-			this._spritesheetRegions = spritesheetRegions;
-			this._totalFrames = spritesheetRegions.length;
+			this.initialize.apply(this, args);
 			
 			this._latestParentTFP = 0;
 			this._hopsBetweenMoves = 0;
 			this._hopEveryNthTime = 0;
 		}
 		
-		override public function get spritesheetRegion():Region {
-			return this._spritesheetRegions? this._spritesheetRegions[this._currentFrame] : null;
+		override public function initialize(...args):void {
+			if (args.length == 2 && args[0] is BitmapData && args[1] is Vector.<Region>) {
+				super.initialize(args[0]);
+				
+				this._regions = args[1];
+				this._totalFrames = this._regions.length;
+			}
+		}
+		
+		override public function get region():Region {
+			return this._regions? this._regions[this._currentFrame] : null;
 		}
 		
 		public function get currentFrame():uint {
@@ -38,14 +46,14 @@ package net.peakgames.components.flatflash {
 		
 		public function set currentFrame(value:uint):void {
 			if (
-				this._spritesheetRegions
+				this._regions
 				&& this.totalFrames > value
 				&& value >= 0
 			) {
 				this._currentFrame = value;
 				
-				this.width = this._spritesheetRegions[this._currentFrame].width;
-				this.height = this._spritesheetRegions[this._currentFrame].height;
+				this.width = this._regions[this._currentFrame].width;
+				this.height = this._regions[this._currentFrame].height;
 			}
 		}
 		
@@ -121,21 +129,21 @@ package net.peakgames.components.flatflash {
 		}
 		
 		override public function get name():String {
-			super.name = !super.name && this._spritesheetRegions && this.totalFrames > this.currentFrame?
-				this._spritesheetRegions[this.currentFrame].name : super.name;
+			super.name = !super.name && this._regions && this.totalFrames > this.currentFrame?
+				this._regions[this.currentFrame].name : super.name;
 			
 			return super.name;
 		}
 		
 		private function gotoNextFrame():void {
-			this.currentFrame = this._spritesheetRegions?
+			this.currentFrame = this._regions?
 				((this.currentFrame + 1 >= this.totalFrames)? 0 : this.currentFrame + 1)
 				: 0
 			;
 		}
 		
 		private function gotoPreviousFrame():void {
-			this.currentFrame = this._spritesheetRegions?
+			this.currentFrame = this._regions?
 				(this.currentFrame > 0? this.currentFrame - 1 : this.totalFrames)
 				: 0
 			;

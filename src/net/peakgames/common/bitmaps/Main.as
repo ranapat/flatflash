@@ -149,6 +149,23 @@ package net.peakgames.common.bitmaps {
 			if (e.id == loadRequestId) {
 				if (e.applicationDomain) {
 					SwfTracer.instance.stage = this.stage;
+					
+					for (var i:uint = 1; i <= 14; ++i) {
+						var m1:MovieClip = DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("Test_Serhat_1") as Class);
+						m1.fps = e.fps;
+						m1.x = 400 + i * 100;
+						m1.y = 400;
+						this.doc.addChild(m1);
+						m1.play();
+						
+						var i1:Image = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Test_Image_2") as Class);
+						i1.x = 400 + i * 100;
+						i1.y = 600;
+						this.doc.addChild(i1);
+					}
+					
+					/*
+					SwfTracer.instance.stage = this.stage;
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, this.handleSwfTracerComplete, false, 0, true);
 					SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, this.handleSwfTracerFail, false, 0, true);
 					
@@ -158,6 +175,7 @@ package net.peakgames.common.bitmaps {
 					for (var i:uint = 1; i <= 160; ++i) {
 						SwfTracer.instance.get(e.applicationDomain.getDefinition("FixedAnimationSequence") as Class);
 					}
+					*/
 					
 					
 					
