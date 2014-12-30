@@ -41,6 +41,7 @@ package net.peakgames.components.flatflash {
 			
 			this.markChanged();
 		}
+		
 		public function get x():Number {
 			return this._x;
 		}
@@ -50,6 +51,7 @@ package net.peakgames.components.flatflash {
 			
 			this.markChanged();
 		}
+		
 		public function get y():Number {
 			return this._y;
 		}
@@ -59,6 +61,7 @@ package net.peakgames.components.flatflash {
 			
 			this.markChanged();
 		}
+		
 		public function get depth():Number {
 			return this._depth;
 		}
@@ -68,6 +71,7 @@ package net.peakgames.components.flatflash {
 			
 			this.markChanged();
 		}
+		
 		public function get width():Number {
 			return this._width;
 		}
@@ -77,6 +81,7 @@ package net.peakgames.components.flatflash {
 			
 			this.markChanged();
 		}
+		
 		public function get height():Number {
 			return this._height;
 		}
