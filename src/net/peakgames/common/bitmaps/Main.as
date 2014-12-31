@@ -385,8 +385,9 @@ package net.peakgames.common.bitmaps {
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, e.result.regions, "Item_8_Animation0010")
 			(this.i1 as MovieClip).play();
 			(this.i1 as MovieClip).fps = 12;
-			this.i1.mouseEnabled = true;
+			//this.i1.mouseEnabled = true;
 			this.doc.addChild(this.i1);
+			//this.i1.mouseEnabled = true;
 			
 			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 			//this.i2 = DisplayObjectFactory.getMovieClipByMinMaxIndexes(e.result.bitmapData, e.result.regions, 1, 3);

@@ -5,6 +5,7 @@ package net.peakgames.components.flatflash {
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.clearTimeout;
+	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
 	import net.peakgames.components.flatflash.tools.slicers.ISlicer;
@@ -26,12 +27,13 @@ package net.peakgames.components.flatflash {
 		private var loopTimeout:uint;
 		
 		private var __changed:uint;
-		private var __mouseEnabled:uint;
+		private var __mouseEnabled:Dictionary;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
 			
 			this.children = new Vector.<DisplayObject>();
+			this.__mouseEnabled = new Dictionary(true);
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
 		}
@@ -57,7 +59,9 @@ package net.peakgames.components.flatflash {
 				
 				this.children[this.children.length] = child;
 				this.__changed += child.changed? 1 : 0;
-				this.__mouseEnabled += child.mouseEnabled? 1 : 0;
+				if (child.mouseEnabled) {
+					this.__mouseEnabled[child] = 1;
+				}
 			}
 		}
 		
@@ -68,6 +72,8 @@ package net.peakgames.components.flatflash {
 					this.children.splice(index, 1);
 					
 					child.parent = null;
+					
+					delete this.__mouseEnabled[child];
 				}
 			}
 		}
@@ -167,8 +173,12 @@ package net.peakgames.components.flatflash {
 			++this.__changed;
 		}
 		
-		public function childMouseEnabledChanged(delta:int):void {
-			this.__mouseEnabled = this.__mouseEnabled + delta < 0? 0 : this.__mouseEnabled + delta;
+		public function childMouseEnabledChanged(child:DisplayObject):void {
+			if (child.mouseEnabled) {
+				this.__mouseEnabled[child] = 1;
+			} else {
+				delete this.__mouseEnabled[child];
+			}
 		}
 		
 		private function get reorderedChildren():Vector.<DisplayObject> {
@@ -212,23 +222,22 @@ package net.peakgames.components.flatflash {
 		}
 		
 		private function loopChildrenForMouseEvent(x:Number, y:Number, e:MouseEvent):void {
-			var length:uint = this.numChildren;
+			e.localX = x;
+			e.localY = y;
+			
 			var child:DisplayObject;
-			for (var i:uint = 0; i < length; ++i) {
-				child = this.children[i];
-				if (child.mouseEnabled) {
-					if (
-						x >= child.x
-						&& y >= child.y
-						&& x <= child.x + child.width
-						&& y <= child.y + child.height
-					) {
-						e.localX = x;
-						e.localY = y;
-						
-						child.handleMouseEvent(e);
-					}
+			for (var _child:Object in this.__mouseEnabled) {
+				child = DisplayObject(_child);
+				if (
+					child
+					&& x >= child.x
+					&& y >= child.y
+					&& x <= child.x + child.width
+					&& y <= child.y + child.height
+				) {
+					child.handleMouseEvent(e);
 				}
+				
 			}
 		}
 		
@@ -236,36 +245,28 @@ package net.peakgames.components.flatflash {
 			var x:Number = e.stageX - this.x;
 			var y:Number = e.stageY - this.y;
 			
-			if (this.__mouseEnabled > 0) {
-				this.loopChildrenForMouseEvent(x, y, e);
-			}
+			this.loopChildrenForMouseEvent(x, y, e);
 		}
 		
 		private function handleMouseMove(e:MouseEvent):void {
 			var x:Number = e.stageX - this.x;
 			var y:Number = e.stageY - this.y;
 			
-			if (this.__mouseEnabled > 0) {
-				this.loopChildrenForMouseEvent(x, y, e);
-			}
+			this.loopChildrenForMouseEvent(x, y, e);
 		}
 		
 		private function handleMouseDown(e:MouseEvent):void {
 			var x:Number = e.stageX - this.x;
 			var y:Number = e.stageY - this.y;
 			
-			if (this.__mouseEnabled > 0) {
-				this.loopChildrenForMouseEvent(x, y, e);
-			}
+			this.loopChildrenForMouseEvent(x, y, e);
 		}
 		
 		private function handleMouseUp(e:MouseEvent):void {
 			var x:Number = e.stageX - this.x;
 			var y:Number = e.stageY - this.y;
 			
-			if (this.__mouseEnabled > 0) {
-				this.loopChildrenForMouseEvent(x, y, e);
-			}
+			this.loopChildrenForMouseEvent(x, y, e);
 		}
 		
 		private function handleEnterFrame(e:Event):void {

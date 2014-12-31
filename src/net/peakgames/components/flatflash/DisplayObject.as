@@ -128,10 +128,10 @@ package net.peakgames.components.flatflash {
 		}
 		
 		public function set mouseEnabled(value:Boolean):void {
-			if (this.parent) {
-				this.parent.childMouseEnabledChanged(!this._mouseEnabled && value? 1 : this._mouseEnabled && !value? -1 : 0);
-			}
 			this._mouseEnabled = value;
+			if (this.parent) {
+				this.parent.childMouseEnabledChanged(this);
+			}
 		}
 		
 		public function get mouseEnabled():Boolean {
