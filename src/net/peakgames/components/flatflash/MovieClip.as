@@ -118,8 +118,6 @@ package net.peakgames.components.flatflash {
 			
 			this._previousTimeOffset = timeOffset;
 			
-			
-			
 			if (this.playing) {
 				this.offsetFrames(delta);
 			}

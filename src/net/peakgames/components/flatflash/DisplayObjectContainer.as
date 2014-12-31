@@ -235,7 +235,7 @@ package net.peakgames.components.flatflash {
 					&& x <= child.x + child.width
 					&& y <= child.y + child.height
 				) {
-					child.handleMouseEvent(e);
+					child.mouseEvent(e);
 				}
 				
 			}

@@ -169,18 +169,24 @@ package net.peakgames.components.flatflash {
 			this._strongHolder = value? this.spritesheet : null;
 		}
 		
-		public function handleMouseEvent(e:MouseEvent):void {
-			//
+		public function mouseEvent(value:MouseEvent):void {
+			this.handleMouseEvent(value);
 		}
 		
 		protected function markChanged():void {
+			var previousChanged:Boolean = this.changed;
 			this._changed = true;
-			if (this.visible && this.parent) {
+			
+			if (!previousChanged && this.visible && this.parent) {
 				this.parent.childChanged();
 			}
 		}
 		
 		protected function handleInitialized():void {
+			//
+		}
+		
+		protected function handleMouseEvent(e:MouseEvent):void {
 			//
 		}
 		
