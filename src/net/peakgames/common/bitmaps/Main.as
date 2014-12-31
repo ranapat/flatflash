@@ -132,7 +132,8 @@ package net.peakgames.common.bitmaps {
 			// entry point
 			
 			//this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-2.xml", "../assets/");
-			this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/ATLAS/atlas.xml", "../assets/ATLAS/");
+			//this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/ATLAS/atlas.xml", "../assets/ATLAS/");
+			this.atlasLoader = new AtlasLoader(EngineTypes.TYPE_STARLING, "../assets/Untitled-1.xml", "../assets/");
 			this.atlasLoader.addEventListener(LoaderEvent.LOAD_COMPLETE, this.handleAtlasLoaderComplete);
 			this.atlasLoader.addEventListener(LoaderEvent.LOAD_FAIL, this.handleAtlasLoaderFail);
 			
