@@ -7,8 +7,8 @@ package org.ranapat.flatflash.tools.slicers {
 		function copyPixels(
 			source:BitmapData, destination:BitmapData,
 			sourceRegion:Region, destinationPoint:Point,
-			alphaBitmapData:BitmapData = null, alphaPoint:Point = null,
-			mergeAlpha:Boolean = true
+			sourceAlpha:Number,
+			sourceScaleX:Number, sourceScaleY:Number
 		):void;
 	}
 	

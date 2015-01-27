@@ -76,7 +76,7 @@ package org.ranapat.flatflash.examples {
 		private var slicer:ISlicer;
 		
 		private var doc:DisplayObjectContainer;
-		private var i1:DisplayObject;
+		private var i1:MovieClip;
 		private var i2:MovieClip;
 		
 		private var tf:TextField;
@@ -110,6 +110,16 @@ package org.ranapat.flatflash.examples {
 				} else if (e.keyCode == Keyboard.UP) {
 					this.i1.mouseEnabled = true;
 					this.i1.y -= 10;
+				} else if (e.keyCode == Keyboard.SPACE) {
+					//
+				} else if (e.keyCode == Keyboard.PAGE_UP) {
+					this.i1.alpha += .05;
+				} else if (e.keyCode == Keyboard.PAGE_DOWN) {
+					this.i1.alpha -= .05;
+				} else if (e.keyCode == Keyboard.HOME) {
+					this.i1.scale -= .05;
+				} else if (e.keyCode == Keyboard.END) {
+					this.i1.scale += .05;
 				}
 			}
 			
@@ -186,8 +196,8 @@ package org.ranapat.flatflash.examples {
 					
 					
 					//return;
-					var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Resize_Animation") as Class;
-					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
+					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Resize_Animation") as Class;
+					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
 					_ClassDefinition = ClassDefinition;
 					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Serhat_1") as Class;
 
@@ -208,6 +218,10 @@ package org.ranapat.flatflash.examples {
 						}
 					}
 					*/
+					
+					this.i1 = DisplayObjectFactory.movieClipFromSWF(ClassDefinition);
+					this.i1.play();
+					this.doc.addChild(this.i1);
 					
 					tt = new ClassDefinition();
 					tt.x = 200;
@@ -381,13 +395,14 @@ package org.ranapat.flatflash.examples {
 			this.doc.y = 100;
 			this.addChild(this.doc);
 			
-			this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
+			//this.i1 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
 			//this.i1 = DisplayObjectFactory.getImageByRegion(e.result.bitmapData, e.result.regions[10]);
 			//this.i1 = DisplayObjectFactory.getImageByName(e.result.bitmapData, e.result.regions, "Item_8_Animation0010")
-			(this.i1 as MovieClip).play();
-			(this.i1 as MovieClip).fps = 12;
+			//(this.i1 as MovieClip).play();
+			//(this.i1 as MovieClip).currentFrame = 1;
+			//(this.i1 as MovieClip).fps = 12;
 			//this.i1.mouseEnabled = true;
-			this.doc.addChild(this.i1);
+			//this.doc.addChild(this.i1);
 			//this.i1.mouseEnabled = true;
 			
 			//this.i2 = DisplayObjectFactory.getMovieClipFromAll(e.result.bitmapData, e.result.regions);
@@ -534,7 +549,7 @@ package org.ranapat.flatflash.examples {
 			
 			//populate(bitmapData2, 100);
 			
-			//addEventListener(Event.ENTER_FRAME, handleEnterFrame);
+			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
 			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
 			stage.displayState = StageDisplayState.FULL_SCREEN; 	
@@ -614,6 +629,7 @@ package org.ranapat.flatflash.examples {
 			//populate(bitmapData2, 1);
 			//populate(bitmapData2, 1000);
 			//populateFromSlices(bitmapData1);
+			/*
 			if (this.i1) {
 				this.i1.mouseEnabled = false;
 				if (this.i1.x > this.stage.stageWidth) {
@@ -627,6 +643,7 @@ package org.ranapat.flatflash.examples {
 					this.i1.y += 1;
 				}
 			}
+			*/
 			
 			if (++frameNumber == 4) {
 				var loader:ResourceLoader = ResourceLoader.instance;

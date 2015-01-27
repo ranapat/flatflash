@@ -4,7 +4,6 @@ package org.ranapat.flatflash {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
-	
 	import org.ranapat.flatflash.tools.regions.Region;
 	
 	public class DisplayObject {
@@ -13,10 +12,17 @@ package org.ranapat.flatflash {
 		private var _depth:Number;
 		private var _width:Number;
 		private var _height:Number;
-		private var _name:String;
-		private var _changed:Boolean;
+		private var _scaleX:Number;
+		private var _scaleY:Number;
+		private var _scale:Number;
+		private var _alpha:Number;
 		private var _visible:Boolean;
+		
 		private var _mouseEnabled:Boolean;
+		
+		private var _name:String;
+		
+		private var _changed:Boolean;
 		
 		private var _parent:DisplayObjectContainer;
 		private var _weakHolder:Dictionary;
@@ -26,6 +32,10 @@ package org.ranapat.flatflash {
 			this._weakHolder = new Dictionary(true);
 			this._strongHolder = null;
 			
+			this.scaleX = 1;
+			this.scaleY = 1;
+			this.scale = 1;
+			this.alpha = 1;
 			this.visible = true;
 			
 			this.initialize.apply(this, args);
@@ -89,6 +99,46 @@ package org.ranapat.flatflash {
 		
 		public function get height():Number {
 			return this._height;
+		}
+		
+		public function set scaleX(value:Number):void {
+			this._scaleX = value < 0? 0 : value;
+			
+			this.markChanged();
+		}
+		
+		public function get scaleX():Number {
+			return this._scaleX;
+		}
+		
+		public function set scaleY(value:Number):void {
+			this._scaleY = value < 0? 0 : value;
+			
+			this.markChanged();
+		}
+		
+		public function get scaleY():Number {
+			return this._scaleY;
+		}
+		
+		public function set scale(value:Number):void {
+			this.scaleX = value;
+			this.scaleY = value;
+			this._scale = value;
+		}
+		
+		public function get scale():Number {
+			return this._scale;
+		}
+		
+		public function set alpha(value:Number):void {
+			this._alpha = value < 0? 0 : value > 1? 1 : value;
+			
+			this.markChanged();
+		}
+		
+		public function get alpha():Number {
+			return this._alpha;
 		}
 		
 		public function set visible(value:Boolean):void {

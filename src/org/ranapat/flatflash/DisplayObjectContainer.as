@@ -136,7 +136,9 @@ package org.ranapat.flatflash {
 						try {
 							latestSlicer.copyPixels(
 								displayObject.spritesheet, bitmapData,
-								displayObject.region, displayObject.position
+								displayObject.region, displayObject.position,
+								displayObject.alpha,
+								displayObject.scaleX, displayObject.scaleY
 							);
 						} catch (e:Error) {
 							//
