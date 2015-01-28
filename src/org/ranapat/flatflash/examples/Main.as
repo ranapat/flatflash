@@ -81,6 +81,8 @@ package org.ranapat.flatflash.examples {
 		
 		private var tf:TextField;
 		
+		private var recorder:MovieClip;
+		
 		private var loadRequestId:int = -1;
 		
 		[Embed(source="../../../../../assets/img1.png")]
@@ -120,6 +122,22 @@ package org.ranapat.flatflash.examples {
 					this.i1.scale -= .05;
 				} else if (e.keyCode == Keyboard.END) {
 					this.i1.scale += .05;
+				} else if (e.keyCode == Keyboard.A) {
+					this.doc.visible = false;
+				} else if (e.keyCode == Keyboard.B) {
+					this.doc.visible = true;
+				} else if (e.keyCode == Keyboard.C) {
+					DisplayObjectFactory.startRecording(this.doc, new Rectangle(0, 0, 200, 200));
+				} else if (e.keyCode == Keyboard.D) {
+					recorder = DisplayObjectFactory.stopRecording(this.doc);
+					this.doc.addChild(recorder);
+					recorder.x = 10;
+					recorder.y = -10;
+					recorder.fps = 240;
+					recorder.play();
+				} else if (e.keyCode == Keyboard.E) {
+					this.doc.removeChild(recorder);
+					recorder = null;
 				}
 			}
 			

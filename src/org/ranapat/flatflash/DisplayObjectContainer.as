@@ -316,6 +316,7 @@ package org.ranapat.flatflash {
 			this.latestSlicer = null;
 			this.latestSlicerType = null;
 			
+			this.bitmapData.dispose();
 			this.bitmapData = null;
 			
 			clearTimeout(this.loopTimeout);

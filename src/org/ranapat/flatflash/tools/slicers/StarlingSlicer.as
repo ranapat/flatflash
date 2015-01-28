@@ -38,7 +38,7 @@ package org.ranapat.flatflash.tools.slicers {
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
 				if (sourceScaleX != 1 || sourceScaleY != 1) {
-					var result:BitmapData = new BitmapData(sourceRegion.width * sourceScaleX, sourceRegion.height * sourceScaleY, true, 0xff00ff);
+					var result:BitmapData = new BitmapData(sourceRegion.width * sourceScaleX, sourceRegion.height * sourceScaleY, true, 0);
 					var matrix:Matrix = new Matrix();
 					matrix.scale(sourceScaleX, sourceScaleY);
 					result.draw(clipped, matrix, null, null, null, sourceSmoothing);

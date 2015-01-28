@@ -1,5 +1,9 @@
 package org.ranapat.flatflash {
 	import flash.display.BitmapData;
+	import flash.events.Event;
+	import flash.geom.Rectangle;
+	import flash.system.System;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import org.ranapat.flatflash.Image;
 	import org.ranapat.flatflash.tools.loader.SwfTracer;
@@ -10,6 +14,8 @@ package org.ranapat.flatflash {
 		
 		private static var swfGetterInitialized:Boolean;
 		private static var swfGetterQueue:Dictionary;
+		
+		private static var recording:Dictionary;
 		
 		public static function getImageByRegion(spritesheet:BitmapData, region:Region):Image {
 			return new Image(spritesheet, region);
@@ -60,6 +66,61 @@ package org.ranapat.flatflash {
 			return new MovieClip(spritesheet, regionsToPick);
 		}
 		
+		public static function movieClipFromSWF(_class:Class, identifier:String = null):MovieClip {
+			DisplayObjectFactory.ensureSWFGetter();
+			
+			var object:MovieClip = new MovieClip();
+			DisplayObjectFactory.swfGetterQueue[object] = -1;
+			var key:uint = SwfTracer.instance.get(_class, identifier);
+			if (DisplayObjectFactory.swfGetterQueue[object]) {
+				DisplayObjectFactory.swfGetterQueue[object] = key;
+			}
+			
+			return object;
+		}
+		
+		public static function imageFromSWF(_class:Class, identifier:String = null):Image {
+			DisplayObjectFactory.ensureSWFGetter();
+			
+			var object:Image = new Image();
+			DisplayObjectFactory.swfGetterQueue[object] = -1;
+			var key:uint = SwfTracer.instance.get(_class, identifier);
+			if (DisplayObjectFactory.swfGetterQueue[object]) {
+				DisplayObjectFactory.swfGetterQueue[object] = key;
+			}
+			
+			return object;
+		}
+		
+		public static function startRecording(object:flash.display.DisplayObject, clipRectangle:Rectangle = null):void {
+			DisplayObjectFactory.ensureRecording();
+			
+			DisplayObjectFactory.recording[object] = new RecordingObject(new Vector.<ByteArray>(), clipRectangle);
+			object.addEventListener(Event.ENTER_FRAME, DisplayObjectFactory.handleRecondingEnterFrame, false, 0, true);
+		}
+		
+		public static function stopRecording(object:flash.display.DisplayObject):MovieClip {
+			if (DisplayObjectFactory.recording && DisplayObjectFactory.recording[object]) {
+				object.removeEventListener(Event.ENTER_FRAME, DisplayObjectFactory.handleRecondingEnterFrame);
+				
+				var vector:Vector.<ByteArray> = DisplayObjectFactory.recording[object].vector;
+				var clipRectangle:Rectangle = DisplayObjectFactory.recording[object].clipRectangle;
+				
+				DisplayObjectFactory.recording[object] = null;
+				delete DisplayObjectFactory.recording[object];
+				
+				return new MovieClip(vector, clipRectangle? clipRectangle.width : object.width, clipRectangle? clipRectangle.width : object.height);
+			} else {
+				return null;
+			}
+		}
+		
+		private static function ensureRecording():void {
+			if (!DisplayObjectFactory.recording) {
+				DisplayObjectFactory.recording = new Dictionary(true);
+			}
+		}
+		
 		private static function ensureSWFGetter():void {
 			if (!DisplayObjectFactory.swfGetterInitialized) {
 				DisplayObjectFactory.swfGetterInitialized = true;
@@ -108,31 +169,40 @@ package org.ranapat.flatflash {
 			return null;
 		}
 		
-		public static function movieClipFromSWF(_class:Class, identifier:String = null):MovieClip {
-			DisplayObjectFactory.ensureSWFGetter();
+		private static function handleRecondingEnterFrame(e:Event):void {
+			var object:flash.display.DisplayObject = e.target as flash.display.DisplayObject;
 			
-			var object:MovieClip = new MovieClip();
-			DisplayObjectFactory.swfGetterQueue[object] = -1;
-			var key:uint = SwfTracer.instance.get(_class, identifier);
-			if (DisplayObjectFactory.swfGetterQueue[object]) {
-				DisplayObjectFactory.swfGetterQueue[object] = key;
+			if (DisplayObjectFactory.recording[object]) {
+				try {
+					
+					var vector:Vector.<ByteArray> = DisplayObjectFactory.recording[object].vector;
+					var clipRectangle:Rectangle = DisplayObjectFactory.recording[object].clipRectangle;
+					
+					var tmp:BitmapData = new BitmapData(clipRectangle? clipRectangle.width : object.width, clipRectangle? clipRectangle.height : object.height, true, 0);
+					
+					tmp.draw(object, null, null, null, clipRectangle, false);
+					
+					var bytearray:ByteArray = tmp.getPixels(new Rectangle(0, 0, tmp.width, tmp.height));
+					bytearray.deflate();
+					vector[vector.length] = bytearray;
+				} catch (err:Error) {
+					//trace(err);
+				}
 			}
-			
-			return object;
-		}
-		
-		public static function imageFromSWF(_class:Class, identifier:String = null):Image {
-			DisplayObjectFactory.ensureSWFGetter();
-			
-			var object:Image = new Image();
-			DisplayObjectFactory.swfGetterQueue[object] = -1;
-			var key:uint = SwfTracer.instance.get(_class, identifier);
-			if (DisplayObjectFactory.swfGetterQueue[object]) {
-				DisplayObjectFactory.swfGetterQueue[object] = key;
-			}
-			
-			return object;
 		}
 	}
 
+}
+
+import flash.geom.Rectangle;
+import flash.utils.ByteArray;
+
+class RecordingObject {
+	public var vector:Vector.<ByteArray>;
+	public var clipRectangle:Rectangle;
+	
+	public function RecordingObject(vector:Vector.<ByteArray>, clipRectangle:Rectangle) {
+		this.vector = vector;
+		this.clipRectangle = clipRectangle;
+	}
 }
