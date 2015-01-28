@@ -138,7 +138,8 @@ package org.ranapat.flatflash {
 								displayObject.spritesheet, bitmapData,
 								displayObject.region, displayObject.position,
 								displayObject.alpha,
-								displayObject.scaleX, displayObject.scaleY
+								displayObject.scaleX, displayObject.scaleY,
+								displayObject.smoothing
 							);
 						} catch (e:Error) {
 							//

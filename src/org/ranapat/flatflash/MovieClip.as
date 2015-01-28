@@ -1,9 +1,11 @@
 package org.ranapat.flatflash {
 	import flash.display.BitmapData;
+	import org.ranapat.flatflash.tools.EngineTypes;
 	import org.ranapat.flatflash.tools.regions.Region;
 	
 	public class MovieClip extends DisplayObject {
 		private var _regions:Vector.<Region>;
+		private var _raw:Vector.<BitmapData>;
 		
 		private var _currentFrame:uint;
 		private var _playing:Boolean;
@@ -34,11 +36,13 @@ package org.ranapat.flatflash {
 				this.fps = -1;
 				this._regions = args[1];
 				this._totalFrames = this._regions.length;
+			} else if (args.length == 1 && args[0] is Vector.<BitmapData>) {
+				this.handleInitialized();
+				
+				this.fps = -1;
+				this._raw = args[0];
+				this._totalFrames = this._raw.length;
 			}
-		}
-		
-		override public function get region():Region {
-			return this._regions? this._regions[this._currentFrame] : null;
 		}
 		
 		public function get currentFrame():uint {
@@ -47,14 +51,20 @@ package org.ranapat.flatflash {
 		
 		public function set currentFrame(value:uint):void {
 			if (
-				this._regions
-				&& this.totalFrames > value
+				this.totalFrames > value
 				&& value >= 0
 			) {
-				this._currentFrame = value;
-				
-				this.width = this._regions[this._currentFrame].width;
-				this.height = this._regions[this._currentFrame].height;
+				if (this._regions) {
+					this._currentFrame = value;
+					
+					this.width = this._regions[this._currentFrame].width;
+					this.height = this._regions[this._currentFrame].height;
+				} else if (this._raw) {
+					this._currentFrame = value;
+					
+					this.width = this._raw[this._currentFrame].width;
+					this.height = this._raw[this._currentFrame].height;
+				}
 			}
 		}
 		
@@ -107,6 +117,14 @@ package org.ranapat.flatflash {
 			this.stop();
 		}
 		
+		override public function get spritesheet():BitmapData {
+			return this._regions? super.spritesheet : this._raw? this._raw[this._currentFrame] : null;
+		}
+		
+		override public function get region():Region {
+			return this._regions? this._regions[this._currentFrame] : this._raw? new Region(this.name + "-frame-" + this.currentFrame, 0, 0, this.width, this.height, EngineTypes.TYPE_STARLING) : null;
+		}
+		
 		override public function hop(timer:int):void {
 			super.hop(timer);
 			
@@ -129,20 +147,22 @@ package org.ranapat.flatflash {
 		
 		override public function get name():String {
 			super.name = !super.name && this._regions && this.totalFrames > this.currentFrame?
-				this._regions[this.currentFrame].name : super.name;
+				this._regions[this.currentFrame].name : !super.name && this._raw?
+					super.name + "-frame-" + this.currentFrame : super.name
+			;
 			
 			return super.name;
 		}
 		
 		private function gotoNextFrame():void {
-			this.currentFrame = this._regions?
+			this.currentFrame = this._regions || this._raw?
 				((this.currentFrame + 1 >= this.totalFrames)? 0 : this.currentFrame + 1)
 				: 0
 			;
 		}
 		
 		private function gotoPreviousFrame():void {
-			this.currentFrame = this._regions?
+			this.currentFrame = this._regions || this._raw?
 				(this.currentFrame > 0? this.currentFrame - 1 : this.totalFrames)
 				: 0
 			;

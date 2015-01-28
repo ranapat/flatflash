@@ -135,7 +135,7 @@ package org.ranapat.flatflash.tools.loader {
 		}
 		
 		private function failCurrentTask(e:Error):void {
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, e));
+			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, null, e));
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -153,18 +153,21 @@ package org.ranapat.flatflash.tools.loader {
 		private function finalizeCurrentTask():void {
 			var type:String;
 			var joined:JoinResult;
+			var raw:Vector.<BitmapData>;
 			
 			if (this._currentTracedIdentifier && this._cache[this._currentTracedIdentifier]) {
 				type = this._cache[this._currentTracedIdentifier].type;
 				joined = this._cache[this._currentTracedIdentifier].joined;
+				raw = this._cache[this._currentTracedIdentifier].raw;
 			} else {
 				type = this._currentType;
 				joined = this._bitmapDataJoiner.toAtlas(this._currentTracedBitmaps);
+				raw = joined? null : this._currentTracedBitmaps;
 				
-				this._cache[this._currentTracedIdentifier] = new CacheObject(type, joined);
+				this._cache[this._currentTracedIdentifier] = new CacheObject(type, joined, raw);
 			}
 			
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, type, joined, null));
+			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, type, joined, raw, null));
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -213,6 +216,7 @@ package org.ranapat.flatflash.tools.loader {
 
 }
 
+import flash.display.BitmapData;
 import org.ranapat.flatflash.tools.joiners.JoinResult;
 
 class QueueObject {
@@ -231,9 +235,11 @@ class QueueObject {
 class CacheObject {
 	public var type:String;
 	public var joined:JoinResult;
+	public var raw:Vector.<BitmapData>;
 	
-	public function CacheObject(type:String, joined:JoinResult) {
+	public function CacheObject(type:String, joined:JoinResult, raw:Vector.<BitmapData>) {
 		this.type = type;
 		this.joined = joined;
+		this.raw = raw;
 	}
 }

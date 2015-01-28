@@ -17,7 +17,8 @@ package org.ranapat.flatflash.tools.slicers {
 			source:BitmapData, destination:BitmapData,
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAlpha:Number,
-			sourceScaleX:Number, sourceScaleY:Number
+			sourceScaleX:Number, sourceScaleY:Number,
+			sourceSmoothing:Boolean
 		):void {
 			if (sourceAlpha == 0 || sourceScaleX == 0 || sourceScaleY == 0) return;
 			
@@ -40,7 +41,7 @@ package org.ranapat.flatflash.tools.slicers {
 					var result:BitmapData = new BitmapData(sourceRegion.width * sourceScaleX, sourceRegion.height * sourceScaleY, true, 0xff00ff);
 					var matrix:Matrix = new Matrix();
 					matrix.scale(sourceScaleX, sourceScaleY);
-					result.draw(clipped, matrix);
+					result.draw(clipped, matrix, null, null, null, sourceSmoothing);
 					
 					clipped = result;
 					sourceRectangle = new Rectangle(0, 0, result.width, result.height);

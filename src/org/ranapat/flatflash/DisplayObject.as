@@ -16,6 +16,7 @@ package org.ranapat.flatflash {
 		private var _scaleY:Number;
 		private var _scale:Number;
 		private var _alpha:Number;
+		private var _smoothing:Boolean;
 		private var _visible:Boolean;
 		
 		private var _mouseEnabled:Boolean;
@@ -37,6 +38,7 @@ package org.ranapat.flatflash {
 			this.scale = 1;
 			this.alpha = 1;
 			this.visible = true;
+			this.smoothing = true;
 			
 			this.initialize.apply(this, args);
 			
@@ -139,6 +141,14 @@ package org.ranapat.flatflash {
 		
 		public function get alpha():Number {
 			return this._alpha;
+		}
+		
+		public function set smoothing(value:Boolean):void {
+			this._smoothing = value;
+		}
+		
+		public function get smoothing():Boolean {
+			return this._smoothing;
 		}
 		
 		public function set visible(value:Boolean):void {

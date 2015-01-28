@@ -196,8 +196,10 @@ package org.ranapat.flatflash.examples {
 					
 					
 					//return;
+					var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Serhat_2") as Class;
+					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Serhat_1") as Class;
 					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Resize_Animation") as Class;
-					var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
+					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Item_8_Animation") as Class;
 					_ClassDefinition = ClassDefinition;
 					//var ClassDefinition:Class = e.applicationDomain.getDefinition("Test_Serhat_1") as Class;
 
@@ -311,16 +313,18 @@ package org.ranapat.flatflash.examples {
 					
 					var tt:BitmapDataVectorJoiner = new BitmapDataVectorJoiner();
 					var f:JoinResult = tt.toAtlas(ttt);
-					trace(f.bitmapData)
-					trace(f.regions)
-					
-					AssetsKeeper.instance.keep(f.bitmapData);
-					
-					var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
-					newMovie.x = 400;
-					newMovie.y = 200;
-					newMovie.play();
-					this.doc.addChild(newMovie);
+					if (f) {
+						trace(f.bitmapData)
+						trace(f.regions)
+						
+						AssetsKeeper.instance.keep(f.bitmapData);
+						
+						var newMovie:MovieClip = new MovieClip(f.bitmapData, f.regions);
+						newMovie.x = 400;
+						newMovie.y = 200;
+						newMovie.play();
+						this.doc.addChild(newMovie);
+					}
 					
 					
 					/**/

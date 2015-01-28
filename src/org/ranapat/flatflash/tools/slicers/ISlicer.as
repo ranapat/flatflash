@@ -8,7 +8,8 @@ package org.ranapat.flatflash.tools.slicers {
 			source:BitmapData, destination:BitmapData,
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAlpha:Number,
-			sourceScaleX:Number, sourceScaleY:Number
+			sourceScaleX:Number, sourceScaleY:Number,
+			sourceSmoothing:Boolean
 		):void;
 	}
 	

@@ -75,7 +75,11 @@ package org.ranapat.flatflash {
 			if (object) {
 				try {
 					if (e.resultType == SwfTracer.TYPE_MOVIE_CLIP) {
-						(object as MovieClip).initialize(e.result.bitmapData, e.result.regions);
+						if (e.result) {
+							(object as MovieClip).initialize(e.result.bitmapData, e.result.regions);
+						} else {
+							(object as MovieClip).initialize(e.raw);
+						}
 					} else if (e.resultType == SwfTracer.TYPE_SPRITE) {
 						(object as Image).initialize(e.result.bitmapData, e.result.regions[0]);
 					}
