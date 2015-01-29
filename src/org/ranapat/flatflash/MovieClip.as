@@ -34,27 +34,29 @@ package org.ranapat.flatflash {
 		
 		override public function initialize(...args):void {
 			if (args.length == 2 && args[0] is BitmapData && args[1] is Vector.<Region>) {
-				super.initialize(args[0]);
-				
 				this.fps = -1;
 				this._regions = args[1];
 				this._totalFrames = this._regions.length;
-			} else if (args.length == 1 && args[0] is Vector.<BitmapData> && (args[0] as Vector.<BitmapData>).length > 0) {
-				this.handleInitialized();
 				
+				super.initialize(args[0]);
+			} else if (args.length == 1 && args[0] is Vector.<BitmapData> && (args[0] as Vector.<BitmapData>).length > 0) {
 				this.fps = -1;
 				this._raw = args[0];
 				this._totalFrames = this._raw.length;
-			} else if (args.length == 3 && args[0] is Vector.<ByteArray> && (args[0] as Vector.<ByteArray>).length > 0 && args[1] is Number && args[2] is Number) {
-				this.handleInitialized();
 				
+				this.handleInitialized();
+			} else if (args.length == 3 && args[0] is Vector.<ByteArray> && (args[0] as Vector.<ByteArray>).length > 0 && args[1] is Number && args[2] is Number) {
 				this.fps = -1;
 				this._compressed = args[0];
 				this._totalFrames = this._compressed.length;
 				
 				this.width = args[1];
 				this.height = args[2];
+				
+				this.handleInitialized();
 			}
+			
+			this.currentFrame = 0;
 		}
 		
 		public function get currentFrame():uint {
