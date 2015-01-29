@@ -19,6 +19,10 @@ package org.ranapat.flatflash {
 		private var _smoothing:Boolean;
 		private var _visible:Boolean;
 		
+		private var _initialized:Boolean;
+		private var _initializedCallbackHolder:Dictionary;
+		private var _initializedCallbackParameters:Array;
+		
 		private var _mouseEnabled:Boolean;
 		
 		private var _name:String;
@@ -32,6 +36,8 @@ package org.ranapat.flatflash {
 		public function DisplayObject(...args) {
 			this._weakHolder = new Dictionary(true);
 			this._strongHolder = null;
+			
+			this._initializedCallbackHolder = new Dictionary(true);
 			
 			this.scaleX = 1;
 			this.scaleY = 1;
@@ -76,6 +82,10 @@ package org.ranapat.flatflash {
 		public function set depth(value:Number):void {
 			this._depth = value;
 			
+			if (this.parent) {
+				this.parent.reorder();
+			}
+			
 			this.markChanged();
 		}
 		
@@ -90,7 +100,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get width():Number {
-			return this._width;
+			return this._width * this._scaleX;
 		}
 		
 		public function set height(value:Number):void {
@@ -100,7 +110,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get height():Number {
-			return this._height;
+			return this._height * this._scaleY;
 		}
 		
 		public function set scaleX(value:Number):void {
@@ -225,6 +235,10 @@ package org.ranapat.flatflash {
 			return null;
 		}
 		
+		public function get initialized():Boolean {
+			return this._initialized;
+		}
+		
 		public function set keepSpritesheet(value:Boolean):void {
 			this._strongHolder = value? this.spritesheet : null;
 		}
@@ -233,6 +247,21 @@ package org.ranapat.flatflash {
 			this.handleMouseEvent(value);
 		}
 		
+		public function onInitialize(object:Object, callback:Function, parameters:Array = null):void {
+			this._initializedCallbackHolder[object] = callback;
+			this._initializedCallbackParameters = parameters;
+		}
+		
+		private function get onInitialized():Function {
+			for (var i:* in this._initializedCallbackHolder) {
+				if (this._initializedCallbackHolder[i] is Function) {
+					return this._initializedCallbackHolder[i] as Function;
+				}
+			}
+			
+			return null;
+		}
+
 		protected function markChanged():void {
 			var previousChanged:Boolean = this.changed;
 			this._changed = true;
@@ -243,7 +272,11 @@ package org.ranapat.flatflash {
 		}
 		
 		protected function handleInitialized():void {
-			//
+			this._initialized = true;
+			
+			if (this.onInitialized != null) {
+				this.onInitialized.apply(null, this._initializedCallbackParameters);
+			}
 		}
 		
 		protected function handleMouseEvent(e:MouseEvent):void {
