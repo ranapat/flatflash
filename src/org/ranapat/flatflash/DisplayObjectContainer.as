@@ -1,13 +1,14 @@
 package org.ranapat.flatflash {
+	import flash.utils.clearTimeout;
+	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
-	import flash.utils.clearTimeout;
-	import flash.utils.Dictionary;
-	import flash.utils.getTimer;
-	import flash.utils.setTimeout;
+	
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
@@ -65,17 +66,41 @@ package org.ranapat.flatflash {
 			}
 		}
 		
-		public function removeChild(child:DisplayObject):void {
+		public function removeChild(child:DisplayObject):DisplayObject {
 			if (child) {
 				var index:uint = this.children.indexOf(child);
 				if (index != -1) {
-					this.children.splice(index, 1);
-					
-					child.parent = null;
-					
-					delete this.__mouseEnabled[child];
+					return this.removeChildAt(index);
 				}
 			}
+			
+			return null;
+		}
+		
+		public function removeChildAt(index:uint):DisplayObject {
+			if (index >= 0 && index < this.numChildren) {
+				var child:DisplayObject = this.children[index];
+				
+				this.children.splice(index, 1);
+					
+				child.parent = null;
+				
+				delete this.__mouseEnabled[child];
+				
+				return child;
+			}
+			
+			return null;
+		}
+		
+		public function removeAllChildren():Vector.<DisplayObject> {
+			var result:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			
+			while (this.numChildren > 0) {
+				result[result.length] = this.removeChildAt(0);
+			}
+			
+			return result;
 		}
 		
 		public function swapChildren(childA:DisplayObject, childB:DisplayObject):void {
