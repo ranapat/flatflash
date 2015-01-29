@@ -1,4 +1,5 @@
 package org.ranapat.flatflash.examples {
+	import com.greensock.TweenLite;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.BlendMode;
@@ -79,6 +80,10 @@ package org.ranapat.flatflash.examples {
 		private var i1:MovieClip;
 		private var i2:MovieClip;
 		
+		private var i3:Image;
+		
+		private var carousel:Carousel;
+		
 		private var tf:TextField;
 		
 		private var recorder:MovieClip;
@@ -138,6 +143,22 @@ package org.ranapat.flatflash.examples {
 				} else if (e.keyCode == Keyboard.E) {
 					this.doc.removeChild(recorder);
 					recorder = null;
+				} else if (e.keyCode == Keyboard.O) {
+					angleLeft(1);
+					offsetByAngle();
+				} else if (e.keyCode == Keyboard.P) {
+					angleRight(1);
+					offsetByAngle();
+				} else if (e.keyCode == Keyboard.F) {
+					this.carousel.offsetAngle(1);
+				} else if (e.keyCode == Keyboard.G) {
+					this.carousel.offsetAngle(-1);
+				} else if (e.keyCode == Keyboard.K) {
+					TweenLite.killDelayedCallsTo(handleDelayOffsetAngleMinus)
+					TweenLite.delayedCall(.0001, this.handleDelayOffsetAnglePlus);
+				} else if (e.keyCode == Keyboard.L) {
+					TweenLite.killDelayedCallsTo(handleDelayOffsetAnglePlus)
+					TweenLite.delayedCall(.0001, this.handleDelayOffsetAngleMinus);
 				}
 			}
 			
@@ -152,6 +173,20 @@ package org.ranapat.flatflash.examples {
 					this.i2.gotoAndStop(300);
 				}
 			}
+		}
+		
+		private function handleDelayOffsetAnglePlus():void {
+			
+			
+			this.carousel.offsetAngle(1);
+			TweenLite.delayedCall(.0001, this.handleDelayOffsetAnglePlus);
+		}
+		
+		private function handleDelayOffsetAngleMinus():void {
+			
+			
+			this.carousel.offsetAngle( -1);
+			TweenLite.delayedCall(.0001, this.handleDelayOffsetAngleMinus);
 		}
 		
 		private function init(e:Event = null):void {
@@ -176,6 +211,33 @@ package org.ranapat.flatflash.examples {
 			loader.addEventListener(ResourceLoaderEvent.RESOURCE_COMPLETE, this.handleResourceLoaderComplete);
 			
 			addChild(new Stats());
+		}
+		
+		private var initialSize:Rectangle = new Rectangle(0, 0, 418, 252);
+		private var initialPoint:Point = new Point(500, 500);
+		private var radius:uint = 150;
+		private var latestAngle:int = 0;
+		private function angleLeft(step:int):void {
+			latestAngle += step;
+			latestAngle = latestAngle > 90? 90 : latestAngle;
+		}
+		private function angleRight(step:int):void {
+			latestAngle -= step;
+			latestAngle = latestAngle < -90? -90 : latestAngle;
+		}
+		private function offsetByAngle():void {
+			var angleRadians:Number = latestAngle * Math.PI / 180;
+			i3.x = initialPoint.x - radius * Math.sin(angleRadians);
+			
+			var depth:Number = Math.cos(angleRadians);
+			
+			i3.alpha = .6 + .4 * depth;
+			i3.scaleX = i3.scaleY = .6 + .4 * depth;
+			
+			i3.y = initialPoint.y + (initialSize.height - i3.height) / 2;
+			trace(i3.y + " .. " + initialPoint.y + " .. " +  initialSize.height + " .. " + i3.height);
+			
+			trace(latestAngle + " .. " + angleRadians + " .. " + i3.x + " .. " + depth + " .. " + i3.height + " .. " + i3.width);
 		}
 		
 		private var _ClassDefinition:Class;
@@ -253,6 +315,40 @@ package org.ranapat.flatflash.examples {
 					ttt = new Vector.<BitmapData>();
 					
 					tt.addEventListener(Event.ENTER_FRAME, this.handleTTEnterFrame);
+					
+					
+					
+					
+					
+					
+					
+					i3 = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class);
+					this.doc.addChild(i3);
+					i3.x = 500;
+					i3.y = 500;
+					i3.visible = false;
+					
+					this.doc.visible = false;
+					
+					this.carousel = new Carousel();
+					this.carousel.initialPoint = new Point(600, 0);
+					this.carousel.initialSize = new Rectangle(0, 0, 418, 252);
+					this.carousel.items = Vector.<DisplayObject>([
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image2") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image3") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image4") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image5") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image6") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image7") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image8") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image9") as Class)
+					]);
+					this.addChild(this.carousel);
+					this.carousel.x = 400;
+					this.carousel.y = 400;
+					
+					
 					
 					/*
 					for (var i:uint = 0; i < 500; ++i) {
