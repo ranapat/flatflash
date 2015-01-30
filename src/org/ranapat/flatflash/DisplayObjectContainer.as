@@ -36,7 +36,7 @@ package org.ranapat.flatflash {
 			this.children = new Vector.<DisplayObject>();
 			this.__mouseEnabled = new Dictionary(true);
 			
-			this.addEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage, false, 0, true);
+			this.addEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage, false, 0, true);
 		}
 		
 		public function destroy():void {
@@ -265,7 +265,6 @@ package org.ranapat.flatflash {
 				) {
 					child.mouseEvent(e);
 				}
-				
 			}
 		}
 		
@@ -303,10 +302,10 @@ package org.ranapat.flatflash {
 			this.redraw();
 		}
 		
-		private function handleAddedToStage(e:Event):void {
-			this.removeEventListener(Event.ADDED_TO_STAGE, this.handleAddedToStage);
+		private function _handleAddedToStage(e:Event):void {
+			this.removeEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage);
 			
-			this.addEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage, false, 0, true);
+			this.addEventListener(Event.REMOVED_FROM_STAGE, this._handleRemovedFromStage, false, 0, true);
 			
 			this.stage.addEventListener(MouseEvent.CLICK, this.handleClick, false, 0, true);
 			this.stage.addEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove, false, 0, true);
@@ -324,10 +323,12 @@ package org.ranapat.flatflash {
 			}
 			
 			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
+			
+			this.handleAddedToStage();
 		}
 		
-		private function handleRemovedFromStage(e:Event):void {
-			this.removeEventListener(Event.REMOVED_FROM_STAGE, this.handleRemovedFromStage);
+		private function _handleRemovedFromStage(e:Event):void {
+			this.removeEventListener(Event.REMOVED_FROM_STAGE, this._handleRemovedFromStage);
 			
 			this.stage.removeEventListener(MouseEvent.CLICK, this.handleClick);
 			this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove);
@@ -346,6 +347,16 @@ package org.ranapat.flatflash {
 			
 			clearTimeout(this.loopTimeout);
 			this.loopTimeout = 0;
+			
+			this.handleRemovedFromStage();
+		}
+		
+		protected function handleAddedToStage():void {
+			//
+		}
+		
+		protected function handleRemovedFromStage():void {
+			//
 		}
 	}
 
