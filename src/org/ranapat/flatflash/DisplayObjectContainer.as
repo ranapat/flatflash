@@ -1,4 +1,5 @@
 package org.ranapat.flatflash {
+	import flash.geom.Point;
 	import flash.utils.clearTimeout;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
@@ -269,31 +270,23 @@ package org.ranapat.flatflash {
 		}
 		
 		private function handleClick(e:MouseEvent):void {
-			var x:Number = e.stageX - this.x;
-			var y:Number = e.stageY - this.y;
-			
-			this.loopChildrenForMouseEvent(x, y, e);
+			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
+			this.loopChildrenForMouseEvent(point.x, point.y, e);
 		}
 		
 		private function handleMouseMove(e:MouseEvent):void {
-			var x:Number = e.stageX - this.x;
-			var y:Number = e.stageY - this.y;
-			
-			this.loopChildrenForMouseEvent(x, y, e);
+			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
+			this.loopChildrenForMouseEvent(point.x, point.y, e);
 		}
 		
 		private function handleMouseDown(e:MouseEvent):void {
-			var x:Number = e.stageX - this.x;
-			var y:Number = e.stageY - this.y;
-			
-			this.loopChildrenForMouseEvent(x, y, e);
+			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
+			this.loopChildrenForMouseEvent(point.x, point.y, e);
 		}
 		
 		private function handleMouseUp(e:MouseEvent):void {
-			var x:Number = e.stageX - this.x;
-			var y:Number = e.stageY - this.y;
-			
-			this.loopChildrenForMouseEvent(x, y, e);
+			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
+			this.loopChildrenForMouseEvent(point.x, point.y, e);
 		}
 		
 		private function handleEnterFrame(e:Event):void {
