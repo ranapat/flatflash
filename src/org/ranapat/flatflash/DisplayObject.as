@@ -23,6 +23,8 @@ package org.ranapat.flatflash {
 		private var _initializedCallbackHolder:Dictionary;
 		private var _initializedCallbackParameters:Array;
 		
+		private var _mouseEventCallbackHolder:Dictionary;
+		
 		private var _mouseEnabled:Boolean;
 		
 		private var _name:String;
@@ -38,6 +40,7 @@ package org.ranapat.flatflash {
 			this._strongHolder = null;
 			
 			this._initializedCallbackHolder = new Dictionary(true);
+			this._mouseEventCallbackHolder = new Dictionary(true);
 			
 			this.scaleX = 1;
 			this.scaleY = 1;
@@ -252,10 +255,24 @@ package org.ranapat.flatflash {
 			this._initializedCallbackParameters = parameters;
 		}
 		
-		private function get onInitialized():Function {
+		public function onMouseEvent(object:Object, callback:Function):void {
+			this._mouseEventCallbackHolder[object] = callback;
+		}
+		
+		private function get onInitializeCallback():Function {
 			for (var i:* in this._initializedCallbackHolder) {
 				if (this._initializedCallbackHolder[i] is Function) {
 					return this._initializedCallbackHolder[i] as Function;
+				}
+			}
+			
+			return null;
+		}
+		
+		private function get onMouseEventCallback():Function {
+			for (var i:* in this._mouseEventCallbackHolder) {
+				if (this._mouseEventCallbackHolder[i] is Function) {
+					return this._mouseEventCallbackHolder[i] as Function;
 				}
 			}
 			
@@ -274,13 +291,15 @@ package org.ranapat.flatflash {
 		protected function handleInitialized():void {
 			this._initialized = true;
 			
-			if (this.onInitialized != null) {
-				this.onInitialized.apply(null, this._initializedCallbackParameters);
+			if (this.onInitializeCallback != null) {
+				this.onInitializeCallback.apply(null, this._initializedCallbackParameters);
 			}
 		}
 		
 		protected function handleMouseEvent(e:MouseEvent):void {
-			//
+			if (this.onMouseEventCallback != null) {
+				this.onMouseEventCallback.apply(null, [ e ]);
+			}
 		}
 		
 		protected function handleAddedToContainer():void {
