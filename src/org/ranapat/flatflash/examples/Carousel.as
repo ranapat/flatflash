@@ -1,4 +1,6 @@
 package org.ranapat.flatflash.examples {
+	import com.greensock.TweenLite;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import org.ranapat.flatflash.DisplayObject;
@@ -20,6 +22,12 @@ package org.ranapat.flatflash.examples {
 		private var angleToHide:Number;
 		private var constDegreesToRadians:Number;
 		
+		private var swipeDeltaTime:Number;
+		private var swipeAngle:Number;
+		private var swipeBussy:Boolean;
+		
+		private var topElementIndex:uint;
+		
 		public function Carousel() {
 			this._items = new Vector.<DisplayObject>();
 
@@ -28,6 +36,8 @@ package org.ranapat.flatflash.examples {
 			this.minScale = .9;
 			this.minAlpha = .9;
 			this.angleToHide = 35;
+			this.swipeDeltaTime = .002;
+			this.swipeAngle = 1;
 			this.constDegreesToRadians = Math.PI / 180;
 		}
 		
@@ -54,7 +64,67 @@ package org.ranapat.flatflash.examples {
 			this._initialSize = value;
 		}
 		
-		public function offsetAngle(value:int):void {
+		public function left():void {
+			if (!this.swipeBussy) {
+				this.swipeBussy = true;
+				
+				var length:Number = this.angleDelta;
+				var step:Number = this.swipeAngle;
+				var deltaTime:Number = this.swipeDeltaTime;
+				for (var i:Number = 0; i < length; i += step) {
+					TweenLite.delayedCall(i * deltaTime, this.offsetAngle, [ step ]);
+				}
+				TweenLite.delayedCall(length * deltaTime, this.finalizeSwipe);
+			}
+		}
+		
+		public function right():void {
+			if (!this.swipeBussy) {
+				this.swipeBussy = true;
+				
+				var length:Number = this.angleDelta;
+				var step:Number = this.swipeAngle;
+				var deltaTime:Number = this.swipeDeltaTime;
+				for (var i:Number = 0; i < length; i += step) {
+					TweenLite.delayedCall(i * deltaTime, this.offsetAngle, [ -1 * step ]);
+				}
+				TweenLite.delayedCall(length * deltaTime, this.finalizeSwipe);
+			}
+		}
+		
+		override protected function handleRemovedFromStage():void {
+			TweenLite.killDelayedCallsTo(this.offsetAngle);
+			TweenLite.killDelayedCallsTo(this.finalizeSwipe);
+		}
+		
+		private function finalizeSwipe():void {
+			this.swipeBussy = false;
+			
+			var i:uint;
+			var length:uint = this._items.length;
+			
+			var topElementIndex:uint;
+			var topElement:DisplayObject;
+			
+			for (i = 0; i < length; ++i) {
+				this._items[i].mouseEnabled = false;
+				
+				if (!topElement || topElement.depth < this._items[i].depth) {
+					topElement = this._items[i];
+					topElementIndex = i;
+				}
+				
+				//trace(i + " .. " + this._object[i].angle);
+				
+				
+			}
+			//trace("\n")
+			
+			this.topElementIndex = topElementIndex;
+			topElement.mouseEnabled = true;
+		}
+		
+		private function offsetAngle(value:int):void {
 			var i:uint;
 			var length:uint = this._items.length;
 			
@@ -70,7 +140,7 @@ package org.ranapat.flatflash.examples {
 					&& (newAngle > 90 + this.angleToHide || newAngle < -90 - this.angleToHide)
 				) {
 					itemToActiveSet = true;
-					itemToActiveAngleAtTheSet = angle;
+					itemToActiveAngleAtTheSet = newAngle;
 					if (value > 0) {
 						itemToActive = i + this.visibleItems;
 					} else {
@@ -104,6 +174,8 @@ package org.ranapat.flatflash.examples {
 			}
 			
 			this._object[0].angle = 0;
+			this._items[0].mouseEnabled = true;
+			this.topElementIndex = 0;
 			for (i = 1; i <= (visibleItems - 1) / 2; ++i) {
 				this._object[i].angle = -1 * angleDelta * i;
 				this._object[length - i].angle = 1 * angleDelta * i;
@@ -111,6 +183,7 @@ package org.ranapat.flatflash.examples {
 			
 			for (i = 0; i < length; ++i) {
 				this.addChild(this._items[i]);
+				this._items[i].onMouseEvent(this, this.handleMouseEvent);
 			}
 			
 			this.invalidate();
@@ -143,6 +216,8 @@ package org.ranapat.flatflash.examples {
 					object.y = this._initialPoint.y + (this._initialSize.height - object.height) / 2;
 				} else {
 					object.visible = false;
+					object.depth = 0;
+					object.alpha = 0;
 				}
 			} else {
 				object.onInitialize(this, this.handleObjectInitialized, [ index ]);
@@ -155,6 +230,12 @@ package org.ranapat.flatflash.examples {
 		
 		private function handleObjectInitialized(index:uint):void {
 			this.offsetByAngle(index);
+		}
+		
+		private function handleMouseEvent(e:MouseEvent):void {
+			if (e.type == MouseEvent.CLICK) {
+				trace("just clicked, we are here... " + this.topElementIndex)
+			}
 		}
 	}
 

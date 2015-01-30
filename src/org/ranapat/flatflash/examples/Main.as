@@ -150,15 +150,11 @@ package org.ranapat.flatflash.examples {
 					angleRight(1);
 					offsetByAngle();
 				} else if (e.keyCode == Keyboard.F) {
-					this.carousel.offsetAngle(1);
+					this.carousel.left();
 				} else if (e.keyCode == Keyboard.G) {
-					this.carousel.offsetAngle(-1);
+					this.carousel.right();
 				} else if (e.keyCode == Keyboard.K) {
-					TweenLite.killDelayedCallsTo(handleDelayOffsetAngleMinus)
-					TweenLite.delayedCall(.0001, this.handleDelayOffsetAnglePlus);
 				} else if (e.keyCode == Keyboard.L) {
-					TweenLite.killDelayedCallsTo(handleDelayOffsetAnglePlus)
-					TweenLite.delayedCall(.0001, this.handleDelayOffsetAngleMinus);
 				}
 			}
 			
@@ -173,20 +169,6 @@ package org.ranapat.flatflash.examples {
 					this.i2.gotoAndStop(300);
 				}
 			}
-		}
-		
-		private function handleDelayOffsetAnglePlus():void {
-			
-			
-			this.carousel.offsetAngle(1);
-			TweenLite.delayedCall(.0001, this.handleDelayOffsetAnglePlus);
-		}
-		
-		private function handleDelayOffsetAngleMinus():void {
-			
-			
-			this.carousel.offsetAngle( -1);
-			TweenLite.delayedCall(.0001, this.handleDelayOffsetAngleMinus);
 		}
 		
 		private function init(e:Event = null):void {
@@ -331,7 +313,7 @@ package org.ranapat.flatflash.examples {
 					this.doc.visible = false;
 					
 					this.carousel = new Carousel();
-					this.carousel.initialPoint = new Point(600, 0);
+					this.carousel.initialPoint = new Point(265, 0);
 					this.carousel.initialSize = new Rectangle(0, 0, 418, 252);
 					this.carousel.items = Vector.<DisplayObject>([
 						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class),
