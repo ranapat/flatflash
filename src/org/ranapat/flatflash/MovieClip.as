@@ -177,8 +177,6 @@ package org.ranapat.flatflash {
 		}
 		
 		override public function hop(timer:int):void {
-			super.hop(timer);
-			
 			if (this.playing) {
 				var timeOffset:uint = timer / this.timeDelta;
 				var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
@@ -197,6 +195,8 @@ package org.ranapat.flatflash {
 					this.currentFrame = nextFrame;
 				}
 			}
+			
+			super.hop(timer);
 		}
 		
 		override public function get changed():Boolean {
