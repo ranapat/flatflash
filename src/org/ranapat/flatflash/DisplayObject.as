@@ -267,6 +267,15 @@ package org.ranapat.flatflash {
 			this._mouseEventCallbackHolder[object] = callback;
 		}
 		
+		protected function markChanged():void {
+			var previousChanged:Boolean = this.changed;
+			this._changed = true;
+			
+			if (!previousChanged && this.visible && this.parent) {
+				this.parent.childChanged();
+			}
+		}
+		
 		private function get onInitializeCallback():Function {
 			for (var i:* in this._initializedCallbackHolder) {
 				if (this._initializedCallbackHolder[i] is Function) {
@@ -285,15 +294,6 @@ package org.ranapat.flatflash {
 			}
 			
 			return null;
-		}
-
-		protected function markChanged():void {
-			var previousChanged:Boolean = this.changed;
-			this._changed = true;
-			
-			if (!previousChanged && this.visible && this.parent) {
-				this.parent.childChanged();
-			}
 		}
 		
 		protected function handleInitialized():void {

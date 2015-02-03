@@ -17,13 +17,18 @@ package org.ranapat.flatflash {
 		private var _latestParentTFP:Number;
 		private var _hopsBetweenMoves:uint;
 		private var _hopEveryNthTime:Number;
-		
+
+		private var _loops:int;
+		private var _totalLoops:uint;
 		private var _fps:int;
 		private var _timeDelta:Number;
 		private var _previousTimeOffset:uint;
 		
 		public function MovieClip(...args) {
 			super();
+			
+			this.fps = -1;
+			this.loops = -1;
 			
 			this.initialize.apply(this, args);
 			
@@ -34,19 +39,16 @@ package org.ranapat.flatflash {
 		
 		override public function initialize(...args):void {
 			if (args.length == 2 && args[0] is BitmapData && args[1] is Vector.<Region>) {
-				this.fps = -1;
 				this._regions = args[1];
 				this._totalFrames = this._regions.length;
 				
 				super.initialize(args[0]);
 			} else if (args.length == 1 && args[0] is Vector.<BitmapData> && (args[0] as Vector.<BitmapData>).length > 0) {
-				this.fps = -1;
 				this._raw = args[0];
 				this._totalFrames = this._raw.length;
 				
 				this.handleInitialized();
 			} else if (args.length == 3 && args[0] is Vector.<ByteArray> && (args[0] as Vector.<ByteArray>).length > 0 && args[1] is Number && args[2] is Number) {
-				this.fps = -1;
 				this._compressed = args[0];
 				this._totalFrames = this._compressed.length;
 				
@@ -67,6 +69,7 @@ package org.ranapat.flatflash {
 			if (
 				this.totalFrames > value
 				&& value >= 0
+				&& (this._regions || this._raw || this._compressed)
 			) {
 				if (this._regions) {
 					this._currentFrame = value;
@@ -92,6 +95,15 @@ package org.ranapat.flatflash {
 			return this._playing;
 		}
 		
+		public function set loops(value:int):void {
+			this._loops = value < 0? -1 : value;
+			this._totalLoops = 0;
+		}
+		
+		public function get loops():int {
+			return this._loops;
+		}
+		
 		public function set fps(value:int):void {
 			this._fps = value;
 			this._timeDelta = this.fps? 1000 / this.fps : 0;
@@ -101,8 +113,10 @@ package org.ranapat.flatflash {
 			return this._fps == -1 && this.parent? this.parent.fps : this._fps == -1 && !this.parent? 0 : this._fps;
 		}
 		
-		public function play():void {
+		public function play(loops:int = -1):void {
+			this.markChanged();
 			this._playing = true;
+			this.loops = loops;
 		}
 		
 		public function stop():void {
@@ -165,16 +179,23 @@ package org.ranapat.flatflash {
 		override public function hop(timer:int):void {
 			super.hop(timer);
 			
-			var timeOffset:uint = timer / this.timeDelta;
-			
-			var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
-			
-			//trace(timer + " .. " + this.timeDelta + " .. " + this._previousTimeOffset + " .. " + timeOffset + " .. " + this.fps + " .. " + delta);
-			
-			this._previousTimeOffset = timeOffset;
-			
 			if (this.playing) {
-				this.offsetFrames(delta);
+				var timeOffset:uint = timer / this.timeDelta;
+				var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
+				this._previousTimeOffset = timeOffset;
+			
+				var frame:uint = this.currentFrame + delta;
+				var nextFrame:uint = frame < 0? this.totalFrames - frame : frame >= this.totalFrames? frame - this.totalFrames : frame;
+				
+				if (
+					nextFrame < this.currentFrame
+					&& this.loops != -1
+					&& this.loops <= ++this._totalLoops
+				) {
+					this.gotoAndStop(this.totalFrames - 1);
+				} else {
+					this.currentFrame = nextFrame;
+				}
 			}
 		}
 		
@@ -206,11 +227,6 @@ package org.ranapat.flatflash {
 				(this.currentFrame > 0? this.currentFrame - 1 : this.totalFrames)
 				: 0
 			;
-		}
-		
-		private function offsetFrames(offset:int):void {
-			var frame:uint = this.currentFrame + offset;
-			this.currentFrame = frame < 0? this.totalFrames - frame : frame >= this.totalFrames? frame - this.totalFrames : frame;
 		}
 		
 		private function get timeDelta():Number {

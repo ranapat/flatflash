@@ -154,7 +154,9 @@ package org.ranapat.flatflash.examples {
 				} else if (e.keyCode == Keyboard.G) {
 					this.carousel.right();
 				} else if (e.keyCode == Keyboard.K) {
+					this.i1.stop();
 				} else if (e.keyCode == Keyboard.L) {
+					this.i1.play();
 				}
 			}
 			
@@ -284,7 +286,8 @@ package org.ranapat.flatflash.examples {
 					*/
 					
 					this.i1 = DisplayObjectFactory.movieClipFromSWF(ClassDefinition);
-					this.i1.play();
+					this.i1.play(1);
+					this.i1.fps = 120;
 					this.doc.addChild(this.i1);
 					
 					tt = new ClassDefinition();
