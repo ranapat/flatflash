@@ -2,6 +2,7 @@ package org.ranapat.flatflash {
 	import flash.display.BitmapData;
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
 	import org.ranapat.flatflash.tools.EngineTypes;
 	import org.ranapat.flatflash.tools.regions.Region;
 	
@@ -24,8 +25,13 @@ package org.ranapat.flatflash {
 		private var _timeDelta:Number;
 		private var _previousTimeOffset:uint;
 		
+		private var _loopLimitReached:Boolean;
+		private var _loopLimitReachedCallbackHolder:Dictionary;
+		
 		public function MovieClip(...args) {
 			super();
+			
+			this._loopLimitReachedCallbackHolder = new Dictionary(true);
 			
 			this.fps = -1;
 			this.loops = -1;
@@ -98,6 +104,7 @@ package org.ranapat.flatflash {
 		public function set loops(value:int):void {
 			this._loops = value < 0? -1 : value;
 			this._totalLoops = 0;
+			this._loopLimitReached = false;
 		}
 		
 		public function get loops():int {
@@ -147,6 +154,10 @@ package org.ranapat.flatflash {
 			this.stop();
 		}
 		
+		public function onLoopLimitReached(object:Object, callback:Function):void {
+			this._loopLimitReachedCallbackHolder[object] = callback;
+		}
+		
 		override public function get spritesheet():BitmapData {
 			if (this._regions) {
 				return super.spritesheet;
@@ -191,6 +202,7 @@ package org.ranapat.flatflash {
 					&& this.loops <= ++this._totalLoops
 				) {
 					this.gotoAndStop(this.totalFrames - 1);
+					this._loopLimitReached = true;
 				} else {
 					this.currentFrame = nextFrame;
 				}
@@ -215,6 +227,19 @@ package org.ranapat.flatflash {
 			}
 		}
 		
+		override public function afterDraw():void {
+			super.afterDraw();
+			
+			if (this._loopLimitReached) {
+				var callback:Function = this.onLimitReachedCallback;
+				if (callback != null) {
+					callback.apply();
+				}
+				
+				this._loopLimitReached = false;
+			}
+		}
+		
 		private function gotoNextFrame():void {
 			this.currentFrame = this._regions || this._raw || this._compressed?
 				((this.currentFrame + 1 >= this.totalFrames)? 0 : this.currentFrame + 1)
@@ -231,6 +256,16 @@ package org.ranapat.flatflash {
 		
 		private function get timeDelta():Number {
 			return this._fps == -1? (1000 / this.fps) : this._timeDelta;
+		}
+		
+		private function get onLimitReachedCallback():Function {
+			for (var i:* in this._loopLimitReachedCallbackHolder) {
+				if (this._loopLimitReachedCallbackHolder[i] is Function) {
+					return this._loopLimitReachedCallbackHolder[i] as Function;
+				}
+			}
+			
+			return null;
 		}
 	}
 

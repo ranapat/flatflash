@@ -287,7 +287,12 @@ package org.ranapat.flatflash.examples {
 					
 					this.i1 = DisplayObjectFactory.movieClipFromSWF(ClassDefinition);
 					this.i1.play(1);
-					this.i1.fps = 120;
+					this.i1.fps = 1024;
+					this.i1.onBeforeDraw(this, this.beforeDrawI1);
+					this.i1.onAfterDraw(this, this.afterDrawI1);
+					this.i1.onLoopLimitReached(this, this.loopLimitReachedI1);
+					
+					
 					this.doc.addChild(this.i1);
 					
 					tt = new ClassDefinition();
@@ -348,6 +353,18 @@ package org.ranapat.flatflash.examples {
 				
 				
 			}
+		}
+		
+		private function beforeDrawI1():void {
+			//trace("before draw we have here")
+		}
+		
+		private function afterDrawI1():void {
+			//trace("after draw we have here")
+		}
+		
+		private function loopLimitReachedI1():void {
+			trace("we reach the limit " + i1.currentFrame);
 		}
 		
 		private function handleSwfTracerFail(e:SwfTracerEvent):void 

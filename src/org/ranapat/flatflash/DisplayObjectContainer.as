@@ -160,6 +160,7 @@ package org.ranapat.flatflash {
 						}
 						
 						try {
+							displayObject.beforeDraw();
 							latestSlicer.copyPixels(
 								displayObject.spritesheet, bitmapData,
 								displayObject.region, displayObject.position,
@@ -167,6 +168,7 @@ package org.ranapat.flatflash {
 								displayObject.scaleX, displayObject.scaleY,
 								displayObject.smoothing
 							);
+							displayObject.afterDraw();
 						} catch (e:Error) {
 							//
 						}

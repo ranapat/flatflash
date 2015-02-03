@@ -25,6 +25,9 @@ package org.ranapat.flatflash {
 		
 		private var _mouseEventCallbackHolder:Dictionary;
 		
+		private var _beforeDrawCallbackHolder:Dictionary;
+		private var _afterDrawCallbackHolder:Dictionary;
+		
 		private var _mouseEnabled:Boolean;
 		
 		private var _name:String;
@@ -41,6 +44,8 @@ package org.ranapat.flatflash {
 			
 			this._initializedCallbackHolder = new Dictionary(true);
 			this._mouseEventCallbackHolder = new Dictionary(true);
+			this._beforeDrawCallbackHolder = new Dictionary(true);
+			this._afterDrawCallbackHolder = new Dictionary(true);
 			
 			this.scaleX = 1;
 			this.scaleY = 1;
@@ -235,6 +240,20 @@ package org.ranapat.flatflash {
 			this._changed = false;
 		}
 		
+		public function beforeDraw():void {
+			var callback:Function = this.onBeforeDrawCallback;
+			if (callback != null) {
+				callback.apply();
+			}
+		}
+		
+		public function afterDraw():void {
+			var callback:Function = this.onAfterDrawCallback;
+			if (callback != null) {
+				callback.apply();
+			}
+		}
+		
 		public function get spritesheet():BitmapData {
 			for (var spritesheet:* in this._weakHolder) {
 				return BitmapData(spritesheet);
@@ -267,6 +286,14 @@ package org.ranapat.flatflash {
 			this._mouseEventCallbackHolder[object] = callback;
 		}
 		
+		public function onBeforeDraw(object:Object, callback:Function):void {
+			this._beforeDrawCallbackHolder[object] = callback;
+		}
+		
+		public function onAfterDraw(object:Object, callback:Function):void {
+			this._afterDrawCallbackHolder[object] = callback;
+		}
+		
 		protected function markChanged():void {
 			var previousChanged:Boolean = this.changed;
 			this._changed = true;
@@ -290,6 +317,26 @@ package org.ranapat.flatflash {
 			for (var i:* in this._mouseEventCallbackHolder) {
 				if (this._mouseEventCallbackHolder[i] is Function) {
 					return this._mouseEventCallbackHolder[i] as Function;
+				}
+			}
+			
+			return null;
+		}
+		
+		private function get onBeforeDrawCallback():Function {
+			for (var i:* in this._beforeDrawCallbackHolder) {
+				if (this._beforeDrawCallbackHolder[i] is Function) {
+					return this._beforeDrawCallbackHolder[i] as Function;
+				}
+			}
+			
+			return null;
+		}
+		
+		private function get onAfterDrawCallback():Function {
+			for (var i:* in this._afterDrawCallbackHolder) {
+				if (this._afterDrawCallbackHolder[i] is Function) {
+					return this._afterDrawCallbackHolder[i] as Function;
 				}
 			}
 			
