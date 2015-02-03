@@ -103,6 +103,10 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get width():Number {
+			return this._width;
+		}
+		
+		public function get drawnWidth():Number {
 			return this._width * this._scaleX;
 		}
 		
@@ -113,6 +117,10 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get height():Number {
+			return this._height;
+		}
+		
+		public function get drawnHeight():Number {
 			return this._height * this._scaleY;
 		}
 		

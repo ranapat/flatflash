@@ -212,8 +212,8 @@ package org.ranapat.flatflash.examples {
 					object.alpha = this.minAlpha + (1 - this.minAlpha) * depth;
 					object.depth = object.alpha;
 					object.scale = this.minScale + (1 - this.minScale) * depth;
-					object.x = this._initialPoint.x - this.radius * Math.sin(angleRadians) - object.width / 2;
-					object.y = this._initialPoint.y + (this._initialSize.height - object.height) / 2;
+					object.x = this._initialPoint.x - this.radius * Math.sin(angleRadians) - object.drawnWidth / 2;
+					object.y = this._initialPoint.y + (this._initialSize.height - object.drawnHeight) / 2;
 				} else {
 					object.visible = false;
 					object.depth = 0;

@@ -29,8 +29,8 @@ package org.ranapat.flatflash.tools.slicers {
 				sourceAlpha != 1
 				|| sourceScaleX != 1 || sourceScaleY != 1
 			) {
-				var clipped:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true);
-				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, false);
+				var clipped:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0);
+				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, true);
 				sourceRectangle = new Rectangle(0, 0, sourceRectangle.width, sourceRectangle.height);
 				
 				if (sourceAlpha != 1) {

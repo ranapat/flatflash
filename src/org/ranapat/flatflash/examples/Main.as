@@ -47,7 +47,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1920", height="1200", backgroundColor="0x000000", frameRate="60")]
+	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="60")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -310,7 +310,7 @@ package org.ranapat.flatflash.examples {
 					i3.y = 500;
 					i3.visible = false;
 					
-					this.doc.visible = false;
+					//this.doc.visible = false;
 					
 					this.carousel = new Carousel();
 					this.carousel.initialPoint = new Point(265, 0);
