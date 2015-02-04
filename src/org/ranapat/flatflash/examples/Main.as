@@ -18,6 +18,7 @@ package org.ranapat.flatflash.examples {
 	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
+	import org.ranapat.flatflash.Button;
 	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.loader.SwfTracer;
 	import org.ranapat.flatflash.tools.loader.SwfTracerEvent;
@@ -300,9 +301,19 @@ package org.ranapat.flatflash.examples {
 					this.i1.onAfterDrawRemove(this, this.afterDrawI1);
 					this.i1.onBeforeDrawRemove(this, this.beforeDrawI1);
 					this.i1.onLoopLimitReachedRemove(this, this.loopLimitReachedI1);
-					
-					
 					this.doc.addChild(this.i1);
+					
+					
+					var b:Button = new Button(
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class),
+						
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image3") as Class),
+						DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("Test_Resize_Animation") as Class),
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image4") as Class)
+					);
+					b.x = 600;
+					b.y = 100;
+					this.doc.addChild(b);
 					
 					tt = new ClassDefinition();
 					tt.x = 200;

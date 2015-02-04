@@ -61,8 +61,8 @@ package org.ranapat.flatflash {
 				
 				this.children[this.children.length] = child;
 				this.__changed += child.changed? 1 : 0;
-				if (child.mouseEnabled) {
-					this.__mouseEnabled[child] = 1;
+				if (child.mouseEnabled && !this.__mouseEnabled[child]) {
+					this.__mouseEnabled[child] = new MouseEnabledObject(false);
 				}
 			}
 		}
@@ -86,6 +86,7 @@ package org.ranapat.flatflash {
 					
 				child.parent = null;
 				
+				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
 				
 				return child;
@@ -205,9 +206,10 @@ package org.ranapat.flatflash {
 		}
 		
 		public function childMouseEnabledChanged(child:DisplayObject):void {
-			if (child.mouseEnabled) {
-				this.__mouseEnabled[child] = 1;
+			if (child.mouseEnabled && !this.__mouseEnabled[child]) {
+				this.__mouseEnabled[child] = new MouseEnabledObject(false);
 			} else {
+				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
 			}
 		}
@@ -259,15 +261,41 @@ package org.ranapat.flatflash {
 			var child:DisplayObject;
 			for (var _child:Object in this.__mouseEnabled) {
 				child = DisplayObject(_child);
-				if (
-					child
-					&& x >= child.x
-					&& y >= child.y
-					&& x <= child.x + child.width
-					&& y <= child.y + child.height
-				) {
-					child.mouseEvent(e);
+				if (child) {
+					var mouseEnabledObject:MouseEnabledObject = this.__mouseEnabled[child];
+					var hoveredBefore:Boolean = mouseEnabledObject.hovered;
+					var hoveredAfter:Boolean = false;
+					
+					if (
+						x >= child.x
+						&& y >= child.y
+						&& x <= child.x + child.width
+						&& y <= child.y + child.height
+					) {
+						if (!hoveredBefore) {
+							child.mouseEvent(new MouseEvent(
+								MouseEvent.MOUSE_OVER,
+								e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
+							));
+						}
+						
+						child.mouseEvent(e);
+						
+						hoveredAfter = true;
+					} else if (hoveredBefore) {
+						hoveredAfter = false;
+					}
+					
+					if (hoveredBefore && !hoveredAfter) {
+						child.mouseEvent(new MouseEvent(
+							MouseEvent.MOUSE_OUT,
+							e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
+						));
+					}
+					
+					this.__mouseEnabled[child].hovered = hoveredAfter;
 				}
+				
 			}
 		}
 		
@@ -355,4 +383,12 @@ package org.ranapat.flatflash {
 		}
 	}
 
+}
+
+class MouseEnabledObject {
+	public var hovered:Boolean;
+	
+	public function MouseEnabledObject(hovered:Boolean) {
+		this.hovered = hovered
+	}
 }

@@ -121,7 +121,7 @@ package org.ranapat.flatflash.examples {
 			//trace("\n")
 			
 			this.topElementIndex = topElementIndex;
-			topElement.mouseEnabled = true;
+			//topElement.mouseEnabled = true;
 		}
 		
 		private function offsetAngle(value:int):void {
@@ -174,7 +174,7 @@ package org.ranapat.flatflash.examples {
 			}
 			
 			this._object[0].angle = 0;
-			this._items[0].mouseEnabled = true;
+			//this._items[0].mouseEnabled = true;
 			this.topElementIndex = 0;
 			for (i = 1; i <= (visibleItems - 1) / 2; ++i) {
 				this._object[i].angle = -1 * angleDelta * i;
