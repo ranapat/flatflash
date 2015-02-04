@@ -154,8 +154,12 @@ package org.ranapat.flatflash {
 			this.stop();
 		}
 		
-		public function onLoopLimitReached(object:Object, callback:Function):void {
-			this._loopLimitReachedCallbackHolder[object] = callback;
+		public function onLoopLimitReached(object:Object, callback:Function, parameters:Array = null):void {
+			this.addToCallbackHolder(this._loopLimitReachedCallbackHolder, object, callback, parameters);
+		}
+		
+		public function onLoopLimitReachedRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._loopLimitReachedCallbackHolder, object, callback);
 		}
 		
 		override public function get spritesheet():BitmapData {
@@ -231,10 +235,7 @@ package org.ranapat.flatflash {
 			super.afterDraw();
 			
 			if (this._loopLimitReached) {
-				var callback:Function = this.onLimitReachedCallback;
-				if (callback != null) {
-					callback.apply();
-				}
+				this.walkCallbackHolder(this._loopLimitReachedCallbackHolder);
 				
 				this._loopLimitReached = false;
 			}
@@ -256,16 +257,6 @@ package org.ranapat.flatflash {
 		
 		private function get timeDelta():Number {
 			return this._fps == -1? (1000 / this.fps) : this._timeDelta;
-		}
-		
-		private function get onLimitReachedCallback():Function {
-			for (var i:* in this._loopLimitReachedCallbackHolder) {
-				if (this._loopLimitReachedCallbackHolder[i] is Function) {
-					return this._loopLimitReachedCallbackHolder[i] as Function;
-				}
-			}
-			
-			return null;
 		}
 	}
 

@@ -21,7 +21,6 @@ package org.ranapat.flatflash {
 		
 		private var _initialized:Boolean;
 		private var _initializedCallbackHolder:Dictionary;
-		private var _initializedCallbackParameters:Array;
 		
 		private var _mouseEventCallbackHolder:Dictionary;
 		
@@ -241,17 +240,11 @@ package org.ranapat.flatflash {
 		}
 		
 		public function beforeDraw():void {
-			var callback:Function = this.onBeforeDrawCallback;
-			if (callback != null) {
-				callback.apply();
-			}
+			this.walkCallbackHolder(this._beforeDrawCallbackHolder);
 		}
 		
 		public function afterDraw():void {
-			var callback:Function = this.onAfterDrawCallback;
-			if (callback != null) {
-				callback.apply();
-			}
+			this.walkCallbackHolder(this._afterDrawCallbackHolder);
 		}
 		
 		public function get spritesheet():BitmapData {
@@ -278,20 +271,76 @@ package org.ranapat.flatflash {
 		}
 		
 		public function onInitialize(object:Object, callback:Function, parameters:Array = null):void {
-			this._initializedCallbackHolder[object] = callback;
-			this._initializedCallbackParameters = parameters;
+			this.addToCallbackHolder(this._initializedCallbackHolder, object, callback, parameters);
 		}
 		
-		public function onMouseEvent(object:Object, callback:Function):void {
-			this._mouseEventCallbackHolder[object] = callback;
+		public function onInitializeRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._initializedCallbackHolder, object, callback);
 		}
 		
-		public function onBeforeDraw(object:Object, callback:Function):void {
-			this._beforeDrawCallbackHolder[object] = callback;
+		public function onMouseEvent(object:Object, callback:Function, parameters:Array = null):void {
+			this.addToCallbackHolder(this._mouseEventCallbackHolder, object, callback, parameters);
 		}
 		
-		public function onAfterDraw(object:Object, callback:Function):void {
-			this._afterDrawCallbackHolder[object] = callback;
+		public function onMouseEventRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._mouseEventCallbackHolder, object, callback);
+		}
+		
+		public function onBeforeDraw(object:Object, callback:Function, parameters:Array = null):void {
+			this.addToCallbackHolder(this._beforeDrawCallbackHolder, object, callback, parameters);
+		}
+		
+		public function onBeforeDrawRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._beforeDrawCallbackHolder, object, callback);
+		}
+		
+		public function onAfterDraw(object:Object, callback:Function, parameters:Array = null):void {
+			this.addToCallbackHolder(this._afterDrawCallbackHolder, object, callback, parameters);
+		}
+		
+		public function onAfterDrawRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._afterDrawCallbackHolder, object, callback);
+		}
+		
+		protected function addToCallbackHolder(callbackHolder:Dictionary, object:Object, callback:Function, parameters:Array):void {
+			if (callbackHolder[object] == null) {
+				callbackHolder[object] = new Vector.<CallbackObject>();
+			}
+			(callbackHolder[object] as Vector.<CallbackObject>).push(new CallbackObject(
+				callback, parameters
+			));
+		}
+		
+		protected function removeFromCallbackHolder(callbackHolder:Dictionary, object:Object, callback:Function):void {
+			if (callbackHolder[object]) {
+				if (callback == null) {
+					callbackHolder[object] = null;
+					delete callbackHolder[object];
+				} else {
+					var vector:Vector.<CallbackObject> = callbackHolder[object];
+					var length:uint = vector.length;
+					for (var i:uint = 0; i < length; ++i) {
+						var callbackObject:CallbackObject = vector[i];
+						if (callbackObject.callback == callback) {
+							vector.splice(i, 1);
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		protected function walkCallbackHolder(callbackHolder:Dictionary, extraParameters:Array = null):void {
+			for (var object:Object in callbackHolder) {
+				var vector:Vector.<CallbackObject> = callbackHolder[object];
+				if (vector) {
+					var length:uint = vector.length;
+					for (var i:uint = 0; i < length; ++i) {
+						var callbackObject:CallbackObject = vector[i];
+						callbackObject.callback.apply(null, extraParameters? callbackObject.parameters.concat(extraParameters) : callbackObject.parameters);
+					}
+				}
+			}
 		}
 		
 		protected function markChanged():void {
@@ -303,58 +352,14 @@ package org.ranapat.flatflash {
 			}
 		}
 		
-		private function get onInitializeCallback():Function {
-			for (var i:* in this._initializedCallbackHolder) {
-				if (this._initializedCallbackHolder[i] is Function) {
-					return this._initializedCallbackHolder[i] as Function;
-				}
-			}
-			
-			return null;
-		}
-		
-		private function get onMouseEventCallback():Function {
-			for (var i:* in this._mouseEventCallbackHolder) {
-				if (this._mouseEventCallbackHolder[i] is Function) {
-					return this._mouseEventCallbackHolder[i] as Function;
-				}
-			}
-			
-			return null;
-		}
-		
-		private function get onBeforeDrawCallback():Function {
-			for (var i:* in this._beforeDrawCallbackHolder) {
-				if (this._beforeDrawCallbackHolder[i] is Function) {
-					return this._beforeDrawCallbackHolder[i] as Function;
-				}
-			}
-			
-			return null;
-		}
-		
-		private function get onAfterDrawCallback():Function {
-			for (var i:* in this._afterDrawCallbackHolder) {
-				if (this._afterDrawCallbackHolder[i] is Function) {
-					return this._afterDrawCallbackHolder[i] as Function;
-				}
-			}
-			
-			return null;
-		}
-		
 		protected function handleInitialized():void {
 			this._initialized = true;
-			
-			if (this.onInitializeCallback != null) {
-				this.onInitializeCallback.apply(null, this._initializedCallbackParameters);
-			}
+
+			this.walkCallbackHolder(this._initializedCallbackHolder);
 		}
 		
 		protected function handleMouseEvent(e:MouseEvent):void {
-			if (this.onMouseEventCallback != null) {
-				this.onMouseEventCallback.apply(null, [ e ]);
-			}
+			this.walkCallbackHolder(this._mouseEventCallbackHolder, [ e ]);
 		}
 		
 		protected function handleAddedToContainer():void {
@@ -366,4 +371,14 @@ package org.ranapat.flatflash {
 		}
 	}
 
+}
+
+class CallbackObject {
+	public var callback:Function;
+	public var parameters:Array;
+	
+	public function CallbackObject(callback:Function, parameters:Array) {
+		this.callback = callback;
+		this.parameters = parameters? parameters : [];
+	}
 }

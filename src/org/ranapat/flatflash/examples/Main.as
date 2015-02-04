@@ -9,6 +9,7 @@ package org.ranapat.flatflash.examples {
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.events.PressAndTapGestureEvent;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
@@ -287,10 +288,18 @@ package org.ranapat.flatflash.examples {
 					
 					this.i1 = DisplayObjectFactory.movieClipFromSWF(ClassDefinition);
 					this.i1.play(1);
+					this.i1.mouseEnabled = true;
 					this.i1.fps = 1024;
 					this.i1.onBeforeDraw(this, this.beforeDrawI1);
 					this.i1.onAfterDraw(this, this.afterDrawI1);
-					this.i1.onLoopLimitReached(this, this.loopLimitReachedI1);
+					this.i1.onLoopLimitReached(this, this.loopLimitReachedI1, [ "test" ]);
+					this.i1.onInitialize(this, this.onInitializeI1);
+					this.i1.onInitialize(this, this.onInitializeI1Another, [ "test", this.i1 ]);
+					this.i1.onMouseEvent(this, this.onMouseEventI1);
+					this.i1.onInitializeRemove(this, this.onInitializeI1);
+					this.i1.onAfterDrawRemove(this, this.afterDrawI1);
+					this.i1.onBeforeDrawRemove(this, this.beforeDrawI1);
+					this.i1.onLoopLimitReachedRemove(this, this.loopLimitReachedI1);
 					
 					
 					this.doc.addChild(this.i1);
@@ -356,20 +365,32 @@ package org.ranapat.flatflash.examples {
 		}
 		
 		private function beforeDrawI1():void {
-			//trace("before draw we have here")
+			trace("before draw we have here")
 		}
 		
 		private function afterDrawI1():void {
-			//trace("after draw we have here")
+			trace("after draw we have here")
 		}
 		
-		private function loopLimitReachedI1():void {
-			trace("we reach the limit " + i1.currentFrame);
+		private function loopLimitReachedI1(...args):void {
+			trace("we reach the limit " + i1.currentFrame + " .. " + args.length + " .. " + args);
 		}
 		
 		private function handleSwfTracerFail(e:SwfTracerEvent):void 
 		{
 			trace("trace failed.... " + e.key + " .. " + e.resultType + " .. " + e.error + " .. ")
+		}
+		
+		private function onInitializeI1():void {
+			trace("our i1 is initialized")
+		}
+		
+		private function onInitializeI1Another(...args):void {
+			trace("our i1 is initialized another " + args.length + " .. " + args)
+		}
+		
+		private function onMouseEventI1(e:MouseEvent):void {
+			trace("our i1 has mouse event " + e)
 		}
 		
 		private var totalLoaded:uint;
