@@ -6,6 +6,7 @@ package org.ranapat.flatflash {
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import org.ranapat.flatflash.Image;
+	import org.ranapat.flatflash.tools.joiners.JoinResult;
 	import org.ranapat.flatflash.tools.loader.SwfTracer;
 	import org.ranapat.flatflash.tools.loader.SwfTracerEvent;
 	import org.ranapat.flatflash.tools.regions.Region;
@@ -126,8 +127,39 @@ package org.ranapat.flatflash {
 				DisplayObjectFactory.swfGetterInitialized = true;
 				DisplayObjectFactory.swfGetterQueue = new Dictionary(true);
 				
-				SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, DisplayObjectFactory.handleSwfTracerComplete, false, 0, true);
-				SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, DisplayObjectFactory.handleSwfTracerFail, false, 0, true);
+				SwfTracer.instance.traceCompleteCallback = DisplayObjectFactory.handleSwfTracerCompleteCallback;
+				SwfTracer.instance.traceFailCallback = DisplayObjectFactory.handleSwfTracerFailCallback;
+				//SwfTracer.instance.addEventListener(SwfTracer.TRACE_COMPLETE, DisplayObjectFactory.handleSwfTracerComplete, false, 0, true);
+				//SwfTracer.instance.addEventListener(SwfTracer.TRACE_FAIL, DisplayObjectFactory.handleSwfTracerFail, false, 0, true);
+			}
+		}
+		
+		private static function handleSwfTracerCompleteCallback(key:uint, resultType:String, result:JoinResult, raw:Vector.<BitmapData>, error:Error):void {
+			var object:DisplayObject = DisplayObjectFactory.swfTracerGetObjectByKey(key);
+			if (object) {
+				try {
+					if (resultType == SwfTracer.TYPE_MOVIE_CLIP) {
+						if (result) {
+							(object as MovieClip).initialize(result.bitmapData, result.regions);
+						} else {
+							(object as MovieClip).initialize(raw);
+						}
+					} else if (resultType == SwfTracer.TYPE_SPRITE) {
+						(object as Image).initialize(result.bitmapData, result.regions[0]);
+					}
+					object.keepSpritesheet = true;
+				} catch (err:Error) {
+					//trace(err)
+				}
+				
+				DisplayObjectFactory.swfGetterQueue[object] = null;
+			}
+		}
+		
+		private static function handleSwfTracerFailCallback(key:uint, resultType:String, result:JoinResult, raw:Vector.<BitmapData>, error:Error):void {
+			var object:DisplayObject = DisplayObjectFactory.swfTracerGetObjectByKey(key);
+			if (object) {
+				DisplayObjectFactory.swfGetterQueue[object] = null;
 			}
 		}
 		

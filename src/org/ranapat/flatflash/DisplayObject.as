@@ -50,7 +50,7 @@ package org.ranapat.flatflash {
 			this.y = 0;
 			this.width = 0;
 			this.height = 0;
-			this.depth = 0;
+			this.depth = -1;
 			this.scaleX = 1;
 			this.scaleY = 1;
 			this.scale = 1;

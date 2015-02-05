@@ -47,6 +47,9 @@ package org.ranapat.flatflash.tools.loader {
 		
 		private var _cache:Dictionary;
 		
+		private var _traceCompleteCallback:Function;
+		private var _traceFailCallback:Function;
+		
 		public static function get instance():SwfTracer {
 			if (!SwfTracer._instance) {
 				SwfTracer._allowInstance = true;
@@ -77,7 +80,22 @@ package org.ranapat.flatflash.tools.loader {
 		
 		public function set stage(value:Stage):void {
 			this._stage = value;
-			
+		}
+		
+		public function set traceCompleteCallback(value:Function):void {
+			this._traceCompleteCallback = value;
+		}
+		
+		public function get traceCompleteCallback():Function {
+			return this._traceCompleteCallback;
+		}
+		
+		public function set traceFailCallback(value:Function):void {
+			this._traceFailCallback = value;
+		}
+		
+		public function get traceFailCallback():Function {
+			return this._traceFailCallback;
 		}
 
 		public function get(_class:Class, identifier:String = null, clipRectangle:Rectangle = null):uint {
@@ -164,7 +182,11 @@ package org.ranapat.flatflash.tools.loader {
 		}
 		
 		private function failCurrentTask(e:Error):void {
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, null, e));
+			if (this.traceFailCallback != null) {
+				this.traceFailCallback.apply(null, [ this._currentKey, this._currentType, null, null, e ]);
+			} else {
+				this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_FAIL, this._currentKey, this._currentType, null, null, e));
+			}
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
@@ -198,7 +220,11 @@ package org.ranapat.flatflash.tools.loader {
 				this._cache[this._currentTracedIdentifier] = new CacheObject(type, joined, raw);
 			}
 			
-			this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, type, joined, raw, null));
+			if (this.traceCompleteCallback != null) {
+				this.traceCompleteCallback.apply(null, [ this._currentKey, type, joined, raw, null ]);
+			} else {
+				this.dispatchEvent(new SwfTracerEvent(SwfTracer.TRACE_COMPLETE, this._currentKey, type, joined, raw, null));
+			}
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			

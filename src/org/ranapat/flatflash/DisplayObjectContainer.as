@@ -16,6 +16,7 @@ package org.ranapat.flatflash {
 	public class DisplayObjectContainer extends Bitmap {
 		private var render:uint;
 		
+		private var _numChildren:uint;
 		private var children:Vector.<DisplayObject>;
 		
 		private var latestSlicer:ISlicer;
@@ -30,6 +31,7 @@ package org.ranapat.flatflash {
 		
 		private var __changed:uint;
 		private var __mouseEnabled:Dictionary;
+		private var __toReorder:Boolean;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
@@ -41,7 +43,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function destroy():void {
-			var length:uint = this.children.length;
+			var length:uint = this.numChildren;
 			for (var i:uint = 0; i < length; ++i) {
 				this.children[i].parent = null;
 			}
@@ -54,13 +56,13 @@ package org.ranapat.flatflash {
 		
 		public function addChild(child:DisplayObject):DisplayObject {
 			if (child) {
-				child.x = isNaN(child.x)? 0 : child.x;
-				child.y = isNaN(child.y)? 0 : child.y;
-				child.depth = this.children.length;
+				child.depth = child.depth == -1? this.numChildren : child.depth;
 				child.parent = this;
 				
-				this.children[this.children.length] = child;
+				this.children[this.numChildren] = child;
+				++this._numChildren;
 				this.__changed += child.changed? 1 : 0;
+				this.__toReorder = true;
 				if (child.mouseEnabled && !this.__mouseEnabled[child]) {
 					this.__mouseEnabled[child] = new MouseEnabledObject(false);
 				}
@@ -85,6 +87,7 @@ package org.ranapat.flatflash {
 				var child:DisplayObject = this.children[index];
 				
 				this.children.splice(index, 1);
+				--this._numChildren;
 					
 				child.parent = null;
 				
@@ -118,15 +121,15 @@ package org.ranapat.flatflash {
 		}
 		
 		public function reorder():void {
-			this.children = this.reorderedChildren;
+			this.__toReorder = true;
 		}
 		
 		public function getChildAt(index:uint):DisplayObject {
-			return index >= 0 && index < this.children.length? this.children[index] : null;
+			return index >= 0 && index < this.numChildren? this.children[index] : null;
 		}
 		
 		public function getChildByName(name:String):DisplayObject {
-			var length:uint = this.children.length;
+			var length:uint = this.numChildren;
 			for (var i:uint = 0; i < length; ++i) {
 				var child:DisplayObject = this.children[i];
 				if (child.name == name) {
@@ -140,6 +143,11 @@ package org.ranapat.flatflash {
 			if (this.stage && this.bitmapData && this.__changed > 0) {
 				this.__changed = 0;
 				
+				if (this.__toReorder) {
+					this.children = this.reorderedChildren;
+					this.__toReorder = false;
+				}
+				
 				var bitmapData:BitmapData = this.bitmapData;
 				var latestSlicer:ISlicer = this.latestSlicer;
 				var latestSlicerType:String = this.latestSlicerType;
@@ -149,7 +157,7 @@ package org.ranapat.flatflash {
 				bitmapData.fillRect(bitmapData.rect, 0);
 				
 				var children:Vector.<DisplayObject> = this.children;
-				var length:uint = this.children.length;
+				var length:uint = this.numChildren;
 				var displayObject:DisplayObject;
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
@@ -188,7 +196,8 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get numChildren():uint {
-			return this.children.length;
+			return this._numChildren;
+			//return this.children.length;
 		}
 		
 		public function set fps(value:uint):void {
@@ -223,7 +232,13 @@ package org.ranapat.flatflash {
 		}
 		
 		private function sortByZ(objA:DisplayObject, objB:DisplayObject):int {
-			if (objA.depth > objB.depth) {
+			if (objA && !objB) {
+				return 1;
+			} else if (!objA && objB) {
+				return -1;
+			} else if (!objA && !objB) {
+				return 1;
+			} else if (objA.depth > objB.depth) {
 				return 1;
 			} else if (objA.depth < objB.depth) {
 				return -1;

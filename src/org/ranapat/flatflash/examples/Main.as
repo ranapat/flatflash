@@ -91,6 +91,7 @@ package org.ranapat.flatflash.examples {
 		private var recorder:MovieClip;
 		
 		private var loadRequestId:int = -1;
+		private var loadRequestId2:int = -1;
 		
 		[Embed(source="../../../../../assets/img1.png")]
 		private var Img1:Class;
@@ -376,8 +377,44 @@ package org.ranapat.flatflash.examples {
 				}
 				
 				
+			} else if (e.id == loadRequestId2) {
+				var _cc:Class = e.applicationDomain.getDefinition("TestDices1") as Class;
+				//var _cc:Class = e.applicationDomain.getDefinition("DiceRotateAtStand") as Class;
+				
+				var j:uint;
+				
+				var index:uint;
+				//for (var j:uint = 0; j < 1; ++j) 
+				//for (i = 0; i < 150; ++i) {
+					var cc:MovieClip = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle( -196.05, -512.15, 416.15 - 196.05, 772.15 - 512.15));
+					//var cc:MovieClip = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle( -15, -16, 15, 16));
+					cc.play();
+					cc.x = 80 + i * 5 + j * 32;
+					cc.y = 0 + i * 5;
+					cc.fps = 60;
+					this.doc.addChild(cc);
+					cc.depth = 50 * 150 - index++;
+					//TweenLite.delayedCall(3, cc.play);
+				//}
+				
+				/**/
+				//for (var j:uint = 0; j < 1; ++j) 
+				//for (i = 0; i < 150; ++i) {
+					_ccc = new _cc();
+					this.addChild(_ccc);
+					_ccc.y = 612;
+					//_ccc.x = 325 + i * 5 + j * 32;
+					_ccc.x = 820;
+					//_ccc.y = 116 + i * 5;
+					_ccc.play();
+					//TweenLite.delayedCall(3, _ccc.play);
+					
+					
+				//}
+				/**/
 			}
 		}
+		private var _ccc:flash.display.MovieClip;
 		
 		private function beforeDrawI1():void {
 			trace("before draw we have here")
@@ -804,6 +841,7 @@ package org.ranapat.flatflash.examples {
 			if (++frameNumber == 4) {
 				var loader:ResourceLoader = ResourceLoader.instance;
 				loadRequestId = loader.load("../assets/Untitled-n.swf");
+				loadRequestId2 = loader.load("../assets/TestDices.swf");
 			}
 			
 			++frames;
