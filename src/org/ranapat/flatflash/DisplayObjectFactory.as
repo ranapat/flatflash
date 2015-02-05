@@ -66,12 +66,12 @@ package org.ranapat.flatflash {
 			return new MovieClip(spritesheet, regionsToPick);
 		}
 		
-		public static function movieClipFromSWF(_class:Class, identifier:String = null):MovieClip {
+		public static function movieClipFromSWF(_class:Class, identifier:String = null, clipRectangle:Rectangle = null):MovieClip {
 			DisplayObjectFactory.ensureSWFGetter();
 			
 			var object:MovieClip = new MovieClip();
 			DisplayObjectFactory.swfGetterQueue[object] = -1;
-			var key:uint = SwfTracer.instance.get(_class, identifier);
+			var key:uint = SwfTracer.instance.get(_class, identifier, clipRectangle);
 			if (DisplayObjectFactory.swfGetterQueue[object]) {
 				DisplayObjectFactory.swfGetterQueue[object] = key;
 			}
@@ -79,12 +79,12 @@ package org.ranapat.flatflash {
 			return object;
 		}
 		
-		public static function imageFromSWF(_class:Class, identifier:String = null):Image {
+		public static function imageFromSWF(_class:Class, identifier:String = null, clipRectangle:Rectangle = null):Image {
 			DisplayObjectFactory.ensureSWFGetter();
 			
 			var object:Image = new Image();
 			DisplayObjectFactory.swfGetterQueue[object] = -1;
-			var key:uint = SwfTracer.instance.get(_class, identifier);
+			var key:uint = SwfTracer.instance.get(_class, identifier, clipRectangle);
 			if (DisplayObjectFactory.swfGetterQueue[object]) {
 				DisplayObjectFactory.swfGetterQueue[object] = key;
 			}

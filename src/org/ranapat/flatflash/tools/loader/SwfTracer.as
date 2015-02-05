@@ -6,6 +6,8 @@ package org.ranapat.flatflash.tools.loader {
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.geom.Matrix;
+	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.joiners.BitmapDataVectorJoiner;
@@ -35,6 +37,7 @@ package org.ranapat.flatflash.tools.loader {
 		private var _currentType:String;
 		private var _currentTraced:DisplayObjectContainer;
 		private var _currentTracedIdentifier:String;
+		private var _currentTracedClipRectangle:Rectangle;
 		private var _currentTracedBitmaps:Vector.<BitmapData>;
 		private var _currentTargetPreviousFrame:uint;
 		private var _currentTargetFrameMultiplier:Number;
@@ -77,11 +80,12 @@ package org.ranapat.flatflash.tools.loader {
 			
 		}
 
-		public function get(_class:Class, identifier:String = null):uint {
+		public function get(_class:Class, identifier:String = null, clipRectangle:Rectangle = null):uint {
 			this.enqueue(
 				++this._index,
 				_class,
-				identifier && identifier != Settings.NO_IDENTIFIER? identifier : identifier != Settings.NO_IDENTIFIER? Tools.getFullClassName(_class) : null
+				identifier && identifier != Settings.NO_IDENTIFIER? identifier : identifier != Settings.NO_IDENTIFIER? Tools.getFullClassName(_class) + ">><<" + clipRectangle : null,
+				clipRectangle
 			);
 			
 			this.tryToDequeue();
@@ -89,8 +93,8 @@ package org.ranapat.flatflash.tools.loader {
 			return this._index;
 		}
 		
-		private function enqueue(key:uint, _class:Class, identifier:String):void {
-			this._queue[this._queue.length] = new QueueObject(key, _class, identifier);
+		private function enqueue(key:uint, _class:Class, identifier:String, clipRectangle:Rectangle):void {
+			this._queue[this._queue.length] = new QueueObject(key, _class, identifier, clipRectangle);
 		}
 		
 		private function tryToDequeue():void {
@@ -101,6 +105,7 @@ package org.ranapat.flatflash.tools.loader {
 				
 				this._currentKey = item.key;
 				this._currentTracedIdentifier = item.identifier;
+				this._currentTracedClipRectangle = item.clipRectangle;
 				
 				if (this._currentTracedIdentifier && this._cache[this._currentTracedIdentifier]) {
 					this.finalizeCurrentTask();
@@ -120,8 +125,32 @@ package org.ranapat.flatflash.tools.loader {
 						} else if (this._currentTraced is Sprite) {
 							this._currentType = SwfTracer.TYPE_SPRITE;
 							
-							var tmp:BitmapData = new BitmapData(this._currentTraced.width, this._currentTraced.height, true, 0);
-							tmp.draw(this._currentTraced);
+							var offsetX:Number;
+							var offsetY:Number;
+							var width:Number;
+							var height:Number;
+							var clipRectangleToDraw:Rectangle;
+							
+							if (this._currentTracedClipRectangle) {
+								offsetX = -1 * this._currentTracedClipRectangle.x;
+								offsetY = -1 * this._currentTracedClipRectangle.y;
+								
+								width = this._currentTracedClipRectangle.width - this._currentTracedClipRectangle.x;
+								width = width > this._currentTraced.width + offsetX? this._currentTraced.width + offsetX : width;
+								
+								height = this._currentTracedClipRectangle.height - this._currentTracedClipRectangle.y;
+								height = height > this._currentTraced.height + offsetY? this._currentTraced.height + offsetY : height;
+								
+								clipRectangleToDraw = new Rectangle(0, 0, width, height);
+							} else {
+								offsetX = 0;
+								offsetY = 0;
+								width = this._currentTraced.width;
+								height = this._currentTraced.height;
+							}
+							
+							var tmp:BitmapData = new BitmapData(width, height, true, 0);
+							tmp.draw(this._currentTraced, new Matrix(1, 0, 0, 1, offsetX, offsetY), null, null, clipRectangleToDraw, false);
 							
 							this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
 							
@@ -143,6 +172,8 @@ package org.ranapat.flatflash.tools.loader {
 			this._currentKey = 0;
 			this._currentType = "";
 			this._currentTraced = null;
+			this._currentTracedIdentifier = "";
+			this._currentTracedClipRectangle = null;
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
@@ -175,6 +206,8 @@ package org.ranapat.flatflash.tools.loader {
 			this._currentKey = 0;
 			this._currentType = "";
 			this._currentTraced = null;
+			this._currentTracedIdentifier = "";
+			this._currentTracedClipRectangle = null;
 			this._currentTracedBitmaps = new Vector.<BitmapData>();
 			this._currentTracedBitmaps = null;
 			this._currentTargetPreviousFrame = 0;
@@ -185,15 +218,38 @@ package org.ranapat.flatflash.tools.loader {
 		private function traceMovieClips():void {
 			var length:uint = SwfTracer.FRAMES_COPY_PER_ITERATION;
 			var movieClip:MovieClip = this._currentTraced as MovieClip;
+			var clipRectangle:Rectangle = this._currentTracedClipRectangle;
+			
+			var offsetX:Number;
+			var offsetY:Number;
+			var width:Number;
+			var height:Number;
+			var clipRectangleToDraw:Rectangle;
+			
+			if (clipRectangle) {
+				offsetX = -1 * clipRectangle.x;
+				offsetY = -1 * clipRectangle.y;
+				
+				width = clipRectangle.width - clipRectangle.x;
+				width = width > movieClip.width + offsetX? movieClip.width + offsetX : width;
+				
+				height = clipRectangle.height - clipRectangle.y;
+				height = height > movieClip.height + offsetY? movieClip.height + offsetY : height;
+				
+				clipRectangleToDraw = new Rectangle(0, 0, width, height);
+			} else {
+				offsetX = 0;
+				offsetY = 0;
+				width = movieClip.width;
+				height = movieClip.height;
+			}
 			
 			while (movieClip.currentFrame <= movieClip.totalFrames && this._currentTargetPreviousFrame != movieClip.currentFrame && this._totalFramesCopiesThisFrame < length) {
 				this._currentTargetPreviousFrame = movieClip.currentFrame;
 				
-				var tmp:BitmapData = new BitmapData(movieClip.width, movieClip.height, true, 0);
-				tmp.draw(movieClip);
+				var tmp:BitmapData = new BitmapData(width, height, true, 0);
+				tmp.draw(movieClip, new Matrix(1, 0, 0, 1, offsetX, offsetY), null, null, clipRectangleToDraw, false);
 
-				var multiplier:Number;
-				
 				this._currentTracedBitmaps[this._currentTracedBitmaps.length] = tmp;
 				
 				movieClip.nextFrame();
@@ -217,19 +273,21 @@ package org.ranapat.flatflash.tools.loader {
 }
 
 import flash.display.BitmapData;
+import flash.geom.Rectangle;
 import org.ranapat.flatflash.tools.joiners.JoinResult;
 
 class QueueObject {
 	public var key:uint;
 	public var _class:Class;
 	public var identifier:String;
+	public var clipRectangle:Rectangle;
 	
-	public function QueueObject(key:uint, _class:Class, identifier:String) {
+	public function QueueObject(key:uint, _class:Class, identifier:String, clipRectangle:Rectangle) {
 		this.key = key;
 		this._class = _class;
 		this.identifier = identifier;
+		this.clipRectangle = clipRectangle;
 	}
-	
 }
 
 class CacheObject {

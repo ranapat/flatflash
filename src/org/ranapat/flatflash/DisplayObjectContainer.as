@@ -52,7 +52,7 @@ package org.ranapat.flatflash {
 			this.latestSlicerType = null;
 		}
 		
-		public function addChild(child:DisplayObject):void {
+		public function addChild(child:DisplayObject):DisplayObject {
 			if (child) {
 				child.x = isNaN(child.x)? 0 : child.x;
 				child.y = isNaN(child.y)? 0 : child.y;
@@ -65,6 +65,8 @@ package org.ranapat.flatflash {
 					this.__mouseEnabled[child] = new MouseEnabledObject(false);
 				}
 			}
+			
+			return child;
 		}
 		
 		public function removeChild(child:DisplayObject):DisplayObject {

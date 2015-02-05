@@ -303,13 +303,17 @@ package org.ranapat.flatflash.examples {
 					this.i1.onLoopLimitReachedRemove(this, this.loopLimitReachedI1);
 					this.doc.addChild(this.i1);
 					
+					this.doc.addChild(DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, "ffffff", new Rectangle(100, 100, 200, 200))).alpha = .5;
+					
 					
 					var b:Button = new Button(
-						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class),
+						DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("BigClip") as Class, null, new Rectangle(0, 0, 100, 100)),
+						//DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, null, new Rectangle(200, 100, 300, 200)),
+						DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("BigClip") as Class, null, new Rectangle(0, 110, 100, 210)),
+						DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("BigClip") as Class, null, new Rectangle(110, 0, 210, 100)),
+						//DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("BigClip") as Class, null, new Rectangle(110, 110, 210, 210))
+						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, null, new Rectangle(200, 100, 300, 200))
 						
-						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image3") as Class),
-						DisplayObjectFactory.movieClipFromSWF(e.applicationDomain.getDefinition("Test_Resize_Animation") as Class),
-						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image4") as Class)
 					);
 					b.x = 600;
 					b.y = 100;

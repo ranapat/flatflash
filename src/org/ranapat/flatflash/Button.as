@@ -9,7 +9,7 @@ package org.ranapat.flatflash {
 		private var down:DisplayObject;
 		private var hit:DisplayObject;
 		
-		private var active:DisplayObject;
+		private var _active:DisplayObject;
 		
 		public function Button(...args) {
 			super();
@@ -81,7 +81,7 @@ package org.ranapat.flatflash {
 		}
 		
 		override protected function handleAddedToContainer():void {
-			//
+			this.checkActiveAutoRun();
 		}
 		
 		override protected function handleRemovedFromContainer():void {
@@ -89,38 +89,44 @@ package org.ranapat.flatflash {
 		}
 		
 		private function doHandleMouseEvent(e:MouseEvent):void {
-			var changed:Boolean;
-			var previous:DisplayObject = this.active;
-			
 			if (e.type == MouseEvent.MOUSE_OVER) {
 				this.active = this.hover;
-			
-				changed = true;
 			} else if (e.type == MouseEvent.MOUSE_OUT) {
 				this.active = this.up;
-				
-				changed = true;
 			} else if (e.type == MouseEvent.MOUSE_DOWN) {
 				this.active = this.down;
-				
-				changed = true;
 			} else if (e.type == MouseEvent.MOUSE_UP) {
 				this.active = this.hover;
-				
-				changed = true;
-			}
-			
-			if (changed) {
-				if (previous is MovieClip) {
-					(previous as MovieClip).gotoAndStop(0);
-				}
-				if (this.active is MovieClip) {
-					(this.active as MovieClip).fps = this.parent.fps;
-					(this.active as MovieClip).gotoAndPlay(0);
-				}
 			}
 		}
 		
+		private function get active():DisplayObject {
+			return this._active;
+		}
+		
+		private function set active(value:DisplayObject):void {
+			var changed:Boolean = this._active != value;
+			var previous:DisplayObject = this.active;
+			this._active = value;
+			
+			if (changed) {
+				this.checkPreviousAutoRun(previous);
+				this.checkActiveAutoRun();
+			}
+		}
+		
+		private function checkPreviousAutoRun(previous:DisplayObject):void {
+			if (previous is MovieClip) {
+				(previous as MovieClip).gotoAndStop(0);
+			}
+		}
+		
+		private function checkActiveAutoRun():void {
+			if (this.active is MovieClip && this.parent) {
+				(this.active as MovieClip).fps = this.parent.fps;
+				(this.active as MovieClip).gotoAndPlay(0);
+			}
+		}
 	}
 
 }
