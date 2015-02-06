@@ -11,7 +11,7 @@ package org.ranapat.flatflash {
 		private var _raw:Vector.<BitmapData>;
 		private var _compressed:Vector.<ByteArray>;
 		
-		private var _currentFrame:uint;
+		private var _currentFrame:int;
 		private var _playing:Boolean;
 		private var _totalFrames:uint;
 		
@@ -33,6 +33,7 @@ package org.ranapat.flatflash {
 			
 			this._loopLimitReachedCallbackHolder = new Dictionary(true);
 			
+			this._currentFrame = -1;
 			this.fps = -1;
 			this.loops = -1;
 			
@@ -64,31 +65,29 @@ package org.ranapat.flatflash {
 				this.handleInitialized();
 			}
 			
-			this.currentFrame = 0;
+			this.currentFrame = this.currentFrame;
 		}
 		
 		public function get currentFrame():uint {
-			return this._currentFrame;
+			return this._currentFrame < 0 || this.totalFrames == 0? 0 : this._currentFrame >= this.totalFrames? this.totalFrames - 1 : this._currentFrame;
 		}
 		
 		public function set currentFrame(value:uint):void {
+			this._currentFrame = value;
+			
 			if (
 				this.totalFrames > value
 				&& value >= 0
 				&& (this._regions || this._raw || this._compressed)
 			) {
 				if (this._regions) {
-					this._currentFrame = value;
-					
 					this.width = this._regions[this._currentFrame].width;
 					this.height = this._regions[this._currentFrame].height;
 				} else if (this._raw) {
-					this._currentFrame = value;
-					
 					this.width = this._raw[this._currentFrame].width;
 					this.height = this._raw[this._currentFrame].height;
 				} else if (this._compressed) {
-					this._currentFrame = value;
+					//
 				}
 			}
 		}
@@ -166,11 +165,11 @@ package org.ranapat.flatflash {
 			if (this._regions) {
 				return super.spritesheet;
 			} else if (this._raw) {
-				return this._raw[this._currentFrame];
+				return this._raw[this.currentFrame];
 			} else if (this._compressed) {
 				var bitmapData:BitmapData = new BitmapData(this.width, this.height, true, 0);
 				var byteArray:ByteArray = new ByteArray();
-				byteArray.writeBytes(this._compressed[this._currentFrame]);
+				byteArray.writeBytes(this._compressed[this.currentFrame]);
 				byteArray.inflate();
 				bitmapData.setPixels(new Rectangle(0, 0, this.width, this.height), byteArray);
 				return bitmapData;
@@ -181,7 +180,7 @@ package org.ranapat.flatflash {
 		
 		override public function get region():Region {
 			if (this._regions) {
-				return this._regions[this._currentFrame];
+				return this._regions[this.currentFrame];
 			} else if (this._raw) {
 				return new Region(this.name, 0, 0, this.width, this.height, EngineTypes.TYPE_STARLING);
 			} else if (this._compressed) {
