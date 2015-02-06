@@ -177,7 +177,8 @@ package org.ranapat.flatflash {
 								displayObject.region, displayObject.position,
 								displayObject.alpha,
 								displayObject.scaleX, displayObject.scaleY,
-								displayObject.smoothing
+								displayObject.smoothing,
+								displayObject.filtersVector
 							);
 							displayObject.afterDraw();
 						} catch (e:Error) {

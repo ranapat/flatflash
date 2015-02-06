@@ -1,6 +1,7 @@
 package org.ranapat.flatflash {
 	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
+	import flash.filters.BitmapFilter;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
@@ -18,6 +19,7 @@ package org.ranapat.flatflash {
 		private var _alpha:Number;
 		private var _smoothing:Boolean;
 		private var _visible:Boolean;
+		private var _filters:Vector.<BitmapFilter>;
 		
 		private var _initialized:Boolean;
 		private var _initializedCallbackHolder:Dictionary;
@@ -238,6 +240,32 @@ package org.ranapat.flatflash {
 		
 		public function get position():Point {
 			return new Point(this.x, this.y);
+		}
+		
+		public function set filters(value:Array):void {
+			var length:uint = value.length;
+			this._filters = new Vector.<BitmapFilter>();
+			
+			for (var i:uint = 0; i < length; ++i) {
+				if (value[i] is BitmapFilter) {
+					this._filters[this._filters.length] = value[i];
+				}
+			}
+		}
+		
+		public function get filters():Array {
+			var result:Array = [];
+			var length:uint = this._filters.length;
+			
+			for (var i:uint = 0; i < length; ++i) {
+				result[result.length] = this._filters[i];
+			}
+			
+			return result;
+		}
+		
+		public function get filtersVector():Vector.<BitmapFilter> {
+			return this._filters;
 		}
 		
 		public function hop(timer:int):void {

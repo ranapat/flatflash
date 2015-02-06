@@ -206,17 +206,18 @@ package org.ranapat.flatflash {
 			
 			if (DisplayObjectFactory.recording[object]) {
 				try {
-					
 					var vector:Vector.<ByteArray> = DisplayObjectFactory.recording[object].vector;
 					var clipRectangle:Rectangle = DisplayObjectFactory.recording[object].clipRectangle;
 					
 					var tmp:BitmapData = new BitmapData(clipRectangle? clipRectangle.width : object.width, clipRectangle? clipRectangle.height : object.height, true, 0);
-					
 					tmp.draw(object, null, null, null, clipRectangle, false);
 					
 					var bytearray:ByteArray = tmp.getPixels(new Rectangle(0, 0, tmp.width, tmp.height));
 					bytearray.deflate();
 					vector[vector.length] = bytearray;
+					
+					tmp.dispose();
+					tmp = null;
 				} catch (err:Error) {
 					//trace(err);
 				}

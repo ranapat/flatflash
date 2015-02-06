@@ -11,6 +11,7 @@ package org.ranapat.flatflash.examples {
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.PressAndTapGestureEvent;
+	import flash.filters.DropShadowFilter;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -22,6 +23,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.loader.SwfTracer;
 	import org.ranapat.flatflash.tools.loader.SwfTracerEvent;
+	import org.ranapat.flatflash.tools.Tools;
 	
 	import net.hires.debug.Stats;
 	
@@ -49,7 +51,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="60")]
+	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="40")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -359,7 +361,7 @@ package org.ranapat.flatflash.examples {
 						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image8") as Class),
 						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image9") as Class)
 					]);
-					this.addChild(this.carousel);
+					//this.addChild(this.carousel);
 					this.carousel.x = 400;
 					this.carousel.y = 400;
 					
@@ -378,30 +380,57 @@ package org.ranapat.flatflash.examples {
 				
 				
 			} else if (e.id == loadRequestId2) {
-				var _cc:Class = e.applicationDomain.getDefinition("TestDices1") as Class;
-				//var _cc:Class = e.applicationDomain.getDefinition("DiceRotateAtStand") as Class;
+				//var _cc:Class = e.applicationDomain.getDefinition("TestDices1") as Class;
+				var _cc:Class = e.applicationDomain.getDefinition("DiceRotateAtStand") as Class;
 				
 				var j:uint;
 				
 				var index:uint;
 				//for (var j:uint = 0; j < 1; ++j) 
 				//for (i = 0; i < 150; ++i) {
-					var cc:MovieClip = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle( -196.05, -512.15, 416.15 - 196.05, 772.15 - 512.15));
+					cc1 = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle(-15, -16, 15, 16));
+					cc2 = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle(-15, -16, 15, 16));
+					cc3 = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle(-15, -16, 15, 16));
+					cc4 = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle(-15, -16, 15, 16));
 					//var cc:MovieClip = DisplayObjectFactory.movieClipFromSWF(_cc, null, new Rectangle( -15, -16, 15, 16));
-					cc.play();
+					
+					
+					
+					/*
 					cc.x = 80 + i * 5 + j * 32;
 					cc.y = 0 + i * 5;
 					cc.fps = 60;
-					this.doc.addChild(cc);
-					cc.depth = 50 * 150 - index++;
+					cc.scale = .25
+					*/
+					
+					/*
+					cc1.fps = 40;
+					cc2.fps = 40;
+					cc3.fps = 40;
+					cc4.fps = 40;
+					*/
+					
+					cc1.play();
+					cc2.play();
+					cc3.play();
+					cc4.play();
+					
+					this.doc.addChild(cc1);
+					this.doc.addChild(cc2);
+					this.doc.addChild(cc3);
+					this.doc.addChild(cc4);
+					
 					//TweenLite.delayedCall(3, cc.play);
 				//}
 				
 				/**/
 				//for (var j:uint = 0; j < 1; ++j) 
 				//for (i = 0; i < 150; ++i) {
-					_ccc = new _cc();
+					//_ccc = new _cc();
+					_ccc = new (e.applicationDomain.getDefinition("TestDices2") as Class)();
 					this.addChild(_ccc);
+					this.swapChildren(_ccc, this.doc)
+					_ccc.visible = false;
 					_ccc.y = 612;
 					//_ccc.x = 325 + i * 5 + j * 32;
 					_ccc.x = 820;
@@ -409,12 +438,58 @@ package org.ranapat.flatflash.examples {
 					_ccc.play();
 					//TweenLite.delayedCall(3, _ccc.play);
 					
+					_ccc.addEventListener(Event.ENTER_FRAME, this.cccEnterFrame);
+					
 					
 				//}
 				/**/
 			}
 		}
+		private var cc1:MovieClip;
+		private var cc2:MovieClip;
+		private var cc3:MovieClip;
+		private var cc4:MovieClip;
 		private var _ccc:flash.display.MovieClip;
+		private var _previousFrame:uint;
+		
+		private function cccEnterFrame(e:Event):void {
+			if (this._previousFrame != _ccc.currentFrame) {
+				this._previousFrame = _ccc.currentFrame;
+				walkThru(_ccc)
+				
+			}
+			
+		}
+		
+		private function walkThru(object:flash.display.DisplayObjectContainer):void {
+			var length:uint = object.numChildren;
+			
+			var dicesIndex:uint;
+			
+			for (var i:uint = 0; i < length; ++i) {
+				var tmp:flash.display.DisplayObject = object.getChildAt(i);
+				if (
+					tmp
+					&& (
+						Tools.getFullClassName(tmp) == "DiceRotationAnimation"
+						|| Tools.getFullClassName(tmp) == "DiceRotationAnimationUp"
+						|| Tools.getFullClassName(tmp) == "DiceStopped"
+						|| Tools.getFullClassName(tmp) == "DiceSideRotation"
+					)
+				) {
+					++dicesIndex;
+					this["cc" + dicesIndex].x = 700 + tmp.x;
+					this["cc" + dicesIndex].y = 490 + tmp.y;
+					this["cc" + dicesIndex].scaleX = tmp.scaleX;
+					this["cc" + dicesIndex].scaleY = tmp.scaleY;
+					this["cc" + dicesIndex].filters = tmp.filters;
+					tmp.transform.matrix
+					//this["cc" + dicesIndex].alpha = .5;
+					
+					//trace(tmp + " .. " + tmp.name + " .. " + tmp.x + " .. " + tmp.y + " .. " + tmp.scaleX + " .. " + tmp.scaleY + " .. " + tmp.filters + " .. " + tmp.rotation)
+				}
+			}
+		}
 		
 		private function beforeDrawI1():void {
 			trace("before draw we have here")

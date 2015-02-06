@@ -1,5 +1,6 @@
 package org.ranapat.flatflash.tools.slicers {
 	import flash.display.BitmapData;
+	import flash.filters.BitmapFilter;
 	import flash.geom.Point;
 	import org.ranapat.flatflash.tools.regions.Region;
 	
@@ -9,7 +10,8 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
-			sourceSmoothing:Boolean
+			sourceSmoothing:Boolean,
+			sourceFilters:Vector.<BitmapFilter>
 		):void;
 	}
 	
