@@ -1,8 +1,6 @@
 package org.ranapat.flatflash.tools.slicers {
 	import flash.display.BitmapData;
 	import flash.filters.BitmapFilter;
-	import flash.filters.BlurFilter;
-	import flash.filters.DropShadowFilter;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
