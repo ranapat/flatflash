@@ -5,6 +5,7 @@ package org.ranapat.flatflash.tools.slicers {
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.regions.Region;
 	
 	public class StarlingSlicer implements ISlicer {
@@ -26,9 +27,13 @@ package org.ranapat.flatflash.tools.slicers {
 			
 			var sourceBitmapData:BitmapData = source;
 			var sourceRectangle:Rectangle = sourceRegion.sliceRectangle;
+			var destinationPointToApply:Point = destinationPoint;
+			
+			var i:uint;
 			
 			var clipped:BitmapData;
 			var scaled:BitmapData;
+			var filtered:BitmapData;
 			
 			if (
 				sourceAlpha != 1
@@ -43,7 +48,7 @@ package org.ranapat.flatflash.tools.slicers {
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
 				if (sourceScaleX != 1 || sourceScaleY != 1) {
-					scaled = new BitmapData(sourceRegion.width * sourceScaleX, sourceRegion.height * sourceScaleY, true, 0);
+					scaled = new BitmapData(sourceRectangle.width * sourceScaleX, sourceRectangle.height * sourceScaleY, true, 0);
 					var matrix:Matrix = new Matrix();
 					matrix.scale(sourceScaleX, sourceScaleY);
 					scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
@@ -54,20 +59,32 @@ package org.ranapat.flatflash.tools.slicers {
 				
 				sourceBitmapData = clipped;
 			}
+
+			if (sourceFilters && sourceFilters.length > 0)  {
+				filtered = new BitmapData(
+					sourceRectangle.width + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
+					sourceRectangle.height + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
+					true, 0
+				);
+				filtered.copyPixels(sourceBitmapData, sourceRectangle, new Point(Settings.FILTER_MARGIN_DELTA_CUT, Settings.FILTER_MARGIN_DELTA_CUT), null, null, false);
+				
+				var filtersRectangle:Rectangle = new Rectangle(0, 0, filtered.width, filtered.height);
+				var filtersPoint:Point = new Point(0, 0);
+				var sourceFiltersLength:uint = sourceFilters.length;
+				for (i = 0; i < sourceFiltersLength; ++i) {
+					filtered.applyFilter(filtered, filtersRectangle, filtersPoint, sourceFilters[i]);
+				}
+				
+				sourceBitmapData = filtered;
+				sourceRectangle = new Rectangle(0, 0, filtered.width, filtered.height);
+				destinationPointToApply = new Point(destinationPointToApply.x - Settings.FILTER_MARGIN_DELTA_CUT, destinationPointToApply.y - Settings.FILTER_MARGIN_DELTA_CUT);
+			}
 			
 			destination.copyPixels(
 				sourceBitmapData,
-				sourceRectangle, destinationPoint,
+				sourceRectangle, destinationPointToApply,
 				null, null, true
 			);
-			
-			if (sourceFilters) {
-				var length:uint = sourceFilters.length;
-				var rectangle:Rectangle = new Rectangle(destinationPoint.x, destinationPoint.y, sourceRectangle.width, sourceRectangle.height);
-				for (var i:uint = 0; i < length; ++i) {
-					destination.applyFilter(destination, rectangle, destinationPoint, sourceFilters[i]);
-				}
-			}
 			
 			if (clipped) {
 				clipped.dispose();
@@ -76,6 +93,10 @@ package org.ranapat.flatflash.tools.slicers {
 			if (scaled) {
 				scaled.dispose();
 				scaled = null;
+			}
+			if (filtered) {
+				filtered.dispose();
+				filtered = null;
 			}
 		}
 	}

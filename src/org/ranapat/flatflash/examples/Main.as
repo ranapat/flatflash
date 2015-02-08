@@ -51,7 +51,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="40")]
+	[SWF(width="1366", height="768", backgroundColor="0xFF00FF", frameRate="4")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -162,8 +162,19 @@ package org.ranapat.flatflash.examples {
 					this.i1.stop();
 				} else if (e.keyCode == Keyboard.L) {
 					this.i1.play();
+				} else if (e.keyCode == Keyboard.M) {
+					++this._tracedValuesPlayIndex;
+					this.applyDiceAnimation(this._tracedValuesPlayIndex);
+					
+					trace(".............." + this._tracedValuesPlayIndex)
+				} else if (e.keyCode == Keyboard.N) {
+					--this._tracedValuesPlayIndex;
+					this.applyDiceAnimation(this._tracedValuesPlayIndex);
+					
+					trace(".............." + this._tracedValuesPlayIndex)
 				}
 			}
+			
 			
 			if (this.i2) {
 				if (e.keyCode == Keyboard.SPACE) {
@@ -361,7 +372,7 @@ package org.ranapat.flatflash.examples {
 						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image8") as Class),
 						DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image9") as Class)
 					]);
-					this.addChild(this.carousel);
+					//this.addChild(this.carousel);
 					this.carousel.x = 400;
 					this.carousel.y = 400;
 					
@@ -396,8 +407,12 @@ package org.ranapat.flatflash.examples {
 				if (true) {
 					diceTurnMyAnimation1 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnMyAnimation2 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnMyAnimation3 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnMyAnimation4 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnOpponentAnimation1 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnOpponentAnimation2 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnOpponentAnimation3 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnOpponentAnimation4 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceStill1 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
 					diceStill2 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
 					diceStill3 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
@@ -409,8 +424,12 @@ package org.ranapat.flatflash.examples {
 				} else {
 					diceTurnMyAnimation1 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnMyAnimation2 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnMyAnimation3 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnMyAnimation4 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnOpponentAnimation1 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnOpponentAnimation2 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnOpponentAnimation3 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+					diceTurnOpponentAnimation4 = DisplayObjectFactory.movieClipFromSWF(BlackDiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceStill1 = DisplayObjectFactory.movieClipFromSWF(BlackDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
 					diceStill2 = DisplayObjectFactory.movieClipFromSWF(BlackDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
 					diceStill3 = DisplayObjectFactory.movieClipFromSWF(BlackDiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
@@ -423,8 +442,12 @@ package org.ranapat.flatflash.examples {
 				
 				diceTurnMyAnimation1.play();
 				diceTurnMyAnimation2.play();
+				diceTurnMyAnimation3.play();
+				diceTurnMyAnimation4.play();
 				diceTurnOpponentAnimation1.play();
 				diceTurnOpponentAnimation2.play();
+				diceTurnOpponentAnimation3.play();
+				diceTurnOpponentAnimation4.play();
 				diceStill1.gotoAndStop(0);
 				diceStill2.gotoAndStop(1);
 				diceStill3.gotoAndStop(2);
@@ -436,8 +459,12 @@ package org.ranapat.flatflash.examples {
 				
 				this.doc.addChild(diceTurnMyAnimation1);
 				this.doc.addChild(diceTurnMyAnimation2);
+				this.doc.addChild(diceTurnMyAnimation3);
+				this.doc.addChild(diceTurnMyAnimation4);
 				this.doc.addChild(diceTurnOpponentAnimation1);
 				this.doc.addChild(diceTurnOpponentAnimation2);
+				this.doc.addChild(diceTurnOpponentAnimation3);
+				this.doc.addChild(diceTurnOpponentAnimation4);
 				this.doc.addChild(diceStill1);
 				this.doc.addChild(diceStill2);
 				this.doc.addChild(diceStill3);
@@ -451,6 +478,7 @@ package org.ranapat.flatflash.examples {
 				
 				var _ccc:flash.display.MovieClip = new (e.applicationDomain.getDefinition("DiceAnimations") as Class)();
 				_ccc.gotoAndStop(1);
+				
 				var previousFrame:uint = 1;
 				do {
 					previousFrame = _ccc.currentFrame;
@@ -460,7 +488,14 @@ package org.ranapat.flatflash.examples {
 				} while (_ccc.currentFrame != previousFrame);
 				_ccc = null;
 				
-				addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
+				//_ccc.x = 113;
+				//_ccc.y = 113;
+				//_ccc.alpha = .4;
+				//addChild(_ccc);
+				//_ccc.play();
+				//swapChildren(_ccc, this.doc)
+				
+				//addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
 			}
 		}
 		
@@ -497,18 +532,18 @@ package org.ranapat.flatflash.examples {
 				
 				if (dice) {
 					dice.visible = true;
-					dice.x = 700 + tracedDiceObject.x + 7;
-					dice.y = 490 + tracedDiceObject.y + 7;
+					dice.x = /*707 + */tracedDiceObject.x;
+					dice.y = /*497 + */tracedDiceObject.y;
 					dice.scaleX = tracedDiceObject.scaleX;
 					dice.scaleY = tracedDiceObject.scaleY;
 					dice.filters = tracedDiceObject.filters;
 				}
 			}
 			
-			while (dicesTurnIndexMy < 2) {
+			while (dicesTurnIndexMy < 4) {
 				this["diceTurnMyAnimation" + ++dicesTurnIndexMy].visible = false;
 			}
-			while (dicesTurnIndexOpponent < 2) {
+			while (dicesTurnIndexOpponent < 4) {
 				this["diceTurnOpponentAnimation" + ++dicesTurnIndexOpponent].visible = false;
 			}
 			while (dicesStillIndex < 4) {
@@ -521,8 +556,12 @@ package org.ranapat.flatflash.examples {
 		
 		private var diceTurnMyAnimation1:MovieClip;
 		private var diceTurnMyAnimation2:MovieClip;
+		private var diceTurnMyAnimation3:MovieClip;
+		private var diceTurnMyAnimation4:MovieClip;
 		private var diceTurnOpponentAnimation1:MovieClip;
 		private var diceTurnOpponentAnimation2:MovieClip;
+		private var diceTurnOpponentAnimation3:MovieClip;
+		private var diceTurnOpponentAnimation4:MovieClip;
 		private var diceStill1:MovieClip;
 		private var diceStill2:MovieClip;
 		private var diceStill3:MovieClip;
@@ -899,7 +938,7 @@ package org.ranapat.flatflash.examples {
 			
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
-			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
+			stage.fullScreenSourceRect = new Rectangle(0,0,1366,768); 
 			stage.displayState = StageDisplayState.FULL_SCREEN; 	
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			
