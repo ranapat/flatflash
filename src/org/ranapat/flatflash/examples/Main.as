@@ -51,7 +51,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1366", height="768", backgroundColor="0xFF00FF", frameRate="4")]
+	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="40")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -94,6 +94,9 @@ package org.ranapat.flatflash.examples {
 		
 		private var loadRequestId:int = -1;
 		private var loadRequestId2:int = -1;
+		
+		private var diceRollAnimationWhite:DiceRollAnimation;
+		private var diceRollAnimationBlack:DiceRollAnimation;
 		
 		[Embed(source="../../../../../assets/img1.png")]
 		private var Img1:Class;
@@ -172,6 +175,21 @@ package org.ranapat.flatflash.examples {
 					this.applyDiceAnimation(this._tracedValuesPlayIndex);
 					
 					trace(".............." + this._tracedValuesPlayIndex)
+				} else if (e.keyCode == 49) {
+					diceRollAnimationWhite.play("dice_anm_01")
+					diceRollAnimationBlack.play("dice_anm_01")
+				} else if (e.keyCode == 50) {
+					diceRollAnimationWhite.play("dice_anm_02")
+					diceRollAnimationBlack.play("dice_anm_02")
+				} else if (e.keyCode == 51) {
+					diceRollAnimationWhite.play("dice_anm_03")
+					diceRollAnimationBlack.play("dice_anm_03")
+				} else if (e.keyCode == 52) {
+					diceRollAnimationWhite.play("dice_anm_04")
+					diceRollAnimationBlack.play("dice_anm_04")
+				} else if (e.keyCode == 53) {
+					diceRollAnimationWhite.play("dice_anm_05")
+					diceRollAnimationBlack.play("dice_anm_05")
 				}
 			}
 			
@@ -391,6 +409,15 @@ package org.ranapat.flatflash.examples {
 				
 				
 			} else if (e.id == loadRequestId2) {
+				diceRollAnimationWhite = new DiceRollAnimation();
+				diceRollAnimationWhite.record(e.applicationDomain, "White");
+				this.addChild(diceRollAnimationWhite);
+				
+				diceRollAnimationBlack = new DiceRollAnimation();
+				diceRollAnimationBlack.record(e.applicationDomain, "Black");
+				diceRollAnimationBlack.x += 700;
+				this.addChild(diceRollAnimationBlack);
+				
 				//var _cc:Class = e.applicationDomain.getDefinition("TestDices1") as Class;
 				var WhiteDiceTurnMyAnimation:Class = e.applicationDomain.getDefinition("WhiteDiceTurnMyAnimation") as Class;
 				var WhiteDiceTurnOpponentAnimation:Class = e.applicationDomain.getDefinition("WhiteDiceTurnOpponentAnimation") as Class;
@@ -404,7 +431,7 @@ package org.ranapat.flatflash.examples {
 				
 				var j:uint;
 				
-				if (true) {
+				if (false) {
 					diceTurnMyAnimation1 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnMyAnimation2 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
 					diceTurnMyAnimation3 = DisplayObjectFactory.movieClipFromSWF(WhiteDiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
@@ -495,7 +522,7 @@ package org.ranapat.flatflash.examples {
 				//_ccc.play();
 				//swapChildren(_ccc, this.doc)
 				
-				//addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
+				addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
 			}
 		}
 		
@@ -938,7 +965,7 @@ package org.ranapat.flatflash.examples {
 			
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
-			stage.fullScreenSourceRect = new Rectangle(0,0,1366,768); 
+			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
 			stage.displayState = StageDisplayState.FULL_SCREEN; 	
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			

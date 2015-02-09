@@ -22,7 +22,7 @@ package org.ranapat.flatflash {
 		private var latestSlicer:ISlicer;
 		private var latestSlicerType:String;
 		
-		private var _fps:uint;
+		private var _fps:int;
 		private var _cfps:uint;
 		
 		private var startTime:int;
@@ -35,6 +35,8 @@ package org.ranapat.flatflash {
 		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
+			
+			this._fps = -1;
 			
 			this.children = new Vector.<DisplayObject>();
 			this.__mouseEnabled = new Dictionary(true);
@@ -140,7 +142,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function redraw():void {
-			if (this.stage && this.bitmapData && this.__changed > 0) {
+			if (this.stage && this.bitmapData && this.isChanged) {
 				this.__changed = 0;
 				
 				if (this.__toReorder) {
@@ -201,12 +203,12 @@ package org.ranapat.flatflash {
 			//return this.children.length;
 		}
 		
-		public function set fps(value:uint):void {
-			this._fps = value;
+		public function set fps(value:int):void {
+			this._fps = value < 0? 0 : value;
 		}
 		
-		public function get fps():uint {
-			return this._fps;
+		public function get fps():int {
+			return this._fps > 0? this._fps : 0;
 		}
 		
 		public function get cfps():uint {
@@ -224,6 +226,10 @@ package org.ranapat.flatflash {
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
 			}
+		}
+		
+		protected function get isChanged():Boolean {
+			return this.__changed > 0;
 		}
 		
 		private function get reorderedChildren():Vector.<DisplayObject> {
@@ -353,7 +359,7 @@ package org.ranapat.flatflash {
 			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown, false, 0, true);
 			this.stage.addEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp, false, 0, true);
 			
-			this.fps = this.stage.frameRate;
+			this._fps = this._fps == -1? this.stage.frameRate : this._fps;
 			
 			this.initFPSCounter();
 			

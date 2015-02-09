@@ -1,0 +1,328 @@
+package org.ranapat.flatflash.examples {
+	import flash.geom.Rectangle;
+	import flash.system.ApplicationDomain;
+	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
+	import org.ranapat.flatflash.DisplayObject;
+	import org.ranapat.flatflash.DisplayObjectContainer;
+	import org.ranapat.flatflash.DisplayObjectFactory;
+	import org.ranapat.flatflash.MovieClip;
+	import org.ranapat.flatflash.tools.Tools;
+	
+	import flash.display.MovieClip;
+	import flash.display.DisplayObjectContainer;
+	
+	
+	public class DiceRollAnimation extends org.ranapat.flatflash.DisplayObjectContainer {
+		private var diceTurnMyAnimation1:org.ranapat.flatflash.MovieClip;
+		private var diceTurnMyAnimation2:org.ranapat.flatflash.MovieClip;
+		private var diceTurnMyAnimation3:org.ranapat.flatflash.MovieClip;
+		private var diceTurnMyAnimation4:org.ranapat.flatflash.MovieClip;
+		private var diceTurnOpponentAnimation1:org.ranapat.flatflash.MovieClip;
+		private var diceTurnOpponentAnimation2:org.ranapat.flatflash.MovieClip;
+		private var diceTurnOpponentAnimation3:org.ranapat.flatflash.MovieClip;
+		private var diceTurnOpponentAnimation4:org.ranapat.flatflash.MovieClip;
+		private var diceStill1:org.ranapat.flatflash.MovieClip;
+		private var diceStill2:org.ranapat.flatflash.MovieClip;
+		private var diceStill3:org.ranapat.flatflash.MovieClip;
+		private var diceStill4:org.ranapat.flatflash.MovieClip;
+		private var diceTurnSideAnimation1:org.ranapat.flatflash.MovieClip;
+		private var diceTurnSideAnimation2:org.ranapat.flatflash.MovieClip;
+		private var diceTurnSideAnimation3:org.ranapat.flatflash.MovieClip;
+		private var diceTurnSideAnimation4:org.ranapat.flatflash.MovieClip;
+		
+		private var applicationDomain:ApplicationDomain;
+		
+		private var tracedValues:Vector.<Vector.<TracedDiceObjects>>;
+		private var _tracedValuesPlayIndex:uint;
+		
+		private var _initialized:Boolean;
+		private var _playing:Boolean;
+		
+		private var _ranges:Dictionary;
+		private var _playFrom:uint;
+		private var _playTo:uint;
+		
+		private var _timeDelta:Number;
+		private var _previousTimeOffset:uint;
+		private var _startTime:int;
+		
+		public function DiceRollAnimation() {
+			super();
+			
+			this.fps = 40;
+		}
+		
+		override public function set fps(value:int):void {
+			super.fps = value;
+			this._timeDelta = this.fps? 1000 / this.fps : 0;
+		}
+		
+		public function record(applicationDomain:ApplicationDomain, variation:String):void {
+			this.removeAllChildren();
+			
+			this.applicationDomain = applicationDomain;
+			
+			this._ranges = new Dictionary();
+			this.tracedValues = new Vector.<Vector.<TracedDiceObjects>>();
+			
+			var toRecord:flash.display.MovieClip = new (applicationDomain.getDefinition("DiceAnimations") as Class)();
+			toRecord.gotoAndStop(1);
+			
+			var previousFrame:uint = 1;
+			var previousLabel:String;
+			var currentFrameStartIndex:uint;
+			do {
+				if (!previousLabel) {
+					currentFrameStartIndex = toRecord.currentFrame - 1;
+					previousLabel = toRecord.currentLabel;
+				} else if (previousLabel != toRecord.currentLabel) {
+					this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 1);
+					
+					currentFrameStartIndex = toRecord.currentFrame - 1;
+					previousLabel = toRecord.currentLabel;
+				}
+				previousFrame = toRecord.currentFrame;
+				this.walkThru(toRecord.currentFrame - 1, toRecord);
+				toRecord.nextFrame();
+				
+			} while (toRecord.currentFrame != previousFrame);
+			if (toRecord.currentFrame == previousFrame) {
+				this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 1);
+			}
+			
+			toRecord = null;
+			
+			var DiceTurnMyAnimation:Class = applicationDomain.getDefinition(variation + "DiceTurnMyAnimation") as Class;
+			var DiceTurnOpponentAnimation:Class = applicationDomain.getDefinition(variation + "DiceTurnOpponentAnimation") as Class;
+			var DiceStill:Class = applicationDomain.getDefinition(variation + "DiceStill") as Class;
+			var DiceTurnSideAnimation:Class = applicationDomain.getDefinition(variation + "DiceTurnSideAnimation") as Class;
+			
+			this.diceTurnMyAnimation1 = DisplayObjectFactory.movieClipFromSWF(DiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnMyAnimation2 = DisplayObjectFactory.movieClipFromSWF(DiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnMyAnimation3 = DisplayObjectFactory.movieClipFromSWF(DiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnMyAnimation4 = DisplayObjectFactory.movieClipFromSWF(DiceTurnMyAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnOpponentAnimation1 = DisplayObjectFactory.movieClipFromSWF(DiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnOpponentAnimation2 = DisplayObjectFactory.movieClipFromSWF(DiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnOpponentAnimation3 = DisplayObjectFactory.movieClipFromSWF(DiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceTurnOpponentAnimation4 = DisplayObjectFactory.movieClipFromSWF(DiceTurnOpponentAnimation, null, new Rectangle(-15, -16, 15, 16));
+			this.diceStill1 = DisplayObjectFactory.movieClipFromSWF(DiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
+			this.diceStill2 = DisplayObjectFactory.movieClipFromSWF(DiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
+			this.diceStill3 = DisplayObjectFactory.movieClipFromSWF(DiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
+			this.diceStill4 = DisplayObjectFactory.movieClipFromSWF(DiceStill, null, new Rectangle( -15, -16, 15, 16 + 14));
+			this.diceTurnSideAnimation1 = DisplayObjectFactory.movieClipFromSWF(DiceTurnSideAnimation, null, new Rectangle( -15, -16, 15, 16));
+			this.diceTurnSideAnimation2 = DisplayObjectFactory.movieClipFromSWF(DiceTurnSideAnimation, null, new Rectangle( -15, -16, 15, 16));
+			this.diceTurnSideAnimation3 = DisplayObjectFactory.movieClipFromSWF(DiceTurnSideAnimation, null, new Rectangle( -15, -16, 15, 16));
+			this.diceTurnSideAnimation4 = DisplayObjectFactory.movieClipFromSWF(DiceTurnSideAnimation, null, new Rectangle( -15, -16, 15, 16));
+			
+			this.diceTurnMyAnimation1.play();
+			this.diceTurnMyAnimation2.play();
+			this.diceTurnMyAnimation3.play();
+			this.diceTurnMyAnimation4.play();
+			this.diceTurnOpponentAnimation1.play();
+			this.diceTurnOpponentAnimation2.play();
+			this.diceTurnOpponentAnimation3.play();
+			this.diceTurnOpponentAnimation4.play();
+			this.diceStill1.gotoAndStop(0);
+			this.diceStill2.gotoAndStop(1);
+			this.diceStill3.gotoAndStop(2);
+			this.diceStill4.gotoAndStop(3);
+			this.diceTurnSideAnimation1.play();
+			this.diceTurnSideAnimation2.play();
+			this.diceTurnSideAnimation3.play();
+			this.diceTurnSideAnimation4.play();
+			
+			this.addChild(this.diceTurnMyAnimation1);
+			this.addChild(this.diceTurnMyAnimation2);
+			this.addChild(this.diceTurnMyAnimation3);
+			this.addChild(this.diceTurnMyAnimation4);
+			this.addChild(this.diceTurnOpponentAnimation1);
+			this.addChild(this.diceTurnOpponentAnimation2);
+			this.addChild(this.diceTurnOpponentAnimation3);
+			this.addChild(this.diceTurnOpponentAnimation4);
+			this.addChild(this.diceStill1);
+			this.addChild(this.diceStill2);
+			this.addChild(this.diceStill3);
+			this.addChild(this.diceStill4);
+			this.addChild(this.diceTurnSideAnimation1);
+			this.addChild(this.diceTurnSideAnimation2);
+			this.addChild(this.diceTurnSideAnimation3);
+			this.addChild(this.diceTurnSideAnimation4);
+			
+			this._initialized = true;
+		}
+		
+		override public function redraw():void {
+			if (this.stage && this._initialized && this._playing) {
+				this.applyDiceAnimation(this._tracedValuesPlayIndex);
+				
+				var currentTime:int = getTimer();
+				var timer:int = currentTime - this._startTime;
+				var timeOffset:uint = timer / this.timeDelta;
+				var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
+				
+				this._previousTimeOffset = timeOffset;
+				this._tracedValuesPlayIndex = this.currentFrame + delta;
+				if (this._tracedValuesPlayIndex > this._playTo) {
+					this._playing = false;
+				}
+				
+				super.redraw();
+			}
+		}
+		
+		public function addRange(range:String, from:uint, to:uint):void {
+			this._ranges[range] = new RangeObject(from, to);
+		}
+		
+		public function play(range:String):void {
+			if (this._ranges[range]) {
+				this._playing = true;
+				
+				var rangeObject:RangeObject = this._ranges[range];
+				
+				this._playFrom = rangeObject.from;
+				this._playTo = rangeObject.to;
+				
+				this._tracedValuesPlayIndex = this._playFrom;
+				
+				this._startTime = getTimer();
+				this._previousTimeOffset = 0;
+			}
+		}
+		
+		public function stop():void {
+			this._playing = false;
+		}
+		
+		override protected function get isChanged():Boolean {
+			return this._playing;
+		}
+		
+		private function applyDiceAnimation(frame:uint):void {
+			var vector:Vector.<TracedDiceObjects> = this.tracedValues[frame];
+			var length:uint = vector.length;
+			
+			var dicesTurnIndexMy:uint;
+			var dicesTurnIndexOpponent:uint;
+			var dicesStillIndex:uint;
+			var dicesSideIndex:uint;
+			
+			var dice:org.ranapat.flatflash.MovieClip;
+			for (var i:uint = 0; i < length; ++i) {
+				dice = null;
+				
+				var tracedDiceObject:TracedDiceObjects = vector[i];
+				var className:String = tracedDiceObject.className;
+				if (className == "WhiteDiceTurnMyAnimation") {
+					dice = this["diceTurnMyAnimation" + ++dicesTurnIndexMy];
+				} else if (className == "WhiteDiceTurnOpponentAnimation") {
+					dice = this["diceTurnOpponentAnimation" + ++dicesTurnIndexOpponent];
+				} else if (className == "WhiteDiceStill") {
+					dice = this["diceStill" + ++dicesStillIndex];
+				} else if (className == "WhiteDiceTurnSideAnimation") {
+					dice = this["diceTurnSideAnimation" + ++dicesSideIndex];
+				}
+				
+				if (dice) {
+					dice.visible = true;
+					dice.x = tracedDiceObject.x;
+					dice.y = tracedDiceObject.y;
+					dice.scaleX = tracedDiceObject.scaleX;
+					dice.scaleY = tracedDiceObject.scaleY;
+					dice.filters = tracedDiceObject.filters;
+				}
+			}
+			
+			while (dicesTurnIndexMy < 4) {
+				this["diceTurnMyAnimation" + ++dicesTurnIndexMy].visible = false;
+			}
+			while (dicesTurnIndexOpponent < 4) {
+				this["diceTurnOpponentAnimation" + ++dicesTurnIndexOpponent].visible = false;
+			}
+			while (dicesStillIndex < 4) {
+				this["diceStill" + ++dicesStillIndex].visible = false;
+			}
+			while (dicesSideIndex < 4) {
+				this["diceTurnSideAnimation" + ++dicesSideIndex].visible = false;
+			}
+		}
+		
+		private function walkThru(frame:uint, object:flash.display.DisplayObjectContainer):void {
+			var length:uint = object.numChildren;
+			
+			var located:Boolean;
+			for (var i:uint = 0; i < length; ++i) {
+				var tmp:flash.display.DisplayObject = object.getChildAt(i);
+				if (tmp) {
+					located = false;
+					
+					var className:String = Tools.getFullClassName(tmp);
+					if (className == "WhiteDiceTurnMyAnimation") {
+						located = true;
+					} else if (className == "WhiteDiceTurnOpponentAnimation") {
+						located = true;
+					} else if (className == "WhiteDiceStill") {
+						located = true;
+					} else if (className == "WhiteDiceTurnSideAnimation") {
+						located = true;
+					}
+					
+					if (located) {
+						while (this.tracedValues.length <= frame) {
+							this.tracedValues[this.tracedValues.length] = new Vector.<TracedDiceObjects>();
+						}
+						this.tracedValues[frame][this.tracedValues[frame].length] = new TracedDiceObjects(
+							className,
+							tmp.x, tmp.y,
+							tmp.scaleX, tmp.scaleY,
+							tmp.filters
+						);
+					}
+				}
+			}
+		}
+		
+		private function get currentFrame():uint {
+			return this._playing? this._tracedValuesPlayIndex : 0;
+		}
+		
+		private function get totalFrames():uint {
+			return this._playing? this._playTo : 0;
+		}
+		
+		private function get timeDelta():Number {
+			return this.fps == -1? (1000 / this.fps) : this._timeDelta;
+		}
+		
+	}
+
+}
+
+class TracedDiceObjects {
+	public var className:String;
+	public var x:Number;
+	public var y:Number;
+	public var scaleX:Number;
+	public var scaleY:Number;
+	public var filters:Array;
+	
+	public function TracedDiceObjects(className:String, x:Number, y:Number, scaleX:Number, scaleY:Number, filters:Array) {
+		this.className = className
+		this.x = x;
+		this.y = y;
+		this.scaleX = scaleX;
+		this.scaleY = scaleY;
+		this.filters = filters;
+	}
+}
+
+class RangeObject {
+	public var from:uint;
+	public var to:uint;
+	
+	public function RangeObject(from:uint, to:uint):void {
+		this.from = from;
+		this.to = to;
+	}
+}

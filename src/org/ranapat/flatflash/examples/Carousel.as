@@ -29,6 +29,8 @@ package org.ranapat.flatflash.examples {
 		private var topElementIndex:uint;
 		
 		public function Carousel() {
+			super();
+			
 			this._items = new Vector.<DisplayObject>();
 
 			this._visibleItems = 3;
