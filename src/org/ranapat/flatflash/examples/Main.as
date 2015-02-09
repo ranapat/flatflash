@@ -522,7 +522,7 @@ package org.ranapat.flatflash.examples {
 				//_ccc.play();
 				//swapChildren(_ccc, this.doc)
 				
-				addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
+				//addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
 			}
 		}
 		
