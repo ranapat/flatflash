@@ -176,20 +176,20 @@ package org.ranapat.flatflash.examples {
 					
 					trace(".............." + this._tracedValuesPlayIndex)
 				} else if (e.keyCode == 49) {
-					diceRollAnimationWhite.play("dice_anm_01")
-					diceRollAnimationBlack.play("dice_anm_01")
+					diceRollAnimationWhite.play("dice_anm_01", 1, 2, 3, 4)
+					diceRollAnimationBlack.play("dice_anm_01", 1, 2, 3, 4)
 				} else if (e.keyCode == 50) {
-					diceRollAnimationWhite.play("dice_anm_02")
-					diceRollAnimationBlack.play("dice_anm_02")
+					diceRollAnimationWhite.play("dice_anm_02", 1, 2, 3, 4)
+					diceRollAnimationBlack.play("dice_anm_02", 1, 2, 3, 4)
 				} else if (e.keyCode == 51) {
-					diceRollAnimationWhite.play("dice_anm_03")
-					diceRollAnimationBlack.play("dice_anm_03")
+					diceRollAnimationWhite.play("dice_anm_03", 1, 2, 3, 4)
+					diceRollAnimationBlack.play("dice_anm_03", 1, 2, 3, 4)
 				} else if (e.keyCode == 52) {
-					diceRollAnimationWhite.play("dice_anm_04")
-					diceRollAnimationBlack.play("dice_anm_04")
+					diceRollAnimationWhite.play("dice_anm_04", 1, 2, 3, 4)
+					diceRollAnimationBlack.play("dice_anm_04", 1, 2, 3, 4)
 				} else if (e.keyCode == 53) {
-					diceRollAnimationWhite.play("dice_anm_05")
-					diceRollAnimationBlack.play("dice_anm_05")
+					diceRollAnimationWhite.play("dice_anm_05", 1, 2, 3, 4)
+					diceRollAnimationBlack.play("dice_anm_05", 1, 2, 3, 4)
 				}
 			}
 			

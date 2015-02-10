@@ -47,6 +47,11 @@ package org.ranapat.flatflash.examples {
 		private var _previousTimeOffset:uint;
 		private var _startTime:int;
 		
+		private var _dice1:uint;
+		private var _dice2:uint;
+		private var _dice3:uint;
+		private var _dice4:uint;
+		
 		public function DiceRollAnimation() {
 			super();
 			
@@ -124,9 +129,9 @@ package org.ranapat.flatflash.examples {
 			this.diceTurnOpponentAnimation3.play();
 			this.diceTurnOpponentAnimation4.play();
 			this.diceStill1.gotoAndStop(0);
-			this.diceStill2.gotoAndStop(1);
-			this.diceStill3.gotoAndStop(2);
-			this.diceStill4.gotoAndStop(3);
+			this.diceStill2.gotoAndStop(0);
+			this.diceStill3.gotoAndStop(0);
+			this.diceStill4.gotoAndStop(0);
 			this.diceTurnSideAnimation1.play();
 			this.diceTurnSideAnimation2.play();
 			this.diceTurnSideAnimation3.play();
@@ -165,9 +170,9 @@ package org.ranapat.flatflash.examples {
 				this._tracedValuesPlayIndex = this.currentFrame + delta;
 				if (this._tracedValuesPlayIndex > this._playTo) {
 					this._playing = false;
+				} else {
+					super.redraw();
 				}
-				
-				super.redraw();
 			}
 		}
 		
@@ -175,9 +180,14 @@ package org.ranapat.flatflash.examples {
 			this._ranges[range] = new RangeObject(from, to);
 		}
 		
-		public function play(range:String):void {
+		public function play(range:String, dice1:uint, dice2:uint, dice3:uint, dice4:uint):void {
 			if (this._ranges[range]) {
 				this._playing = true;
+				
+				this._dice1 = dice1;
+				this._dice2 = dice2;
+				this._dice3 = dice3;
+				this._dice4 = dice4;
 				
 				var rangeObject:RangeObject = this._ranges[range];
 				
@@ -220,6 +230,7 @@ package org.ranapat.flatflash.examples {
 					dice = this["diceTurnOpponentAnimation" + ++dicesTurnIndexOpponent];
 				} else if (className == "WhiteDiceStill") {
 					dice = this["diceStill" + ++dicesStillIndex];
+					dice.gotoAndStop(this["_" + tracedDiceObject.name] - 1);
 				} else if (className == "WhiteDiceTurnSideAnimation") {
 					dice = this["diceTurnSideAnimation" + ++dicesSideIndex];
 				}
@@ -273,6 +284,7 @@ package org.ranapat.flatflash.examples {
 							this.tracedValues[this.tracedValues.length] = new Vector.<TracedDiceObjects>();
 						}
 						this.tracedValues[frame][this.tracedValues[frame].length] = new TracedDiceObjects(
+							tmp.name,
 							className,
 							tmp.x, tmp.y,
 							tmp.scaleX, tmp.scaleY,
@@ -300,6 +312,7 @@ package org.ranapat.flatflash.examples {
 }
 
 class TracedDiceObjects {
+	public var name:String;
 	public var className:String;
 	public var x:Number;
 	public var y:Number;
@@ -307,7 +320,8 @@ class TracedDiceObjects {
 	public var scaleY:Number;
 	public var filters:Array;
 	
-	public function TracedDiceObjects(className:String, x:Number, y:Number, scaleX:Number, scaleY:Number, filters:Array) {
+	public function TracedDiceObjects(name:String, className:String, x:Number, y:Number, scaleX:Number, scaleY:Number, filters:Array) {
+		this.name = name
 		this.className = className
 		this.x = x;
 		this.y = y;
