@@ -411,6 +411,7 @@ package org.ranapat.flatflash.examples {
 			} else if (e.id == loadRequestId2) {
 				diceRollAnimationWhite = new DiceRollAnimation();
 				diceRollAnimationWhite.record(e.applicationDomain, "White");
+				diceRollAnimationWhite.sound = "DiceAnimationsSound24FPS";
 				this.addChild(diceRollAnimationWhite);
 				
 				diceRollAnimationBlack = new DiceRollAnimation();

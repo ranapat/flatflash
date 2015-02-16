@@ -52,6 +52,9 @@ package org.ranapat.flatflash.examples {
 		private var _dice3:uint;
 		private var _dice4:uint;
 		
+		private var soundMovieClip:flash.display.MovieClip;
+		private var soundMovieClipName:String;
+		
 		public function DiceRollAnimation() {
 			super();
 			
@@ -61,6 +64,19 @@ package org.ranapat.flatflash.examples {
 		override public function set fps(value:int):void {
 			super.fps = value;
 			this._timeDelta = this.fps? 1000 / this.fps : 0;
+		}
+		
+		public function set sound(value:String):void {
+			this.soundMovieClipName = value;
+			
+			if (this.applicationDomain) {
+				this.soundMovieClip = new (this.applicationDomain.getDefinition(this.soundMovieClipName) as Class)();
+				this.soundMovieClip.stop();
+			}
+		}
+		
+		public function get sound():String {
+			return this.soundMovieClipName;
 		}
 		
 		public function record(applicationDomain:ApplicationDomain, variation:String):void {
@@ -173,6 +189,9 @@ package org.ranapat.flatflash.examples {
 				this._tracedValuesPlayIndex = this.currentFrame + delta;
 				if (this._tracedValuesPlayIndex > this._playTo) {
 					this._playing = false;
+					if (this.soundMovieClip) {
+						this.soundMovieClip.stop();
+					}
 				}
 			}
 		}
@@ -199,11 +218,18 @@ package org.ranapat.flatflash.examples {
 				
 				this._startTime = getTimer();
 				this._previousTimeOffset = 0;
+				
+				if (this.soundMovieClip) {
+					this.soundMovieClip.gotoAndPlay(this._tracedValuesPlayIndex);
+				}
 			}
 		}
 		
 		public function stop():void {
 			this._playing = false;
+			if (this.soundMovieClip) {
+				this.soundMovieClip.stop();
+			}
 		}
 		
 		override protected function get isChanged():Boolean {
