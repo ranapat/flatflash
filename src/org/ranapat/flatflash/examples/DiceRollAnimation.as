@@ -82,7 +82,7 @@ package org.ranapat.flatflash.examples {
 					currentFrameStartIndex = toRecord.currentFrame - 1;
 					previousLabel = toRecord.currentLabel;
 				} else if (previousLabel != toRecord.currentLabel) {
-					this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 1);
+					this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 2);
 					
 					currentFrameStartIndex = toRecord.currentFrame - 1;
 					previousLabel = toRecord.currentLabel;
@@ -93,7 +93,7 @@ package org.ranapat.flatflash.examples {
 				
 			} while (toRecord.currentFrame != previousFrame);
 			if (toRecord.currentFrame == previousFrame) {
-				this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 1);
+				this.addRange(previousLabel, currentFrameStartIndex, toRecord.currentFrame - 2);
 			}
 			
 			toRecord = null;
@@ -157,9 +157,12 @@ package org.ranapat.flatflash.examples {
 			this._initialized = true;
 		}
 		
+		private var _hop:uint;
+		
 		override public function redraw():void {
 			if (this.stage && this._initialized && this._playing) {
 				this.applyDiceAnimation(this._tracedValuesPlayIndex);
+				super.redraw();
 				
 				var currentTime:int = getTimer();
 				var timer:int = currentTime - this._startTime;
@@ -170,8 +173,6 @@ package org.ranapat.flatflash.examples {
 				this._tracedValuesPlayIndex = this.currentFrame + delta;
 				if (this._tracedValuesPlayIndex > this._playTo) {
 					this._playing = false;
-				} else {
-					super.redraw();
 				}
 			}
 		}

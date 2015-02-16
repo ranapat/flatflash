@@ -51,7 +51,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1920", height="1200", backgroundColor="0xFF00FF", frameRate="40")]
+	[SWF(width="1920", height="1200", backgroundColor="0xFFFFFF", frameRate="24")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
