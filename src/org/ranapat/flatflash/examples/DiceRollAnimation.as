@@ -251,6 +251,15 @@ package org.ranapat.flatflash.examples {
 				
 				var tracedDiceObject:TracedDiceObjects = vector[i];
 				var className:String = tracedDiceObject.className;
+				var diceVisible:Boolean = true;
+				if (
+					tracedDiceObject.name == "dice1"
+					|| tracedDiceObject.name == "dice2"
+					|| tracedDiceObject.name == "dice3"
+					|| tracedDiceObject.name == "dice4"
+				) {
+					diceVisible = this["_" + tracedDiceObject.name] > 0;
+				}
 				if (className == "WhiteDiceTurnMyAnimation") {
 					dice = this["diceTurnMyAnimation" + ++dicesTurnIndexMy];
 				} else if (className == "WhiteDiceTurnOpponentAnimation") {
@@ -263,7 +272,7 @@ package org.ranapat.flatflash.examples {
 				}
 				
 				if (dice) {
-					dice.visible = true;
+					dice.visible = diceVisible;
 					dice.x = tracedDiceObject.x;
 					dice.y = tracedDiceObject.y;
 					dice.scaleX = tracedDiceObject.scaleX;
@@ -311,7 +320,7 @@ package org.ranapat.flatflash.examples {
 							this.tracedValues[this.tracedValues.length] = new Vector.<TracedDiceObjects>();
 						}
 						this.tracedValues[frame][this.tracedValues[frame].length] = new TracedDiceObjects(
-							tmp.name,
+							tmp.name.replace("_moving_", "").replace("_still_", "").replace("_prim_", "").replace("_spinning_", ""),
 							className,
 							tmp.x, tmp.y,
 							tmp.scaleX, tmp.scaleY,
