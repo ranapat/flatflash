@@ -51,7 +51,7 @@ package org.ranapat.flatflash.examples {
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
-	[SWF(width="1920", height="1200", backgroundColor="0xFFFFFF", frameRate="24")]
+	[SWF(width="760", height="830", backgroundColor="0xFFFFFF", frameRate="24")]
 	public class Main extends Sprite {
 		private var frames:uint;
 		private var startTime:uint;
@@ -514,14 +514,14 @@ package org.ranapat.flatflash.examples {
 					_ccc.nextFrame();
 					
 				} while (_ccc.currentFrame != previousFrame);
-				_ccc = null;
+				//_ccc = null;
 				
-				//_ccc.x = 113;
-				//_ccc.y = 113;
+				_ccc.x = 113;
+				_ccc.y = 113;
 				//_ccc.alpha = .4;
-				//addChild(_ccc);
-				//_ccc.play();
-				//swapChildren(_ccc, this.doc)
+				addChild(_ccc);
+				_ccc.play();
+				swapChildren(_ccc, this.doc)
 				
 				//addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
 			}
@@ -966,9 +966,9 @@ package org.ranapat.flatflash.examples {
 			
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 			
-			stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
+			//stage.fullScreenSourceRect = new Rectangle(0,0,1920,1200); 
 			stage.displayState = StageDisplayState.FULL_SCREEN; 	
-			stage.scaleMode = StageScaleMode.NO_SCALE;
+			//stage.scaleMode = StageScaleMode.NO_SCALE;
 			
 		}
 		
