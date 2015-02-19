@@ -55,10 +55,21 @@ package org.ranapat.flatflash.examples {
 		private var soundMovieClip:flash.display.MovieClip;
 		private var soundMovieClipName:String;
 		
+		private var _scaleFactor:Number;
+		private var _originalWidth:Number;
+		private var _originalHeight:Number;
+		
+		private var _innerScale:Number;
+		
 		public function DiceRollAnimation() {
 			super();
 			
 			this.fps = 40;
+			this._scaleFactor = 1;
+			this._originalWidth = -1;
+			this._originalHeight = -1;
+			this._innerScale = 1;
+			this.instantSizeChangeRecreate = false;
 		}
 		
 		override public function set fps(value:int):void {
@@ -77,6 +88,32 @@ package org.ranapat.flatflash.examples {
 		
 		public function get sound():String {
 			return this.soundMovieClipName;
+		}
+		
+		public function set scaleFactor(value:Number):void {
+			this._scaleFactor = value;
+			
+			if (this._originalWidth > 0 && this._originalHeight > 0) {
+				this.width = this._originalWidth * this._scaleFactor;
+				this.height = this._originalHeight * this._scaleFactor;
+				
+				this.recreateBitmapData();
+			}
+		}
+		
+		public function get scaleFactor():Number {
+			return this._scaleFactor;
+		}
+		
+		public function set innerScale(value:Number):void {
+			this._innerScale = value;
+			
+			this.scaleFactor = value;
+			this.scaleX = this.scaleY = 1 / value;
+		}
+		
+		public function get innerScale():Number {
+			return this._innerScale;
 		}
 		
 		public function record(applicationDomain:ApplicationDomain, variation:String):void {
@@ -173,8 +210,6 @@ package org.ranapat.flatflash.examples {
 			this._initialized = true;
 		}
 		
-		private var _hop:uint;
-		
 		override public function redraw():void {
 			if (this.stage && this._initialized && this._playing) {
 				this.applyDiceAnimation(this._tracedValuesPlayIndex);
@@ -236,6 +271,13 @@ package org.ranapat.flatflash.examples {
 			return this._playing;
 		}
 		
+		override protected function handleAddedToStage():void {
+			this._originalWidth = this.width;
+			this._originalHeight = this.height;
+			
+			this.innerScale = this.innerScale;
+		}
+		
 		private function applyDiceAnimation(frame:uint):void {
 			var vector:Vector.<TracedDiceObjects> = this.tracedValues[frame];
 			var length:uint = vector.length;
@@ -273,10 +315,10 @@ package org.ranapat.flatflash.examples {
 				
 				if (dice) {
 					dice.visible = diceVisible;
-					dice.x = tracedDiceObject.x;
-					dice.y = tracedDiceObject.y;
-					dice.scaleX = tracedDiceObject.scaleX;
-					dice.scaleY = tracedDiceObject.scaleY;
+					dice.x = tracedDiceObject.x * this.scaleFactor;
+					dice.y = tracedDiceObject.y * this.scaleFactor;
+					dice.scaleX = tracedDiceObject.scaleX * this.scaleFactor;
+					dice.scaleY = tracedDiceObject.scaleY * this.scaleFactor;
 					dice.filters = tracedDiceObject.filters;
 				}
 			}

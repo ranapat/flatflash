@@ -176,8 +176,8 @@ package org.ranapat.flatflash.examples {
 					
 					trace(".............." + this._tracedValuesPlayIndex)
 				} else if (e.keyCode == 49) {
-					diceRollAnimationWhite.play("dice_anm_01", 0, 2, 3, 0)
-					diceRollAnimationBlack.play("dice_anm_01", 1, 0, 0, 4)
+					diceRollAnimationWhite.play("dice_anm_01", 0, 1, 1, 0)
+					diceRollAnimationBlack.play("dice_anm_01", 0, 1, 1, 0)
 				} else if (e.keyCode == 50) {
 					diceRollAnimationWhite.play("dice_anm_02", 0, 0, 3, 4)
 					diceRollAnimationBlack.play("dice_anm_02", 1, 2, 0, 0)
@@ -413,11 +413,32 @@ package org.ranapat.flatflash.examples {
 				diceRollAnimationWhite.record(e.applicationDomain, "White");
 				diceRollAnimationWhite.sound = "DiceAnimationsSound24FPS";
 				this.addChild(diceRollAnimationWhite);
+				//diceRollAnimationWhite.scaleFactor = 2;
+				//diceRollAnimationWhite.scaleX = 2;
+				//diceRollAnimationWhite.scaleY = 2;
+				diceRollAnimationWhite.x -= 400;
+				
+				//diceRollAnimationWhite.innerScale = 2;
+				
+				//diceRollAnimationWhite.scaleX = .5;
+				//diceRollAnimationWhite.scaleY = .5;
+				
+				trace(diceRollAnimationWhite.width)
+				
+				//diceRollAnimationWhite.y += 100;
 				
 				diceRollAnimationBlack = new DiceRollAnimation();
-				diceRollAnimationBlack.record(e.applicationDomain, "Black");
-				diceRollAnimationBlack.x += 700;
+				diceRollAnimationBlack.record(e.applicationDomain, "White");
+				//diceRollAnimationBlack.x += 700;
+				diceRollAnimationBlack.x -= 400;
+				diceRollAnimationBlack.y += 100;
+				//diceRollAnimationBlack.scaleX = 2;
+				//diceRollAnimationBlack.scaleY = 2;
+				diceRollAnimationBlack.innerScale = 2;
 				this.addChild(diceRollAnimationBlack);
+				
+				
+				trace(diceRollAnimationBlack.width)
 				
 				//var _cc:Class = e.applicationDomain.getDefinition("TestDices1") as Class;
 				var WhiteDiceTurnMyAnimation:Class = e.applicationDomain.getDefinition("WhiteDiceTurnMyAnimation") as Class;
