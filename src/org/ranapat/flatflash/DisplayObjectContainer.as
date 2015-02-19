@@ -29,14 +29,24 @@ package org.ranapat.flatflash {
 		private var frames:uint;
 		private var loopTimeout:uint;
 		
+		private var _width:Number;
+		private var _height:Number;
+		
 		private var __changed:uint;
 		private var __mouseEnabled:Dictionary;
 		private var __toReorder:Boolean;
+		
+		protected var instantSizeChangeRecreate:Boolean;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
 			
 			this._fps = -1;
+			
+			this._width = -1;
+			this._height = -1;
+			
+			this.instantSizeChangeRecreate = true;
 			
 			this.children = new Vector.<DisplayObject>();
 			this.__mouseEnabled = new Dictionary(true);
@@ -215,6 +225,30 @@ package org.ranapat.flatflash {
 			return this._cfps;
 		}
 		
+		override public function set width(value:Number):void {
+			this._width = value;
+			
+			if (this.instantSizeChangeRecreate) {
+				this.recreateBitmapData();
+			}
+		}
+		
+		override public function get width():Number {
+			return this._width;
+		}
+		
+		override public function set height(value:Number):void {
+			this._height = value;
+			
+			if (this.instantSizeChangeRecreate) {
+				this.recreateBitmapData();
+			}
+		}
+		
+		override public function get height():Number {
+			return this._height;
+		}
+		
 		public function childChanged():void {
 			++this.__changed;
 		}
@@ -230,6 +264,10 @@ package org.ranapat.flatflash {
 		
 		protected function get isChanged():Boolean {
 			return this.__changed > 0;
+		}
+		
+		protected function recreateBitmapData():void {
+			this.bitmapData = new BitmapData(this._width, this._height, true, 0);
 		}
 		
 		private function get reorderedChildren():Vector.<DisplayObject> {
@@ -369,7 +407,9 @@ package org.ranapat.flatflash {
 				this.loopTimeout = setTimeout(this.loop, 1000 / this.fps);
 			}
 			
-			this.bitmapData = new BitmapData(this.stage.stageWidth, this.stage.stageHeight, true, 0);
+			this._width = this._width == -1? this.stage.stageWidth : this._width;
+			this._height = this._height == -1? this.stage.stageHeight : this._height;
+			this.recreateBitmapData();
 			
 			this.handleAddedToStage();
 		}
