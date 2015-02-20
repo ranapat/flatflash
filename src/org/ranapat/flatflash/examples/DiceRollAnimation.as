@@ -212,17 +212,19 @@ package org.ranapat.flatflash.examples {
 		
 		override public function redraw():void {
 			if (this.stage && this._initialized && this._playing) {
+				this._tracedValuesPlayIndex = this._tracedValuesPlayIndex > this._playTo? this._playTo : this._tracedValuesPlayIndex;
 				this.applyDiceAnimation(this._tracedValuesPlayIndex);
 				super.redraw();
 				
-				var currentTime:int = getTimer();
-				var timer:int = currentTime - this._startTime;
-				var timeOffset:uint = timer / this.timeDelta;
-				var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
-				
-				this._previousTimeOffset = timeOffset;
-				this._tracedValuesPlayIndex = this.currentFrame + delta;
-				if (this._tracedValuesPlayIndex > this._playTo) {
+				if (this._tracedValuesPlayIndex < this._playTo) {
+					var currentTime:int = getTimer();
+					var timer:int = currentTime - this._startTime;
+					var timeOffset:uint = timer / this.timeDelta;
+					var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
+					
+					this._previousTimeOffset = timeOffset;
+					this._tracedValuesPlayIndex = this.currentFrame + delta;
+				} else {
 					this._playing = false;
 					if (this.soundMovieClip) {
 						this.soundMovieClip.stop();
