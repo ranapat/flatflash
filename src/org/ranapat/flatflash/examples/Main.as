@@ -418,7 +418,7 @@ package org.ranapat.flatflash.examples {
 				//diceRollAnimationWhite.scaleY = 2;
 				diceRollAnimationWhite.x -= 400;
 				
-				//diceRollAnimationWhite.innerScale = 2;
+				diceRollAnimationWhite.innerScale = 5;
 				
 				//diceRollAnimationWhite.scaleX = .5;
 				//diceRollAnimationWhite.scaleY = .5;
