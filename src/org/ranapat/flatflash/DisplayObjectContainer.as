@@ -267,7 +267,9 @@ package org.ranapat.flatflash {
 		}
 		
 		protected function recreateBitmapData():void {
-			this.bitmapData = new BitmapData(this._width, this._height, true, 0);
+			if (this._width > 0 && this._height > 0) {
+				this.bitmapData = new BitmapData(this._width, this._height, true, 0x0);
+			}
 		}
 		
 		private function get reorderedChildren():Vector.<DisplayObject> {
