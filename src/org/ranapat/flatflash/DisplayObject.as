@@ -16,6 +16,7 @@ package org.ranapat.flatflash {
 		private var _scaleX:Number;
 		private var _scaleY:Number;
 		private var _scale:Number;
+		private var _rotation:Number;
 		private var _alpha:Number;
 		private var _smoothing:Boolean;
 		private var _visible:Boolean;
@@ -55,6 +56,7 @@ package org.ranapat.flatflash {
 			this.depth = -1;
 			this.scaleX = 1;
 			this.scaleY = 1;
+			this.rotation = 0;
 			this.scale = 1;
 			this.alpha = 1;
 			this.visible = true;
@@ -163,6 +165,16 @@ package org.ranapat.flatflash {
 		
 		public function get scale():Number {
 			return this._scale;
+		}
+		
+		public function set rotation(value:Number):void {
+			this._rotation = value;
+			
+			this.markChanged();
+		}
+		
+		public function get rotation():Number {
+			return this._rotation;
 		}
 		
 		public function set alpha(value:Number):void {

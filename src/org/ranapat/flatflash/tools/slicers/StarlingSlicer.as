@@ -20,6 +20,7 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
+			sourceRotation:Number,
 			sourceSmoothing:Boolean,
 			sourceFilters:Vector.<BitmapFilter>
 		):void {
@@ -38,6 +39,7 @@ package org.ranapat.flatflash.tools.slicers {
 			if (
 				sourceAlpha != 1
 				|| sourceScaleX != 1 || sourceScaleY != 1
+				|| sourceRotation != 0
 			) {
 				clipped = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0);
 				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, true);
@@ -47,10 +49,27 @@ package org.ranapat.flatflash.tools.slicers {
 					this._colorTransform.alphaMultiplier = sourceAlpha;
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
-				if (sourceScaleX != 1 || sourceScaleY != 1) {
-					scaled = new BitmapData(sourceRectangle.width * sourceScaleX, sourceRectangle.height * sourceScaleY, true, 0);
+				if (sourceScaleX != 1 || sourceScaleY != 1 || sourceRotation != 0) {
+					scaled = new BitmapData(
+						sourceRectangle.width * sourceScaleX * (sourceRotation != 0? 2 : 1),
+						sourceRectangle.height * sourceScaleY * (sourceRotation != 0? 2 : 1),
+						true, 0x0
+					);
+					
 					var matrix:Matrix = new Matrix();
-					matrix.scale(sourceScaleX, sourceScaleY);
+					if (sourceScaleX != 1 || sourceScaleY != 1) {
+						matrix.scale(sourceScaleX, sourceScaleY);
+					}
+					if (sourceRotation != 0) {
+						var halfWidth:uint = sourceRectangle.width >> 1;
+						var halfHeight:uint = sourceRectangle.height >> 1;
+						matrix.translate(-halfWidth, -halfHeight);
+						matrix.rotate(sourceRotation * Math.PI / 180);
+						matrix.translate(halfWidth + halfWidth, halfHeight + halfHeight);
+						
+						destinationPointToApply = new Point(destinationPointToApply.x - halfWidth, destinationPointToApply.y - halfHeight);
+					}
+					
 					scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
 					
 					clipped = scaled;

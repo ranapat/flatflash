@@ -10,6 +10,7 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
+			sourceRotation:Number,
 			sourceSmoothing:Boolean,
 			sourceFilters:Vector.<BitmapFilter>
 		):void;

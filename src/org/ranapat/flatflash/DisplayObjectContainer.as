@@ -189,6 +189,7 @@ package org.ranapat.flatflash {
 								displayObject.region, displayObject.position,
 								displayObject.alpha,
 								displayObject.scaleX, displayObject.scaleY,
+								displayObject.rotation,
 								displayObject.smoothing,
 								displayObject.filtersVector
 							);
