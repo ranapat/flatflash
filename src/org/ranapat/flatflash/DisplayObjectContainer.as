@@ -322,16 +322,39 @@ package org.ranapat.flatflash {
 			e.localX = x;
 			e.localY = y;
 			
+			var _child:Object;
 			var child:DisplayObject;
-			for (var _child:Object in this.__mouseEnabled) {
+			var i:uint;
+			var inserted:Boolean;
+			var length:uint;
+			var ordered:Vector.<DisplayObject> = new Vector.<DisplayObject>();
+			for (_child in this.__mouseEnabled) {
+				inserted = false;
 				child = DisplayObject(_child);
+				for (i = 0; i < ordered.length; ++i) {
+					if (ordered[i].depth < child.depth) {
+						ordered.splice(i, 0, child);
+						inserted = true;
+						break;
+					}
+				}
+				if (!inserted) {
+					ordered[ordered.length] = child;
+				}
+			}
+			length = ordered.length;
+			
+			var locatedOne:Boolean;
+			for (i = 0; i < length; ++i) {
+				child = ordered[i];
 				if (child) {
 					var mouseEnabledObject:MouseEnabledObject = this.__mouseEnabled[child];
 					var hoveredBefore:Boolean = mouseEnabledObject.hovered;
 					var hoveredAfter:Boolean = false;
 					
 					if (
-						x >= child.x
+						!locatedOne
+						&& x >= child.x
 						&& y >= child.y
 						&& x <= child.x + child.width
 						&& y <= child.y + child.height
@@ -346,6 +369,7 @@ package org.ranapat.flatflash {
 						child.mouseEvent(e);
 						
 						hoveredAfter = true;
+						locatedOne = true;
 					} else if (hoveredBefore) {
 						hoveredAfter = false;
 					}
@@ -361,6 +385,8 @@ package org.ranapat.flatflash {
 				}
 				
 			}
+			
+			ordered = null;
 		}
 		
 		private function handleClick(e:MouseEvent):void {
