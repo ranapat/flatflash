@@ -83,7 +83,7 @@ package org.ranapat.flatflash.tools.slicers {
 				filtered = new BitmapData(
 					sourceRectangle.width + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
 					sourceRectangle.height + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
-					true, 0
+					true, 0x0
 				);
 				filtered.copyPixels(sourceBitmapData, sourceRectangle, new Point(Settings.FILTER_MARGIN_DELTA_CUT, Settings.FILTER_MARGIN_DELTA_CUT), null, null, false);
 				
