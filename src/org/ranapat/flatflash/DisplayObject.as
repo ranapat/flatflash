@@ -10,6 +10,8 @@ package org.ranapat.flatflash {
 	public class DisplayObject {
 		private var _x:Number;
 		private var _y:Number;
+		private var _anchorX:Number;
+		private var _anchorY:Number;
 		private var _depth:Number;
 		private var _width:Number;
 		private var _height:Number;
@@ -49,6 +51,8 @@ package org.ranapat.flatflash {
 			this._beforeDrawCallbackHolder = new Dictionary(true);
 			this._afterDrawCallbackHolder = new Dictionary(true);
 			
+			this.anchorX = 0;
+			this.anchorY = 0;
 			this.x = 0;
 			this.y = 0;
 			this.width = 0;
@@ -81,8 +85,24 @@ package org.ranapat.flatflash {
 			this.markChanged();
 		}
 		
+		public function set anchorX(value:Number):void {
+			this._anchorX = value;
+		}
+		
+		public function get anchorX():Number {
+			return this._anchorX;
+		}
+		
+		public function set anchorY(value:Number):void {
+			this._anchorY = value;
+		}
+		
+		public function get anchorY():Number {
+			return this._anchorY;
+		}
+		
 		public function get x():Number {
-			return this._x;
+			return this._x - this._anchorX;
 		}
 		
 		public function set y(value:Number):void {
@@ -92,7 +112,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get y():Number {
-			return this._y;
+			return this._y - this._anchorY;
 		}
 		
 		public function set depth(value:Number):void {

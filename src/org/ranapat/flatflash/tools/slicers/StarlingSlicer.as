@@ -9,6 +9,8 @@ package org.ranapat.flatflash.tools.slicers {
 	import org.ranapat.flatflash.tools.regions.Region;
 	
 	public class StarlingSlicer implements ISlicer {
+		private static const RADIANS_TO_DEGREES:Number = Math.PI / 180;
+		
 		private var _colorTransform:ColorTransform;
 		
 		public function StarlingSlicer() {
@@ -18,6 +20,7 @@ package org.ranapat.flatflash.tools.slicers {
 		public function copyPixels(
 			source:BitmapData, destination:BitmapData,
 			sourceRegion:Region, destinationPoint:Point,
+			sourceAnchorX:Number, sourceAnchorY:Number,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
 			sourceRotation:Number,
@@ -50,24 +53,47 @@ package org.ranapat.flatflash.tools.slicers {
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
 				if (sourceScaleX != 1 || sourceScaleY != 1 || sourceRotation != 0) {
+					var radiansToDegrees:Number = StarlingSlicer.RADIANS_TO_DEGREES;
+					var width:Number;
+					var height:Number;
+					var rotationOffset:Number = 0;
+					
+					if (sourceRotation != 0) {
+						var maxSize:Number = Math.sqrt(sourceRectangle.width * sourceRectangle.width + sourceRectangle.height * sourceRectangle.height);
+						var anchorXComponsation:Number = sourceAnchorX < 0? -sourceAnchorX : sourceRectangle.width - sourceAnchorX < 0? sourceAnchorX - sourceRectangle.width : 0;
+						var anchorYComponsation:Number = sourceAnchorY < 0? -sourceAnchorY : sourceRectangle.height - sourceAnchorY < 0? sourceAnchorY - sourceRectangle.height : 0;
+						var biggerAnchorCompensation:Number = anchorXComponsation > anchorYComponsation? anchorXComponsation : anchorYComponsation;
+						maxSize += biggerAnchorCompensation;
+						
+						width = 2 * maxSize;
+						height = 2 * maxSize;
+						rotationOffset = maxSize;
+					} else {
+						width = sourceRectangle.width;
+						height = sourceRectangle.height;
+					}
+					
 					scaled = new BitmapData(
-						sourceRectangle.width * sourceScaleX * (sourceRotation != 0? 2 : 1),
-						sourceRectangle.height * sourceScaleY * (sourceRotation != 0? 2 : 1),
+						width,
+						height,
 						true, 0x0
 					);
 					
 					var matrix:Matrix = new Matrix();
+					if (sourceRotation != 0) {
+						matrix.translate(-sourceAnchorX, -sourceAnchorY);
+						matrix.rotate(sourceRotation * radiansToDegrees);
+						matrix.translate(rotationOffset, rotationOffset);
+						
+						destinationPointToApply = new Point(destinationPointToApply.x + sourceAnchorX - rotationOffset, destinationPointToApply.y + sourceAnchorY - rotationOffset);
+					}
 					if (sourceScaleX != 1 || sourceScaleY != 1) {
 						matrix.scale(sourceScaleX, sourceScaleY);
-					}
-					if (sourceRotation != 0) {
-						var halfWidth:uint = sourceRectangle.width >> 1;
-						var halfHeight:uint = sourceRectangle.height >> 1;
-						matrix.translate(-halfWidth, -halfHeight);
-						matrix.rotate(sourceRotation * Math.PI / 180);
-						matrix.translate(halfWidth + halfWidth, halfHeight + halfHeight);
 						
-						destinationPointToApply = new Point(destinationPointToApply.x - halfWidth, destinationPointToApply.y - halfHeight);
+						destinationPointToApply = new Point(
+							destinationPointToApply.x + (sourceRotation != 0? 0 : ((1 - sourceScaleX) * sourceAnchorX)) + (1 - sourceScaleX) * rotationOffset,
+							destinationPointToApply.y + (sourceRotation != 0? 0 : ((1 - sourceScaleY) * sourceAnchorY)) + (1 - sourceScaleY) * rotationOffset
+						);
 					}
 					
 					scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
