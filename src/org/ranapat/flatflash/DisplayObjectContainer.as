@@ -106,6 +106,8 @@ package org.ranapat.flatflash {
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
 				
+				++this.__changed;
+				
 				return child;
 			}
 			
