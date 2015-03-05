@@ -101,8 +101,12 @@ package org.ranapat.flatflash {
 			return this._anchorY;
 		}
 		
-		public function get x():Number {
+		public function get dataX():Number {
 			return this._x - this._anchorX;
+		}
+		
+		public function get x():Number {
+			return this._x;
 		}
 		
 		public function set y(value:Number):void {
@@ -111,8 +115,12 @@ package org.ranapat.flatflash {
 			this.markChanged();
 		}
 		
-		public function get y():Number {
+		public function get dataY():Number {
 			return this._y - this._anchorY;
+		}
+		
+		public function get y():Number {
+			return this._y;
 		}
 		
 		public function set depth(value:Number):void {
@@ -271,7 +279,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function get position():Point {
-			return new Point(this.x, this.y);
+			return new Point(this.dataX, this.dataY);
 		}
 		
 		public function set filters(value:Array):void {
