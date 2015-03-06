@@ -7,6 +7,8 @@ package org.ranapat.flatflash {
 		
 		public static const FILTER_MARGIN_DELTA_CUT:uint = 25;
 		
+		public static const SKEW_RENDER_OFFSET:uint = 10;
+		
 		public static const NO_IDENTIFIER:String = "__no_identifier__";
 	}
 

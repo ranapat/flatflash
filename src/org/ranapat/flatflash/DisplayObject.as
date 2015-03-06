@@ -18,6 +18,8 @@ package org.ranapat.flatflash {
 		private var _scaleX:Number;
 		private var _scaleY:Number;
 		private var _scale:Number;
+		private var _skewX:Number;
+		private var _skewY:Number;
 		private var _rotation:Number;
 		private var _alpha:Number;
 		private var _smoothing:Boolean;
@@ -60,6 +62,8 @@ package org.ranapat.flatflash {
 			this.depth = -1;
 			this.scaleX = 1;
 			this.scaleY = 1;
+			this.skewX = 0;
+			this.skewY = 0;
 			this.rotation = 0;
 			this.scale = 1;
 			this.alpha = 1;
@@ -193,6 +197,26 @@ package org.ranapat.flatflash {
 		
 		public function get scale():Number {
 			return this._scale;
+		}
+		
+		public function set skewX(value:Number):void {
+			this._skewX = value;
+			
+			this.markChanged();
+		}
+		
+		public function get skewX():Number {
+			return this._skewX;
+		}
+		
+		public function set skewY(value:Number):void {
+			this._skewY = value;
+			
+			this.markChanged();
+		}
+		
+		public function get skewY():Number {
+			return this._skewY;
 		}
 		
 		public function set rotation(value:Number):void {

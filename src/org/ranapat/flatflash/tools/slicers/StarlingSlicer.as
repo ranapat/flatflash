@@ -23,6 +23,7 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceAnchorX:Number, sourceAnchorY:Number,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
+			sourceSkewX:Number, sourceSkewY:Number,
 			sourceRotation:Number,
 			sourceSmoothing:Boolean,
 			sourceFilters:Vector.<BitmapFilter>
@@ -43,6 +44,7 @@ package org.ranapat.flatflash.tools.slicers {
 				sourceAlpha != 1
 				|| sourceScaleX != 1 || sourceScaleY != 1
 				|| sourceRotation != 0
+				|| sourceSkewX != 0 || sourceSkewY != 0
 			) {
 				clipped = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0);
 				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, true);
@@ -52,7 +54,7 @@ package org.ranapat.flatflash.tools.slicers {
 					this._colorTransform.alphaMultiplier = sourceAlpha;
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
-				if (sourceScaleX != 1 || sourceScaleY != 1 || sourceRotation != 0) {
+				if (sourceScaleX != 1 || sourceScaleY != 1 || sourceRotation != 0 || sourceSkewX != 0 || sourceSkewY != 0) {
 					var radiansToDegrees:Number = StarlingSlicer.RADIANS_TO_DEGREES;
 					var width:Number;
 					var height:Number;
@@ -72,6 +74,9 @@ package org.ranapat.flatflash.tools.slicers {
 						width = sourceRectangle.width;
 						height = sourceRectangle.height;
 					}
+					
+					width *= sourceScaleX + (sourceSkewX != 0 || sourceSkewY != 0? Settings.SKEW_RENDER_OFFSET : 0);
+					height *= sourceScaleY + (sourceSkewX != 0 || sourceSkewY != 0? Settings.SKEW_RENDER_OFFSET : 0);
 					
 					scaled = new BitmapData(
 						width,
@@ -93,6 +98,16 @@ package org.ranapat.flatflash.tools.slicers {
 						destinationPointToApply = new Point(
 							destinationPointToApply.x + (sourceRotation != 0? 0 : ((1 - sourceScaleX) * sourceAnchorX)) + (1 - sourceScaleX) * rotationOffset,
 							destinationPointToApply.y + (sourceRotation != 0? 0 : ((1 - sourceScaleY) * sourceAnchorY)) + (1 - sourceScaleY) * rotationOffset
+						);
+					}
+					if (sourceSkewX != 0 || sourceSkewY != 0) {
+						var offsetWidth:Number = Settings.SKEW_RENDER_OFFSET / 2;
+						var offsetHeight:Number = Settings.SKEW_RENDER_OFFSET / 2;
+						
+						matrix.concat(new Matrix(1, sourceSkewY, sourceSkewX, 1, offsetWidth, offsetHeight));
+						destinationPointToApply = new Point(
+							destinationPointToApply.x - offsetWidth,
+							destinationPointToApply.y - offsetHeight
 						);
 					}
 					

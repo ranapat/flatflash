@@ -11,6 +11,7 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceAnchorX:Number, sourceAnchorY:Number,
 			sourceAlpha:Number,
 			sourceScaleX:Number, sourceScaleY:Number,
+			sourceSkewX:Number, sourceSkewY:Number,
 			sourceRotation:Number,
 			sourceSmoothing:Boolean,
 			sourceFilters:Vector.<BitmapFilter>
