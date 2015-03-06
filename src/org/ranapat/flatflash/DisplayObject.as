@@ -250,7 +250,7 @@ package org.ranapat.flatflash {
 		public function set visible(value:Boolean):void {
 			this._visible = value;
 			
-			this.markChanged();
+			this.markChanged(true);
 		}
 		
 		public function get visible():Boolean {
@@ -440,11 +440,17 @@ package org.ranapat.flatflash {
 			}
 		}
 		
-		protected function markChanged():void {
+		protected function markChanged(force:Boolean = false):void {
 			var previousChanged:Boolean = this.changed;
 			this._changed = true;
 			
-			if (!previousChanged && this.visible && this.parent) {
+			if (
+				this.parent
+				&& (
+					(!previousChanged && this.visible)
+					|| force
+				)
+			) {
 				this.parent.childChanged();
 			}
 		}
