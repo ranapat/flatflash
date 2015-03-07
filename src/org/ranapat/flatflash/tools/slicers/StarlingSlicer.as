@@ -7,6 +7,7 @@ package org.ranapat.flatflash.tools.slicers {
 	import flash.geom.Rectangle;
 	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.regions.Region;
+	import org.ranapat.flatflash.tools.RGBA;
 	
 	public class StarlingSlicer implements ISlicer {
 		private static const RADIANS_TO_DEGREES:Number = Math.PI / 180;
@@ -18,7 +19,9 @@ package org.ranapat.flatflash.tools.slicers {
 		}
 		
 		public function copyPixels(
-			source:BitmapData, destination:BitmapData,
+			source:BitmapData,
+			destination:BitmapData,
+			overExposedDestination:BitmapData, overExposedRGBA:RGBA,
 			sourceRegion:Region, destinationPoint:Point,
 			sourceAnchorX:Number, sourceAnchorY:Number,
 			sourceAlpha:Number,
@@ -138,6 +141,26 @@ package org.ranapat.flatflash.tools.slicers {
 				sourceBitmapData = filtered;
 				sourceRectangle = new Rectangle(0, 0, filtered.width, filtered.height);
 				destinationPointToApply = new Point(destinationPointToApply.x - Settings.FILTER_MARGIN_DELTA_CUT, destinationPointToApply.y - Settings.FILTER_MARGIN_DELTA_CUT);
+			}
+			
+			if (overExposedDestination) {
+				var overExposedBitmapData:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
+				overExposedBitmapData.copyPixels(sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
+				overExposedBitmapData.colorTransform(
+					sourceRectangle,
+					new ColorTransform(
+						0, 0, 0, 1,
+						overExposedRGBA.r, overExposedRGBA.g, overExposedRGBA.b, overExposedRGBA.a
+					)
+				);
+				overExposedDestination.copyPixels(
+					overExposedBitmapData,
+					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPointToApply,
+					null, null, true
+				);
+				
+				overExposedBitmapData.dispose();
+				overExposedBitmapData = null;
 			}
 			
 			destination.copyPixels(

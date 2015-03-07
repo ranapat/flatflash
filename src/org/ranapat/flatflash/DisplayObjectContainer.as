@@ -9,6 +9,7 @@ package org.ranapat.flatflash {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
+	import org.ranapat.flatflash.tools.RGBA;
 	
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
@@ -36,6 +37,9 @@ package org.ranapat.flatflash {
 		private var __mouseEnabled:Dictionary;
 		private var __toReorder:Boolean;
 		
+		private var _mouseMaskNextColor:RGBA;
+		private var _mouseEventsBitmapData:BitmapData;
+		
 		protected var instantSizeChangeRecreate:Boolean;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
@@ -50,6 +54,8 @@ package org.ranapat.flatflash {
 			
 			this.children = new Vector.<DisplayObject>();
 			this.__mouseEnabled = new Dictionary(true);
+			
+			this._mouseMaskNextColor = new RGBA(0, 0, 0, 255);
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage, false, 0, true);
 		}
@@ -76,7 +82,7 @@ package org.ranapat.flatflash {
 				this.__changed += child.changed? 1 : 0;
 				this.__toReorder = true;
 				if (child.mouseEnabled && !this.__mouseEnabled[child]) {
-					this.__mouseEnabled[child] = new MouseEnabledObject(false);
+					this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
 				}
 			}
 			
@@ -163,20 +169,27 @@ package org.ranapat.flatflash {
 				}
 				
 				var bitmapData:BitmapData = this.bitmapData;
+				var mouseEventsBitmapData:BitmapData = this._mouseEventsBitmapData;
 				var latestSlicer:ISlicer = this.latestSlicer;
 				var latestSlicerType:String = this.latestSlicerType;
 				
 				bitmapData.lock();
+				mouseEventsBitmapData.lock();
 				
 				bitmapData.fillRect(bitmapData.rect, 0);
+				mouseEventsBitmapData.fillRect(mouseEventsBitmapData.rect, 0);
 				
 				var children:Vector.<DisplayObject> = this.children;
 				var length:uint = this.numChildren;
 				var displayObject:DisplayObject;
+				var mouseEnabledObject:MouseEnabledObject;
+				
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
 					displayObject.hop(getTimer() - this.startTime);
 					this.__changed += displayObject.visible && displayObject.changed? 1 : 0;
+					
+					mouseEnabledObject = this.__mouseEnabled[displayObject];
 					
 					if (displayObject.visible && displayObject.region) {
 						if (latestSlicerType != displayObject.region.type) {
@@ -187,7 +200,10 @@ package org.ranapat.flatflash {
 						try {
 							displayObject.beforeDraw();
 							latestSlicer.copyPixels(
-								displayObject.spritesheet, bitmapData,
+								displayObject.spritesheet,
+								bitmapData,
+								mouseEnabledObject != null? mouseEventsBitmapData : null,
+								mouseEnabledObject != null? mouseEnabledObject.rgba : null,
 								displayObject.region, displayObject.position,
 								displayObject.anchorX, displayObject.anchorY,
 								displayObject.alpha,
@@ -210,6 +226,7 @@ package org.ranapat.flatflash {
 				}
 				
 				bitmapData.unlock();
+				mouseEventsBitmapData.unlock();
 			}
 		}
 		
@@ -260,7 +277,7 @@ package org.ranapat.flatflash {
 		
 		public function childMouseEnabledChanged(child:DisplayObject):void {
 			if (child.mouseEnabled && !this.__mouseEnabled[child]) {
-				this.__mouseEnabled[child] = new MouseEnabledObject(false);
+				this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
 			} else {
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
@@ -273,7 +290,16 @@ package org.ranapat.flatflash {
 		
 		protected function recreateBitmapData():void {
 			if (this._width > 0 && this._height > 0) {
+				if (this.bitmapData) {
+					this.bitmapData.dispose();
+					this.bitmapData = null;
+				}
+				if (this._mouseEventsBitmapData) {
+					this._mouseEventsBitmapData.dispose();
+					this._mouseEventsBitmapData = null;
+				}
 				this.bitmapData = new BitmapData(this._width, this._height, true, 0x0);
+				this._mouseEventsBitmapData = new BitmapData(this._width, this._height, true, 0x0);
 			}
 		}
 		
@@ -281,6 +307,24 @@ package org.ranapat.flatflash {
 			this.children = this.children.sort(this.sortByZ);
 			
 			return this.children;
+		}
+		
+		private function get mouseMaskNextColor():RGBA {
+			var mouseEnabled:Dictionary = this.__mouseEnabled;
+			var _child:Object;
+			var unique:Boolean;
+			do {
+				this.updateNextMouseMaskNextColor();
+				unique = true;
+				for (_child in mouseEnabled) {
+					if ((mouseEnabled[_child] as MouseEnabledObject).rgba.equals(this._mouseMaskNextColor)) {
+						unique = false;
+						break;
+					}
+				}
+			} while (!unique);
+			
+			return this._mouseMaskNextColor.clone();
 		}
 		
 		private function sortByZ(objA:DisplayObject, objB:DisplayObject):int {
@@ -327,71 +371,54 @@ package org.ranapat.flatflash {
 			e.localX = x;
 			e.localY = y;
 			
+			var pixel:uint = this._mouseEventsBitmapData.getPixel(x, y);
+			var mouseEnabled:Dictionary = this.__mouseEnabled;
 			var _child:Object;
 			var child:DisplayObject;
-			var i:uint;
-			var inserted:Boolean;
-			var length:uint;
-			var ordered:Vector.<DisplayObject> = new Vector.<DisplayObject>();
-			for (_child in this.__mouseEnabled) {
-				inserted = false;
-				child = DisplayObject(_child);
-				for (i = 0; i < ordered.length; ++i) {
-					if (ordered[i].depth < child.depth) {
-						ordered.splice(i, 0, child);
-						inserted = true;
-						break;
-					}
-				}
-				if (!inserted) {
-					ordered[ordered.length] = child;
-				}
-			}
-			length = ordered.length;
-			
-			var locatedOne:Boolean;
-			for (i = 0; i < length; ++i) {
-				child = ordered[i];
-				if (child) {
-					var mouseEnabledObject:MouseEnabledObject = this.__mouseEnabled[child];
-					var hoveredBefore:Boolean = mouseEnabledObject.hovered;
-					var hoveredAfter:Boolean = false;
-					
-					if (
-						!locatedOne
-						&& x >= child.x
-						&& y >= child.y
-						&& x <= child.x + child.width
-						&& y <= child.y + child.height
-					) {
-						if (!hoveredBefore) {
-							child.mouseEvent(new MouseEvent(
-								MouseEvent.MOUSE_OVER,
-								e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
-							));
-						}
-						
-						child.mouseEvent(e);
-						
-						hoveredAfter = true;
-						locatedOne = true;
-					} else if (hoveredBefore) {
-						hoveredAfter = false;
-					}
-					
-					if (hoveredBefore && !hoveredAfter) {
+			var mouseEnabledObject:MouseEnabledObject;
+			var tasksTodo:uint;
+			for (_child in mouseEnabled) {
+				child = _child as DisplayObject;
+				mouseEnabledObject = mouseEnabled[child];
+				if (pixel == mouseEnabledObject.rgba.rgb) {
+					if (!mouseEnabledObject.hovered) {
+						mouseEnabledObject.hovered = true;
 						child.mouseEvent(new MouseEvent(
-							MouseEvent.MOUSE_OUT,
+							MouseEvent.MOUSE_OVER,
 							e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
 						));
+						
 					}
-					
-					this.__mouseEnabled[child].hovered = hoveredAfter;
+					child.mouseEvent(e);
+						
+					++tasksTodo;
+				} else if (mouseEnabledObject.hovered) {
+					mouseEnabledObject.hovered = false;
+					child.mouseEvent(new MouseEvent(
+						MouseEvent.MOUSE_OUT,
+						e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
+					));
+					++tasksTodo;
 				}
-				
+				if (tasksTodo >= 2) {
+					break;
+				}
 			}
-			
-			ordered = null;
+		}
+		
+		private function updateNextMouseMaskNextColor():void {
+			this._mouseMaskNextColor.r += 1;
+			if (this._mouseMaskNextColor.r > 255) {
+				this._mouseMaskNextColor.r = 0;
+				this._mouseMaskNextColor.g += 1;
+				if (this._mouseMaskNextColor.g > 255) {
+					this._mouseMaskNextColor.g = 0;
+					this._mouseMaskNextColor.b += 1;
+					if (this._mouseMaskNextColor.b > 255) {
+						this._mouseMaskNextColor.b = 0;
+					}
+				}
+			}
 		}
 		
 		private function handleClick(e:MouseEvent):void {
@@ -465,6 +492,9 @@ package org.ranapat.flatflash {
 			this.bitmapData.dispose();
 			this.bitmapData = null;
 			
+			this._mouseEventsBitmapData.dispose();
+			this._mouseEventsBitmapData = null;
+			
 			clearTimeout(this.loopTimeout);
 			this.loopTimeout = 0;
 			
@@ -481,11 +511,14 @@ package org.ranapat.flatflash {
 	}
 
 }
+import org.ranapat.flatflash.tools.RGBA;
 
 class MouseEnabledObject {
 	public var hovered:Boolean;
+	public var rgba:RGBA;
 	
-	public function MouseEnabledObject(hovered:Boolean) {
+	public function MouseEnabledObject(hovered:Boolean, rgba:RGBA) {
 		this.hovered = hovered
+		this.rgba = rgba;
 	}
 }

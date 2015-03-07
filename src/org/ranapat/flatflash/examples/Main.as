@@ -143,7 +143,7 @@ package org.ranapat.flatflash.examples {
 					DisplayObjectFactory.startRecording(this.doc, new Rectangle(0, 0, 200, 200));
 				} else if (e.keyCode == Keyboard.D) {
 					recorder = DisplayObjectFactory.stopRecording(this.doc);
-					this.doc.addChild(recorder);
+					//this.doc.addChild(recorder);
 					recorder.x = 10;
 					recorder.y = -10;
 					recorder.fps = 240;
@@ -269,13 +269,13 @@ package org.ranapat.flatflash.examples {
 						m1.fps = e.fps;
 						m1.x = 400 + i * 100;
 						m1.y = 400;
-						this.doc.addChild(m1);
+						//this.doc.addChild(m1);
 						m1.play();
 						
 						var i1:Image = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Test_Image_2") as Class);
 						i1.x = 400 + i * 100;
 						i1.y = 600;
-						this.doc.addChild(i1);
+						//this.doc.addChild(i1);
 					}
 					
 					/*
@@ -333,9 +333,9 @@ package org.ranapat.flatflash.examples {
 					this.i1.onAfterDrawRemove(this, this.afterDrawI1);
 					this.i1.onBeforeDrawRemove(this, this.beforeDrawI1);
 					this.i1.onLoopLimitReachedRemove(this, this.loopLimitReachedI1);
-					this.doc.addChild(this.i1);
+					//this.doc.addChild(this.i1);
 					
-					this.doc.addChild(DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, "ffffff", new Rectangle(100, 100, 200, 200))).alpha = .5;
+					//this.doc.addChild(DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, "ffffff", new Rectangle(100, 100, 200, 200))).alpha = .5;
 					
 					
 					var b:Button = new Button(
@@ -349,7 +349,8 @@ package org.ranapat.flatflash.examples {
 					);
 					b.x = 600;
 					b.y = 100;
-					this.doc.addChild(b);
+					b.mouseEnabled = true;
+					//this.doc.addChild(b);
 					
 					tt = new ClassDefinition();
 					tt.x = 200;
@@ -364,12 +365,29 @@ package org.ranapat.flatflash.examples {
 					
 					
 					
+					var iiimage:Image = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, null, new Rectangle(200, 100, 300, 200));
+					this.doc.addChild(iiimage);
+					iiimage.x = 300;
+					iiimage.y = 100;
+					iiimage.anchorX = 50;
+					iiimage.anchorY = 50;
+					iiimage.mouseEnabled = true;
+					iiimage.onMouseEvent(this, this.handleIIImageMouseEvents, [ iiimage ]);
+					iiimage.alpha = .1
 					
-					
+					var iiimage2:Image = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class, null, new Rectangle(200, 100, 300, 200));
+					this.doc.addChild(iiimage2);
+					iiimage2.x = 400;
+					iiimage2.y = 200;
+					iiimage2.anchorX = 50;
+					iiimage2.anchorY = 50;
+					iiimage2.mouseEnabled = true;
+					iiimage2.onMouseEvent(this, this.handleIIImageMouseEvents, [ iiimage2 ]);
+					iiimage2.alpha = .1
 					
 					
 					i3 = DisplayObjectFactory.imageFromSWF(e.applicationDomain.getDefinition("Image1") as Class);
-					this.doc.addChild(i3);
+					//this.doc.addChild(i3);
 					i3.x = 500;
 					i3.y = 500;
 					i3.visible = false;
@@ -409,6 +427,7 @@ package org.ranapat.flatflash.examples {
 				
 				
 			} else if (e.id == loadRequestId2) {
+				return;
 				diceRollAnimationWhite = new DiceRollAnimation();
 				diceRollAnimationWhite.record(e.applicationDomain, "White");
 				diceRollAnimationWhite.sound = "DiceAnimationsSound24FPS";
@@ -545,6 +564,18 @@ package org.ranapat.flatflash.examples {
 				swapChildren(_ccc, this.doc)
 				
 				//addEventListener(Event.ENTER_FRAME, handlePlayDiceEnterFrame);
+			}
+		}
+		
+		private function handleIIImageMouseEvents(image:Image, e:MouseEvent):void {
+			if (e.type == MouseEvent.MOUSE_OVER) {
+				image.alpha = .5;
+			} else if (e.type == MouseEvent.MOUSE_OUT) {
+				image.alpha = 1;
+			} else if (e.type == MouseEvent.CLICK) {
+				image.rotation += 10;
+				image.scale += .1
+				
 			}
 		}
 		
