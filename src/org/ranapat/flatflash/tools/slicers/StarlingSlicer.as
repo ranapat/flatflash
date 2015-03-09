@@ -49,7 +49,7 @@ package org.ranapat.flatflash.tools.slicers {
 				|| sourceRotation != 0
 				|| sourceSkewX != 0 || sourceSkewY != 0
 			) {
-				clipped = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0);
+				clipped = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
 				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, true);
 				sourceRectangle = new Rectangle(0, 0, sourceRectangle.width, sourceRectangle.height);
 				
@@ -86,8 +86,9 @@ package org.ranapat.flatflash.tools.slicers {
 						height,
 						true, 0x0
 					);
-					
+
 					var matrix:Matrix = new Matrix();
+					
 					if (sourceRotation != 0) {
 						matrix.translate(-sourceAnchorX, -sourceAnchorY);
 						matrix.rotate(sourceRotation * radiansToDegrees);
