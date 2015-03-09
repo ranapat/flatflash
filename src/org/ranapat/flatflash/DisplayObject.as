@@ -307,12 +307,14 @@ package org.ranapat.flatflash {
 		}
 		
 		public function set filters(value:Array):void {
-			var length:uint = value.length;
 			this._filters = new Vector.<BitmapFilter>();
-			
-			for (var i:uint = 0; i < length; ++i) {
-				if (value[i] is BitmapFilter) {
-					this._filters[this._filters.length] = value[i];
+			if (value) {
+				var length:uint = value.length;
+				
+				for (var i:uint = 0; i < length; ++i) {
+					if (value[i] is BitmapFilter) {
+						this._filters[this._filters.length] = value[i];
+					}
 				}
 			}
 		}
