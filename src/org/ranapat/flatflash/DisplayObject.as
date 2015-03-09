@@ -319,10 +319,12 @@ package org.ranapat.flatflash {
 		
 		public function get filters():Array {
 			var result:Array = [];
-			var length:uint = this._filters.length;
-			
-			for (var i:uint = 0; i < length; ++i) {
-				result[result.length] = this._filters[i];
+			if (this._filters) {
+				var length:uint = this._filters.length;
+				
+				for (var i:uint = 0; i < length; ++i) {
+					result[result.length] = this._filters[i];
+				}
 			}
 			
 			return result;
