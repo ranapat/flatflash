@@ -1,16 +1,16 @@
 package org.ranapat.flatflash {
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.utils.clearTimeout;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.events.Event;
-	import flash.events.MouseEvent;
-	import flash.geom.Rectangle;
+	import org.ranapat.flatflash.tools.cache.CacheHolder;
+	import org.ranapat.flatflash.tools.cache.CacheObject;
 	import org.ranapat.flatflash.tools.RGBA;
-	
 	import org.ranapat.flatflash.tools.slicers.ISlicer;
 	import org.ranapat.flatflash.tools.slicers.SlicerFactory;
 	
@@ -40,6 +40,8 @@ package org.ranapat.flatflash {
 		private var _mouseMaskNextColor:RGBA;
 		private var _mouseEventsBitmapData:BitmapData;
 		
+		private var cacheHolder:CacheHolder;
+		
 		protected var instantSizeChangeRecreate:Boolean;
 		
 		public function DisplayObjectContainer(render:uint = 0) {
@@ -57,6 +59,8 @@ package org.ranapat.flatflash {
 			
 			this._mouseMaskNextColor = new RGBA(0, 0, 0, 255);
 			
+			this.cacheHolder = new CacheHolder();
+			
 			this.addEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage, false, 0, true);
 		}
 		
@@ -70,6 +74,9 @@ package org.ranapat.flatflash {
 			
 			this.latestSlicer = null;
 			this.latestSlicerType = null;
+			
+			this.cacheHolder.destroy();
+			this.cacheHolder = null;
 		}
 		
 		public function addChild(child:DisplayObject):DisplayObject {
@@ -111,6 +118,8 @@ package org.ranapat.flatflash {
 				
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
+				
+				this.cacheHolder.remove(child);
 				
 				++this.__changed;
 				
@@ -184,8 +193,13 @@ package org.ranapat.flatflash {
 				var displayObject:DisplayObject;
 				var mouseEnabledObject:MouseEnabledObject;
 				
+				var initiallyChanged:Boolean;
+				var cacheObject:CacheObject;
+				var processFullCopy:Boolean;
+				
 				for (var i:uint = 0; i < length; ++i) {
 					displayObject = children[i];
+					initiallyChanged = displayObject.changed;
 					displayObject.hop(getTimer() - this.startTime);
 					this.__changed += displayObject.visible && displayObject.changed? 1 : 0;
 					
@@ -199,20 +213,40 @@ package org.ranapat.flatflash {
 						
 						try {
 							displayObject.beforeDraw();
-							latestSlicer.copyPixels(
-								displayObject.spritesheet,
-								bitmapData,
-								mouseEnabledObject != null? mouseEventsBitmapData : null,
-								mouseEnabledObject != null? mouseEnabledObject.rgba : null,
-								displayObject.region, displayObject.position,
-								displayObject.anchorX, displayObject.anchorY,
-								displayObject.alpha,
-								displayObject.scaleX, displayObject.scaleY,
-								displayObject.skewX, displayObject.skewY,
-								displayObject.rotation,
-								displayObject.smoothing,
-								displayObject.filtersVector
-							);
+							
+							processFullCopy = true;
+							if (!initiallyChanged) {
+								cacheObject = this.cacheHolder.get(displayObject);
+								if (cacheObject) {
+									processFullCopy = false;
+									
+									latestSlicer.directCopyPixels(
+										cacheObject.sourceBitmapData,
+										mouseEnabledObject != null? cacheObject.overExposedBitmapData : null,
+										bitmapData,
+										mouseEnabledObject != null? mouseEventsBitmapData : null,
+										cacheObject.sourceRectangle, cacheObject.destinationPoint
+									);
+								}
+							}
+							
+							if (processFullCopy) {
+								this.cacheHolder.add(displayObject, latestSlicer.copyPixels(
+									displayObject.spritesheet,
+									bitmapData,
+									mouseEnabledObject != null? mouseEventsBitmapData : null,
+									mouseEnabledObject != null? mouseEnabledObject.rgba : null,
+									displayObject.region, displayObject.position,
+									displayObject.anchorX, displayObject.anchorY,
+									displayObject.alpha,
+									displayObject.scaleX, displayObject.scaleY,
+									displayObject.skewX, displayObject.skewY,
+									displayObject.rotation,
+									displayObject.smoothing,
+									displayObject.filtersVector
+								));
+							}
+							
 							displayObject.afterDraw();
 						} catch (e:Error) {
 							//

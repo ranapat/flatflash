@@ -6,6 +6,7 @@ package org.ranapat.flatflash.tools.slicers {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import org.ranapat.flatflash.Settings;
+	import org.ranapat.flatflash.tools.cache.CacheObject;
 	import org.ranapat.flatflash.tools.regions.Region;
 	import org.ranapat.flatflash.tools.RGBA;
 	
@@ -16,6 +17,26 @@ package org.ranapat.flatflash.tools.slicers {
 		
 		public function StarlingSlicer() {
 			this._colorTransform = new ColorTransform();
+		}
+		
+		public function directCopyPixels(
+			sourceBitmapData:BitmapData, overExposedBitmapData:BitmapData,
+			destination:BitmapData, overExposedDestination:BitmapData,
+			sourceRectangle:Rectangle, destinationPoint:Point
+		):void {
+			if (overExposedBitmapData && overExposedDestination) {
+				overExposedDestination.copyPixels(
+					overExposedBitmapData,
+					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPoint,
+					null, null, true
+				);
+			}
+			
+			destination.copyPixels(
+				sourceBitmapData,
+				sourceRectangle, destinationPoint,
+				null, null, true
+			);
 		}
 		
 		public function copyPixels(
@@ -30,8 +51,10 @@ package org.ranapat.flatflash.tools.slicers {
 			sourceRotation:Number,
 			sourceSmoothing:Boolean,
 			sourceFilters:Vector.<BitmapFilter>
-		):void {
-			if (sourceAlpha == 0 || sourceScaleX == 0 || sourceScaleY == 0) return;
+		):CacheObject {
+			if (sourceAlpha == 0 || sourceScaleX == 0 || sourceScaleY == 0) return null;
+			
+			var result:CacheObject = new CacheObject(null, null, null, null);
 			
 			var sourceBitmapData:BitmapData = source;
 			var sourceRectangle:Rectangle = sourceRegion.sliceRectangle;
@@ -159,6 +182,8 @@ package org.ranapat.flatflash.tools.slicers {
 					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPointToApply,
 					null, null, true
 				);
+
+				result.overExposedBitmapData = overExposedBitmapData.clone();
 				
 				overExposedBitmapData.dispose();
 				overExposedBitmapData = null;
@@ -169,6 +194,10 @@ package org.ranapat.flatflash.tools.slicers {
 				sourceRectangle, destinationPointToApply,
 				null, null, true
 			);
+			
+			result.sourceBitmapData = sourceBitmapData.clone();
+			result.sourceRectangle = sourceRectangle.clone();
+			result.destinationPoint = destinationPointToApply.clone();
 			
 			if (clipped) {
 				clipped.dispose();
@@ -182,6 +211,8 @@ package org.ranapat.flatflash.tools.slicers {
 				filtered.dispose();
 				filtered = null;
 			}
+			
+			return result;
 		}
 	}
 

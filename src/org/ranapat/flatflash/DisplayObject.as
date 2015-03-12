@@ -89,22 +89,6 @@ package org.ranapat.flatflash {
 			this.markChanged();
 		}
 		
-		public function set anchorX(value:Number):void {
-			this._anchorX = value;
-		}
-		
-		public function get anchorX():Number {
-			return this._anchorX;
-		}
-		
-		public function set anchorY(value:Number):void {
-			this._anchorY = value;
-		}
-		
-		public function get anchorY():Number {
-			return this._anchorY;
-		}
-		
 		public function get dataX():Number {
 			return this._x - this._anchorX;
 		}
@@ -125,6 +109,26 @@ package org.ranapat.flatflash {
 		
 		public function get y():Number {
 			return this._y;
+		}
+		
+		public function set anchorX(value:Number):void {
+			this._anchorX = value;
+			
+			this.markChanged();
+		}
+		
+		public function get anchorX():Number {
+			return this._anchorX;
+		}
+		
+		public function set anchorY(value:Number):void {
+			this._anchorY = value;
+			
+			this.markChanged();
+		}
+		
+		public function get anchorY():Number {
+			return this._anchorY;
 		}
 		
 		public function set depth(value:Number):void {
@@ -241,6 +245,8 @@ package org.ranapat.flatflash {
 		
 		public function set smoothing(value:Boolean):void {
 			this._smoothing = value;
+			
+			this.markChanged();
 		}
 		
 		public function get smoothing():Boolean {
@@ -288,6 +294,8 @@ package org.ranapat.flatflash {
 			if (this.parent) {
 				this.parent.childMouseEnabledChanged(this);
 			}
+			
+			this.markChanged();
 		}
 		
 		public function get mouseEnabled():Boolean {
@@ -317,6 +325,8 @@ package org.ranapat.flatflash {
 					}
 				}
 			}
+			
+			this.markChanged();
 		}
 		
 		public function get filters():Array {
