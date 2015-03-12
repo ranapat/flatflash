@@ -392,7 +392,7 @@ package org.ranapat.flatflash {
 		}
 		
 		private function calculateFPS():void {
-			if ((getTimer() - startTime) / 1000 > 1) {
+			if ((getTimer() - this.startTime) / 1000 > 1) {
 				this._cfps = this.frames;
 				this.startTime = getTimer();
 				this.frames = 1;

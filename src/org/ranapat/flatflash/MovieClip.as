@@ -3,6 +3,7 @@ package org.ranapat.flatflash {
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
 	import org.ranapat.flatflash.tools.EngineTypes;
 	import org.ranapat.flatflash.tools.regions.Region;
 	
@@ -23,7 +24,7 @@ package org.ranapat.flatflash {
 		private var _totalLoops:uint;
 		private var _fps:int;
 		private var _timeDelta:Number;
-		private var _previousTimeOffset:uint;
+		private var _previousTimeOffset:int;
 		
 		private var _loopLimitReached:Boolean;
 		private var _loopLimitReachedCallbackHolder:Dictionary;
@@ -120,6 +121,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function play(loops:int = -1):void {
+			this._previousTimeOffset = -1;
 			this.markChanged();
 			this._playing = true;
 			this.loops = loops;
@@ -192,12 +194,17 @@ package org.ranapat.flatflash {
 		
 		override public function hop(timer:int):void {
 			if (this.playing) {
+				var nextFrame:uint;
+				
 				var timeOffset:uint = timer / this.timeDelta;
-				var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
+				if (this._previousTimeOffset == -1) {
+					nextFrame = 0;
+				} else {
+					var delta:int = this._previousTimeOffset <= timeOffset? (timeOffset - this._previousTimeOffset) : (this.fps - this._previousTimeOffset + timeOffset);
+					var frame:uint = this.currentFrame + delta;
+					nextFrame = frame < 0? this.totalFrames - frame : frame >= this.totalFrames? frame - this.totalFrames : frame;
+				}
 				this._previousTimeOffset = timeOffset;
-			
-				var frame:uint = this.currentFrame + delta;
-				var nextFrame:uint = frame < 0? this.totalFrames - frame : frame >= this.totalFrames? frame - this.totalFrames : frame;
 				
 				if (
 					nextFrame < this.currentFrame
