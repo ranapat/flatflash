@@ -65,6 +65,7 @@ package org.ranapat.flatflash.tools.slicers {
 			var clipped:BitmapData;
 			var scaled:BitmapData;
 			var filtered:BitmapData;
+			var beforeFilters:BitmapData;
 			
 			if (
 				sourceAlpha != 1
@@ -154,6 +155,7 @@ package org.ranapat.flatflash.tools.slicers {
 					true, 0x0
 				);
 				filtered.copyPixels(sourceBitmapData, sourceRectangle, new Point(Settings.FILTER_MARGIN_DELTA_CUT, Settings.FILTER_MARGIN_DELTA_CUT), null, null, false);
+				beforeFilters = filtered.clone();
 				
 				var filtersRectangle:Rectangle = new Rectangle(0, 0, filtered.width, filtered.height);
 				var filtersPoint:Point = new Point(0, 0);
@@ -169,7 +171,7 @@ package org.ranapat.flatflash.tools.slicers {
 			
 			if (overExposedDestination) {
 				var overExposedBitmapData:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
-				overExposedBitmapData.copyPixels(sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
+				overExposedBitmapData.copyPixels(beforeFilters? beforeFilters : sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
 				overExposedBitmapData.colorTransform(
 					sourceRectangle,
 					new ColorTransform(
@@ -210,6 +212,10 @@ package org.ranapat.flatflash.tools.slicers {
 			if (filtered) {
 				filtered.dispose();
 				filtered = null;
+			}
+			if (beforeFilters) {
+				beforeFilters.dispose();
+				beforeFilters = null;
 			}
 			
 			return result;
