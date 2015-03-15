@@ -312,7 +312,7 @@ package org.ranapat.flatflash {
 		public function childMouseEnabledChanged(child:DisplayObject):void {
 			if (child.mouseEnabled && !this.__mouseEnabled[child]) {
 				this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
-			} else {
+			} else if (!child.mouseEnabled && this.__mouseEnabled[child]) {
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
 			}
