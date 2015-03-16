@@ -102,8 +102,8 @@ package org.ranapat.flatflash.tools.slicers {
 						height = sourceRectangle.height;
 					}
 					
-					width *= sourceScaleX + (sourceSkewX != 0 || sourceSkewY != 0? Settings.SKEW_RENDER_OFFSET : 0);
-					height *= sourceScaleY + (sourceSkewX != 0 || sourceSkewY != 0? Settings.SKEW_RENDER_OFFSET : 0);
+					width *= sourceScaleX + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
+					height *= sourceScaleY + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
 					
 					scaled = new BitmapData(
 						width,
