@@ -427,11 +427,11 @@ package org.ranapat.flatflash {
 			}
 		}
 		
-		private function loopChildrenForMouseEvent(x:Number, y:Number, e:MouseEvent):void {
-			e.localX = x;
-			e.localY = y;
+		private function loopChildrenForMouseEvent(e:MouseEvent):void {
+			var stagePoint:Point = new Point(e.stageX, e.stageY);
+			var point:Point = this.globalToLocal(stagePoint);
 			
-			var pixel:uint = this._mouseEventsBitmapData.getPixel(x, y);
+			var pixel:uint = this._mouseEventsBitmapData.getPixel(point.x, point.y);
 			var mouseEnabled:Dictionary = this.__mouseEnabled;
 			var _child:Object;
 			var child:DisplayObject;
@@ -482,23 +482,19 @@ package org.ranapat.flatflash {
 		}
 		
 		private function handleClick(e:MouseEvent):void {
-			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
-			this.loopChildrenForMouseEvent(point.x, point.y, e);
+			this.loopChildrenForMouseEvent(e);
 		}
 		
 		private function handleMouseMove(e:MouseEvent):void {
-			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
-			this.loopChildrenForMouseEvent(point.x, point.y, e);
+			this.loopChildrenForMouseEvent(e);
 		}
 		
 		private function handleMouseDown(e:MouseEvent):void {
-			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
-			this.loopChildrenForMouseEvent(point.x, point.y, e);
+			this.loopChildrenForMouseEvent(e);
 		}
 		
 		private function handleMouseUp(e:MouseEvent):void {
-			var point:Point = this.globalToLocal(new Point(e.currentTarget.mouseX, e.currentTarget.mouseY));
-			this.loopChildrenForMouseEvent(point.x, point.y, e);
+			this.loopChildrenForMouseEvent(e);
 		}
 		
 		private function handleEnterFrame(e:Event):void {
