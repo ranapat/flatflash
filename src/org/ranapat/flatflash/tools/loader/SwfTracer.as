@@ -29,7 +29,7 @@ package org.ranapat.flatflash.tools.loader {
 		private var _stage:Stage;
 		
 		private var _index:uint;
-		private var _bussy:Boolean;
+		private var _busy:Boolean;
 		private var _queue:Vector.<QueueObject>;
 		private var _bitmapDataJoiner:BitmapDataVectorJoiner;
 		
@@ -63,7 +63,7 @@ package org.ranapat.flatflash.tools.loader {
 		public function SwfTracer() {
 			if (SwfTracer._allowInstance) {
 				this._index = 0;
-				this._bussy = false;
+				this._busy = false;
 				
 				this._queue = new Vector.<QueueObject>();
 				
@@ -116,8 +116,8 @@ package org.ranapat.flatflash.tools.loader {
 		}
 		
 		private function tryToDequeue():void {
-			if (!this._bussy && this._queue.length > 0) {
-				this._bussy = true;
+			if (!this._busy && this._queue.length > 0) {
+				this._busy = true;
 				
 				var item:QueueObject = this._queue.shift();
 				
@@ -190,7 +190,7 @@ package org.ranapat.flatflash.tools.loader {
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
-			this._bussy = false;
+			this._busy = false;
 			this._currentKey = 0;
 			this._currentType = "";
 			this._currentTraced = null;
@@ -228,7 +228,7 @@ package org.ranapat.flatflash.tools.loader {
 			
 			this._stage.removeEventListener(Event.ENTER_FRAME, this.handleStageEnterFrame);
 			
-			this._bussy = false;
+			this._busy = false;
 			this._currentKey = 0;
 			this._currentType = "";
 			this._currentTraced = null;

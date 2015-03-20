@@ -24,7 +24,7 @@ package org.ranapat.flatflash.examples {
 		
 		private var swipeDeltaTime:Number;
 		private var swipeAngle:Number;
-		private var swipeBussy:Boolean;
+		private var swipeBusy:Boolean;
 		
 		private var topElementIndex:uint;
 		
@@ -67,8 +67,8 @@ package org.ranapat.flatflash.examples {
 		}
 		
 		public function left():void {
-			if (!this.swipeBussy) {
-				this.swipeBussy = true;
+			if (!this.swipeBusy) {
+				this.swipeBusy = true;
 				
 				var length:Number = this.angleDelta;
 				var step:Number = this.swipeAngle;
@@ -81,8 +81,8 @@ package org.ranapat.flatflash.examples {
 		}
 		
 		public function right():void {
-			if (!this.swipeBussy) {
-				this.swipeBussy = true;
+			if (!this.swipeBusy) {
+				this.swipeBusy = true;
 				
 				var length:Number = this.angleDelta;
 				var step:Number = this.swipeAngle;
@@ -100,7 +100,7 @@ package org.ranapat.flatflash.examples {
 		}
 		
 		private function finalizeSwipe():void {
-			this.swipeBussy = false;
+			this.swipeBusy = false;
 			
 			var i:uint;
 			var length:uint = this._items.length;
