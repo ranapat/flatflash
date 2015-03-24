@@ -10,6 +10,8 @@ package org.ranapat.flatflash {
 		public static const SKEW_RENDER_OFFSET:uint = 10;
 		
 		public static const NO_IDENTIFIER:String = "__no_identifier__";
+		
+		public static var SHOW_REDRAWN_RECTANGLES:Boolean = false;
 	}
 
 }

@@ -5,9 +5,9 @@ package org.ranapat.flatflash.tools.slicers {
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import org.ranapat.flatflash.DisplayObject;
 	import org.ranapat.flatflash.Settings;
 	import org.ranapat.flatflash.tools.cache.CacheObject;
-	import org.ranapat.flatflash.tools.regions.Region;
 	import org.ranapat.flatflash.tools.RGBA;
 	
 	public class StarlingSlicer implements ISlicer {
@@ -40,25 +40,17 @@ package org.ranapat.flatflash.tools.slicers {
 		}
 		
 		public function copyPixels(
-			source:BitmapData,
+			source:DisplayObject,
 			destination:BitmapData,
-			overExposedDestination:BitmapData, overExposedRGBA:RGBA,
-			sourceRegion:Region, destinationPoint:Point,
-			sourceAnchorX:Number, sourceAnchorY:Number,
-			sourceAlpha:Number,
-			sourceScaleX:Number, sourceScaleY:Number,
-			sourceSkewX:Number, sourceSkewY:Number,
-			sourceRotation:Number,
-			sourceSmoothing:Boolean,
-			sourceFilters:Vector.<BitmapFilter>
+			overExposedDestination:BitmapData, overExposedRGBA:RGBA
 		):CacheObject {
-			if (sourceAlpha == 0 || sourceScaleX == 0 || sourceScaleY == 0) return null;
+			if (!source.canBeDrawn) return null;
 			
 			var result:CacheObject = new CacheObject(null, null, null, null);
 			
-			var sourceBitmapData:BitmapData = source;
-			var sourceRectangle:Rectangle = sourceRegion.sliceRectangle;
-			var destinationPointToApply:Point = destinationPoint;
+			var sourceBitmapData:BitmapData = source.spritesheet;
+			var sourceRectangle:Rectangle = source.region.sliceRectangle;
+			var destinationPointToApply:Point = source.position;
 			
 			var i:uint;
 			
@@ -67,79 +59,121 @@ package org.ranapat.flatflash.tools.slicers {
 			var filtered:BitmapData;
 			var beforeFilters:BitmapData;
 			
+			var sourceAlpha:Number = source.alpha;
+			var sourceAnchorX:Number = source.anchorX;
+			var sourceAnchorY:Number = source.anchorY;
+			var sourceScaleX:Number = source.scaleX;
+			var sourceScaleY:Number = source.scaleY;
+			var sourceSkewX:Number = source.skewX;
+			var sourceSkewY:Number = source.skewY;
+			var sourceRotation:Number = source.rotation;
+			var sourceSmoothing:Boolean = source.smoothing;
+			var sourceFilters:Vector.<BitmapFilter> = source.filtersVector;
+			var sourceMatrix:Matrix = source.matrix;
+			
 			if (
-				sourceAlpha != 1
+				sourceMatrix != null
+				|| sourceAlpha != 1
 				|| sourceScaleX != 1 || sourceScaleY != 1
 				|| sourceRotation != 0
 				|| sourceSkewX != 0 || sourceSkewY != 0
 			) {
 				clipped = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
-				clipped.copyPixels(source, sourceRectangle, new Point(0, 0), null, null, true);
+				clipped.copyPixels(sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
 				sourceRectangle = new Rectangle(0, 0, sourceRectangle.width, sourceRectangle.height);
 				
 				if (sourceAlpha != 1) {
 					this._colorTransform.alphaMultiplier = sourceAlpha;
 					clipped.colorTransform(sourceRectangle, this._colorTransform);
 				}
-				if (sourceScaleX != 1 || sourceScaleY != 1 || sourceRotation != 0 || sourceSkewX != 0 || sourceSkewY != 0) {
+				if (
+					sourceMatrix != null
+					|| sourceScaleX != 1
+					|| sourceScaleY != 1
+					|| sourceRotation != 0
+					|| sourceSkewX != 0
+					|| sourceSkewY != 0
+				) {
 					var radiansToDegrees:Number = StarlingSlicer.RADIANS_TO_DEGREES;
 					var width:Number;
 					var height:Number;
 					var rotationOffset:Number = 0;
 					
-					if (sourceRotation != 0) {
-						var maxSize:Number = Math.sqrt(sourceRectangle.width * sourceRectangle.width + sourceRectangle.height * sourceRectangle.height);
-						var anchorXComponsation:Number = sourceAnchorX < 0? -sourceAnchorX : sourceRectangle.width - sourceAnchorX < 0? sourceAnchorX - sourceRectangle.width : 0;
-						var anchorYComponsation:Number = sourceAnchorY < 0? -sourceAnchorY : sourceRectangle.height - sourceAnchorY < 0? sourceAnchorY - sourceRectangle.height : 0;
-						var biggerAnchorCompensation:Number = anchorXComponsation > anchorYComponsation? anchorXComponsation : anchorYComponsation;
-						maxSize += biggerAnchorCompensation;
-						
-						width = 2 * maxSize;
-						height = 2 * maxSize;
-						rotationOffset = maxSize;
+					if (sourceMatrix != null) {
+						width = sourceRectangle.width * (1 + sourceMatrix.a) + 2 * sourceAnchorX;
+						height = sourceRectangle.height * (1 + sourceMatrix.d);
 					} else {
-						width = sourceRectangle.width;
-						height = sourceRectangle.height;
+						if (sourceRotation != 0) {
+							var maxSize:Number = Math.sqrt(sourceRectangle.width * sourceRectangle.width + sourceRectangle.height * sourceRectangle.height);
+							var anchorXComponsation:Number = sourceAnchorX < 0? -sourceAnchorX : sourceRectangle.width - sourceAnchorX < 0? sourceAnchorX - sourceRectangle.width : 0;
+							var anchorYComponsation:Number = sourceAnchorY < 0? -sourceAnchorY : sourceRectangle.height - sourceAnchorY < 0? sourceAnchorY - sourceRectangle.height : 0;
+							var biggerAnchorCompensation:Number = anchorXComponsation > anchorYComponsation? anchorXComponsation : anchorYComponsation;
+							maxSize += biggerAnchorCompensation;
+							
+							width = 2 * maxSize;
+							height = 2 * maxSize;
+							rotationOffset = maxSize;
+						} else {
+							width = sourceRectangle.width;
+							height = sourceRectangle.height;
+						}
+						
+						width *= sourceScaleX + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
+						height *= sourceScaleY + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
 					}
-					
-					width *= sourceScaleX + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
-					height *= sourceScaleY + (sourceSkewX != 0 || sourceSkewY != 0? 1 : 0);
 					
 					scaled = new BitmapData(
 						width,
 						height,
-						true, 0x0
+						Settings.SHOW_REDRAWN_RECTANGLES? false : true, Settings.SHOW_REDRAWN_RECTANGLES? 0xff00ff : 0x0
 					);
 
-					var matrix:Matrix = new Matrix();
+					var matrix:Matrix;
+					if (sourceMatrix == null) {
+						matrix = new Matrix();
+						
+						if (sourceRotation != 0) {
+							matrix.translate(-sourceAnchorX, -sourceAnchorY);
+							matrix.rotate(sourceRotation * radiansToDegrees);
+							matrix.translate(rotationOffset, rotationOffset);
+							
+							destinationPointToApply = new Point(destinationPointToApply.x + sourceAnchorX - rotationOffset, destinationPointToApply.y + sourceAnchorY - rotationOffset);
+						}
+						if (sourceScaleX != 1 || sourceScaleY != 1) {
+							matrix.scale(sourceScaleX, sourceScaleY);
+							
+							destinationPointToApply = new Point(
+								destinationPointToApply.x + (sourceRotation != 0? 0 : ((1 - sourceScaleX) * sourceAnchorX)) + (1 - sourceScaleX) * rotationOffset,
+								destinationPointToApply.y + (sourceRotation != 0? 0 : ((1 - sourceScaleY) * sourceAnchorY)) + (1 - sourceScaleY) * rotationOffset
+							);
+						}
+						if (sourceSkewX != 0 || sourceSkewY != 0) {
+							var offsetWidth:Number = Settings.SKEW_RENDER_OFFSET / 2;
+							var offsetHeight:Number = Settings.SKEW_RENDER_OFFSET / 2;
+							
+							matrix.concat(new Matrix(1, sourceSkewY, sourceSkewX, 1, offsetWidth, offsetHeight));
+							destinationPointToApply = new Point(
+								destinationPointToApply.x - offsetWidth,
+								destinationPointToApply.y - offsetHeight
+							);
+						}
+						
+						scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
+					} else {
+						matrix = sourceMatrix.clone();
+						
+						matrix.tx = 0;
+						matrix.ty = 0;
+						matrix.translate(sourceAnchorX, sourceAnchorY);
 					
-					if (sourceRotation != 0) {
-						matrix.translate(-sourceAnchorX, -sourceAnchorY);
-						matrix.rotate(sourceRotation * radiansToDegrees);
-						matrix.translate(rotationOffset, rotationOffset);
+						scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
 						
-						destinationPointToApply = new Point(destinationPointToApply.x + sourceAnchorX - rotationOffset, destinationPointToApply.y + sourceAnchorY - rotationOffset);
-					}
-					if (sourceScaleX != 1 || sourceScaleY != 1) {
-						matrix.scale(sourceScaleX, sourceScaleY);
-						
+						var point:Point = matrix.transformPoint(new Point(sourceAnchorX, sourceAnchorY));
 						destinationPointToApply = new Point(
-							destinationPointToApply.x + (sourceRotation != 0? 0 : ((1 - sourceScaleX) * sourceAnchorX)) + (1 - sourceScaleX) * rotationOffset,
-							destinationPointToApply.y + (sourceRotation != 0? 0 : ((1 - sourceScaleY) * sourceAnchorY)) + (1 - sourceScaleY) * rotationOffset
+							destinationPointToApply.x - point.x,
+							destinationPointToApply.y - point.y
 						);
 					}
-					if (sourceSkewX != 0 || sourceSkewY != 0) {
-						var offsetWidth:Number = Settings.SKEW_RENDER_OFFSET / 2;
-						var offsetHeight:Number = Settings.SKEW_RENDER_OFFSET / 2;
-						
-						matrix.concat(new Matrix(1, sourceSkewY, sourceSkewX, 1, offsetWidth, offsetHeight));
-						destinationPointToApply = new Point(
-							destinationPointToApply.x - offsetWidth,
-							destinationPointToApply.y - offsetHeight
-						);
-					}
-					
-					scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
 					
 					clipped = scaled;
 					sourceRectangle = new Rectangle(0, 0, scaled.width, scaled.height);

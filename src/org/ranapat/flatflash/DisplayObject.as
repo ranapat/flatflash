@@ -2,6 +2,7 @@ package org.ranapat.flatflash {
 	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
 	import flash.filters.BitmapFilter;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
@@ -21,6 +22,7 @@ package org.ranapat.flatflash {
 		private var _skewX:Number;
 		private var _skewY:Number;
 		private var _rotation:Number;
+		private var _matrix:Matrix;
 		private var _alpha:Number;
 		private var _smoothing:Boolean;
 		private var _visible:Boolean;
@@ -233,6 +235,16 @@ package org.ranapat.flatflash {
 			return this._rotation;
 		}
 		
+		public function set matrix(value:Matrix):void {
+			this._matrix = value;
+			
+			this.markChanged();
+		}
+		
+		public function get matrix():Matrix {
+			return this._matrix;
+		}
+		
 		public function set alpha(value:Number):void {
 			this._alpha = value < 0? 0 : value > 1? 1 : value;
 			
@@ -273,6 +285,10 @@ package org.ranapat.flatflash {
 		
 		public function get changed():Boolean {
 			return this._changed;
+		}
+		
+		public function get canBeDrawn():Boolean {
+			return this.visible != false && this.alpha != 0 && this.scaleX != 0 && this.scaleY != 0;
 		}
 		
 		public function set parent(value:DisplayObjectContainer):void {

@@ -234,18 +234,10 @@ package org.ranapat.flatflash {
 							
 							if (processFullCopy) {
 								this.cacheHolder.add(displayObject, latestSlicer.copyPixels(
-									displayObject.spritesheet,
+									displayObject,
 									bitmapData,
 									mouseEnabledObject != null? mouseEventsBitmapData : null,
-									mouseEnabledObject != null? mouseEnabledObject.rgba : null,
-									displayObject.region, displayObject.position,
-									displayObject.anchorX, displayObject.anchorY,
-									displayObject.alpha,
-									displayObject.scaleX, displayObject.scaleY,
-									displayObject.skewX, displayObject.skewY,
-									displayObject.rotation,
-									displayObject.smoothing,
-									displayObject.filtersVector
+									mouseEnabledObject != null? mouseEnabledObject.rgba : null
 								));
 							}
 							
