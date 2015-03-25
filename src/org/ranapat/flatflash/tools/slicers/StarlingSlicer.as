@@ -100,8 +100,8 @@ package org.ranapat.flatflash.tools.slicers {
 					var rotationOffset:Number = 0;
 					
 					if (sourceMatrix != null) {
-						width = sourceRectangle.width * (1 + sourceMatrix.a) + 2 * sourceAnchorX;
-						height = sourceRectangle.height * (1 + sourceMatrix.d);
+						width = sourceRectangle.width * sourceMatrix.a + (sourceMatrix.c < 0? -sourceMatrix.c : sourceMatrix.c) * 100 + Settings.MATRIX_WIDTH_EXTRA;
+						height = sourceRectangle.height * sourceMatrix.d + (sourceMatrix.b < 0? -sourceMatrix.b : sourceMatrix.b) * 100 + Settings.MATRIX_HEIGHT_EXTRA;
 					} else {
 						if (sourceRotation != 0) {
 							var maxSize:Number = Math.sqrt(sourceRectangle.width * sourceRectangle.width + sourceRectangle.height * sourceRectangle.height);
@@ -164,8 +164,11 @@ package org.ranapat.flatflash.tools.slicers {
 						
 						matrix.tx = 0;
 						matrix.ty = 0;
-						matrix.translate(sourceAnchorX, sourceAnchorY);
-					
+						
+						matrix.translate(
+							(matrix.c < 0? -matrix.c * 100 : 0) + Settings.MATRIX_WIDTH_EXTRA / 2,
+							(matrix.b < 0? -matrix.b * 100 : 0) + Settings.MATRIX_HEIGHT_EXTRA / 2
+						);
 						scaled.draw(clipped, matrix, null, null, null, sourceSmoothing);
 						
 						var point:Point = matrix.transformPoint(new Point(sourceAnchorX, sourceAnchorY));
