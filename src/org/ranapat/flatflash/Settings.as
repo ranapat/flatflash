@@ -14,6 +14,7 @@ package org.ranapat.flatflash {
 		public static const NO_IDENTIFIER:String = "__no_identifier__";
 		
 		public static var SHOW_REDRAWN_RECTANGLES:Boolean = false;
+		public static var PREVENT_RENDER_FILTERS:Boolean = false;
 	}
 
 }

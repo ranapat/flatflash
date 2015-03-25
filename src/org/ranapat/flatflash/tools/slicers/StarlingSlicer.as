@@ -185,7 +185,7 @@ package org.ranapat.flatflash.tools.slicers {
 				sourceBitmapData = clipped;
 			}
 
-			if (sourceFilters && sourceFilters.length > 0)  {
+			if (!Settings.PREVENT_RENDER_FILTERS && sourceFilters && sourceFilters.length > 0)  {
 				filtered = new BitmapData(
 					sourceRectangle.width + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
 					sourceRectangle.height + 2 * Settings.FILTER_MARGIN_DELTA_CUT,
