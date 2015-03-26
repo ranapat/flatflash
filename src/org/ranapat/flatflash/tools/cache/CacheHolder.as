@@ -10,9 +10,30 @@ package org.ranapat.flatflash.tools.cache {
 		}
 		
 		public function add(displayObject:DisplayObject, cacheObject:CacheObject):void {
-			this.remove(displayObject);
-			
-			this.dictionary[displayObject] = cacheObject;
+			if (displayObject.shadowMode && this.dictionary[displayObject]) {
+				var _cacheObject:CacheObject = this.dictionary[displayObject] as CacheObject;
+				if (_cacheObject.sourceBitmapData) {
+					_cacheObject.sourceBitmapData.dispose();
+					_cacheObject.sourceBitmapData = null;
+				}
+				_cacheObject.sourceRectangle = null;
+				_cacheObject.destinationPoint = null;
+				
+				if (cacheObject.overExposedBitmapData) {
+					cacheObject.overExposedBitmapData.dispose();
+					cacheObject.overExposedBitmapData = null;
+				}
+				cacheObject.overExposedDestinationPoint = null;
+				cacheObject.rgba = null;
+				
+				_cacheObject.sourceBitmapData = cacheObject.sourceBitmapData;
+				_cacheObject.sourceRectangle = cacheObject.sourceRectangle;
+				_cacheObject.destinationPoint = cacheObject.destinationPoint;
+			} else {
+				this.remove(displayObject);
+				
+				this.dictionary[displayObject] = cacheObject;
+			}
 		}
 		
 		public function remove(displayObject:DisplayObject):void {

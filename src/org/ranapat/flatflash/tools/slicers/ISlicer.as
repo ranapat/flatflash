@@ -10,13 +10,15 @@ package org.ranapat.flatflash.tools.slicers {
 		function directCopyPixels(
 			sourceBitmapData:BitmapData, overExposedBitmapData:BitmapData,
 			destination:BitmapData, overExposedDestination:BitmapData,
-			sourceRectangle:Rectangle, destinationPoint:Point
+			sourceRectangle:Rectangle,
+			destinationPoint:Point, overExposedDestinationPoint:Point
 		):void;
 		
 		function copyPixels(
 			source:DisplayObject,
 			destination:BitmapData,
-			overExposedDestination:BitmapData, overExposedRGBA:RGBA
+			overExposedDestination:BitmapData, overExposedRGBA:RGBA,
+			cacheObject:CacheObject
 		):CacheObject;
 	}
 	

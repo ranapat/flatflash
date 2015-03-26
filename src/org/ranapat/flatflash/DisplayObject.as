@@ -26,6 +26,7 @@ package org.ranapat.flatflash {
 		private var _alpha:Number;
 		private var _smoothing:Boolean;
 		private var _visible:Boolean;
+		private var _shadowMode:Boolean;
 		private var _filters:Vector.<BitmapFilter>;
 		
 		private var _initialized:Boolean;
@@ -273,6 +274,14 @@ package org.ranapat.flatflash {
 		
 		public function get visible():Boolean {
 			return this._visible;
+		}
+		
+		public function set shadowMode(value:Boolean):void {
+			this._shadowMode = value;
+		}
+		
+		public function get shadowMode():Boolean {
+			return this._shadowMode;
 		}
 		
 		public function set name(value:String):void {

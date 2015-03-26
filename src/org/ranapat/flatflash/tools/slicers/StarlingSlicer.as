@@ -22,12 +22,13 @@ package org.ranapat.flatflash.tools.slicers {
 		public function directCopyPixels(
 			sourceBitmapData:BitmapData, overExposedBitmapData:BitmapData,
 			destination:BitmapData, overExposedDestination:BitmapData,
-			sourceRectangle:Rectangle, destinationPoint:Point
+			sourceRectangle:Rectangle,
+			destinationPoint:Point, overExposedDestinationPoint:Point
 		):void {
 			if (overExposedBitmapData && overExposedDestination) {
 				overExposedDestination.copyPixels(
 					overExposedBitmapData,
-					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPoint,
+					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), overExposedDestinationPoint,
 					null, null, true
 				);
 			}
@@ -42,11 +43,12 @@ package org.ranapat.flatflash.tools.slicers {
 		public function copyPixels(
 			source:DisplayObject,
 			destination:BitmapData,
-			overExposedDestination:BitmapData, overExposedRGBA:RGBA
+			overExposedDestination:BitmapData, overExposedRGBA:RGBA,
+			cacheObject:CacheObject
 		):CacheObject {
 			if (!source.canBeDrawn) return null;
 			
-			var result:CacheObject = new CacheObject(null, null, null, null);
+			var result:CacheObject = new CacheObject(null, null, null, null, null, null);
 			
 			var sourceBitmapData:BitmapData = source.spritesheet;
 			var sourceRectangle:Rectangle = source.region.sliceRectangle;
@@ -207,25 +209,35 @@ package org.ranapat.flatflash.tools.slicers {
 			}
 			
 			if (overExposedDestination) {
-				var overExposedBitmapData:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
-				overExposedBitmapData.copyPixels(beforeFilters? beforeFilters : sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
-				overExposedBitmapData.colorTransform(
-					sourceRectangle,
-					new ColorTransform(
-						0, 0, 0, 1,
-						overExposedRGBA.r, overExposedRGBA.g, overExposedRGBA.b, overExposedRGBA.a
-					)
-				);
-				overExposedDestination.copyPixels(
-					overExposedBitmapData,
-					new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPointToApply,
-					null, null, true
-				);
+				if (!source.shadowMode || cacheObject == null) {
+					var overExposedBitmapData:BitmapData = new BitmapData(sourceRectangle.width, sourceRectangle.height, true, 0x0);
+					overExposedBitmapData.copyPixels(beforeFilters? beforeFilters : sourceBitmapData, sourceRectangle, new Point(0, 0), null, null, true);
+					overExposedBitmapData.colorTransform(
+						sourceRectangle,
+						new ColorTransform(
+							0, 0, 0, 1,
+							overExposedRGBA.r, overExposedRGBA.g, overExposedRGBA.b, overExposedRGBA.a
+						)
+					);
+					overExposedDestination.copyPixels(
+						overExposedBitmapData,
+						new Rectangle(0, 0, overExposedBitmapData.width, overExposedBitmapData.height), destinationPointToApply,
+						null, null, true
+					);
 
-				result.overExposedBitmapData = overExposedBitmapData.clone();
-				
-				overExposedBitmapData.dispose();
-				overExposedBitmapData = null;
+					result.overExposedBitmapData = overExposedBitmapData.clone();
+					result.overExposedDestinationPoint = destinationPointToApply.clone();
+					result.rgba = overExposedRGBA;
+					
+					overExposedBitmapData.dispose();
+					overExposedBitmapData = null;
+				} else {
+					overExposedDestination.copyPixels(
+						cacheObject.overExposedBitmapData,
+						new Rectangle(0, 0, cacheObject.overExposedBitmapData.width, cacheObject.overExposedBitmapData.height), cacheObject.overExposedDestinationPoint,
+						null, null, true
+					);
+				}
 			}
 			
 			destination.copyPixels(

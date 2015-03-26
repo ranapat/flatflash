@@ -227,7 +227,8 @@ package org.ranapat.flatflash {
 										mouseEnabledObject != null? cacheObject.overExposedBitmapData : null,
 										bitmapData,
 										mouseEnabledObject != null? mouseEventsBitmapData : null,
-										cacheObject.sourceRectangle, cacheObject.destinationPoint
+										cacheObject.sourceRectangle,
+										cacheObject.destinationPoint, cacheObject.overExposedDestinationPoint
 									);
 								}
 							}
@@ -237,7 +238,8 @@ package org.ranapat.flatflash {
 									displayObject,
 									bitmapData,
 									mouseEnabledObject != null? mouseEventsBitmapData : null,
-									mouseEnabledObject != null? mouseEnabledObject.rgba : null
+									mouseEnabledObject != null? mouseEnabledObject.rgba : null,
+									mouseEnabledObject != null && displayObject.shadowMode? this.cacheHolder.get(displayObject) : null
 								));
 							}
 							
@@ -329,7 +331,16 @@ package org.ranapat.flatflash {
 		
 		public function childMouseEnabledChanged(child:DisplayObject):void {
 			if (child.mouseEnabled && !this.__mouseEnabled[child]) {
-				this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
+				if (child.shadowMode) {
+					var cacheObject:CacheObject = this.cacheHolder.get(child);
+					if (cacheObject) {
+						this.__mouseEnabled[child] = new MouseEnabledObject(false, cacheObject.rgba);
+					} else {
+						this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
+					}
+				} else {
+					this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
+				}
 			} else if (!child.mouseEnabled && this.__mouseEnabled[child]) {
 				this.__mouseEnabled[child] = null;
 				delete this.__mouseEnabled[child];
