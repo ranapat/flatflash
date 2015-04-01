@@ -402,6 +402,13 @@ package org.ranapat.flatflash {
 			this._strongHolder = value? this.spritesheet : null;
 		}
 		
+		public function disposeStrongHolder():void {
+			if (this._strongHolder) {
+				this._strongHolder.dispose();
+				this._strongHolder = null;
+			}
+		}
+		
 		public function mouseEvent(value:MouseEvent):void {
 			this.handleMouseEvent(value);
 		}

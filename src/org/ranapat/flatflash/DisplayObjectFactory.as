@@ -2,10 +2,10 @@ package org.ranapat.flatflash {
 	import flash.display.BitmapData;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
-	import flash.system.System;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import org.ranapat.flatflash.Image;
+	import org.ranapat.flatflash.tools.EngineTypes;
 	import org.ranapat.flatflash.tools.joiners.JoinResult;
 	import org.ranapat.flatflash.tools.loader.SwfTracer;
 	import org.ranapat.flatflash.tools.loader.SwfTracerEvent;
@@ -114,6 +114,29 @@ package org.ranapat.flatflash {
 			} else {
 				return null;
 			}
+		}
+		
+		public static function recordImage(object:flash.display.DisplayObject, clipRectangle:Rectangle = null):Image {
+			var result:Image;
+			
+			try {
+				var tmp:BitmapData = new BitmapData(clipRectangle? clipRectangle.width : object.width, clipRectangle? clipRectangle.height : object.height, true, 0);
+				tmp.draw(object, null, null, null, clipRectangle, true);
+				
+				result = new Image(tmp, new Region(
+					"DisplayObjectFactorty::recordImage" + Math.random(),
+					clipRectangle? clipRectangle.x : 0,
+					clipRectangle? clipRectangle.y : 0,
+					clipRectangle? clipRectangle.width : object.width,
+					clipRectangle? clipRectangle.height : object.height,
+					EngineTypes.TYPE_STARLING
+				));
+				result.keepSpritesheet = true;
+			} catch (err:Error) {
+				//trace(err);
+			}
+			
+			return result;
 		}
 		
 		private static function ensureRecording():void {
