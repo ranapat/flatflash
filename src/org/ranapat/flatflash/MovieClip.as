@@ -26,12 +26,15 @@ package org.ranapat.flatflash {
 		private var _timeDelta:Number;
 		private var _previousTimeOffset:int;
 		
+		private var _playCallbackHolder:Dictionary;
+		
 		private var _loopLimitReached:Boolean;
 		private var _loopLimitReachedCallbackHolder:Dictionary;
 		
 		public function MovieClip(...args) {
 			super();
 			
+			this._playCallbackHolder = new Dictionary(true);
 			this._loopLimitReachedCallbackHolder = new Dictionary(true);
 			
 			this._currentFrame = -1;
@@ -125,6 +128,8 @@ package org.ranapat.flatflash {
 			this.markChanged();
 			this._playing = true;
 			this.loops = loops;
+			
+			this.walkCallbackHolder(this._playCallbackHolder);
 		}
 		
 		public function stop():void {
@@ -153,6 +158,14 @@ package org.ranapat.flatflash {
 		public function previousFrame():void {
 			this.gotoPreviousFrame();
 			this.stop();
+		}
+		
+		public function onPlay(object:Object, callback:Function, parameters:Array = null):void {
+			this.addToCallbackHolder(this._playCallbackHolder, object, callback, parameters);
+		}
+		
+		public function onPlayRemove(object:Object, callback:Function = null):void {
+			this.removeFromCallbackHolder(this._playCallbackHolder, object, callback);
 		}
 		
 		public function onLoopLimitReached(object:Object, callback:Function, parameters:Array = null):void {
