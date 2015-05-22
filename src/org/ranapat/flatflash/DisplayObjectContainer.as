@@ -79,6 +79,8 @@ package org.ranapat.flatflash {
 			
 			this.cacheHolder.destroy();
 			this.cacheHolder = null;
+			
+			this.removeEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage);
 		}
 		
 		public function addChild(child:DisplayObject):DisplayObject {
@@ -531,6 +533,8 @@ package org.ranapat.flatflash {
 		
 		private function _handleRemovedFromStage(e:Event):void {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE, this._handleRemovedFromStage);
+			
+			this.addEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage, false, 0, true);
 			
 			this.mouseEnabled = false;
 			
