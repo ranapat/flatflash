@@ -36,6 +36,10 @@ package org.ranapat.flatflash.tools.cache {
 			this.overExposedDestinationPoint = null;
 			this.rgba = rgba;
 		}
+		
+		public function get valid():Boolean {
+			return this.sourceBitmapData != null;
+		}
 	}
 
 }

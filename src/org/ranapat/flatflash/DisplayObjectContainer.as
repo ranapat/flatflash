@@ -46,6 +46,8 @@ package org.ranapat.flatflash {
 		
 		protected var instantSizeChangeRecreate:Boolean;
 		
+		public var drawException:Function;
+		
 		public function DisplayObjectContainer(render:uint = 0) {
 			this.render = render == Settings.RENDER_TYPE_NOT_SET? Settings.RENDER_TYPE_ENTER_FRAME : render == Settings.RENDER_TYPE_ENTER_FRAME? Settings.RENDER_TYPE_ENTER_FRAME : Settings.RENDER_TYPE_LOOP;
 			
@@ -173,92 +175,102 @@ package org.ranapat.flatflash {
 		}
 		
 		public function redraw():void {
-			if (this.stage && this.bitmapData && this.isChanged) {
-				this.__changed = 0;
-				
-				if (this.__toReorder) {
-					this.children = this.reorderedChildren;
-					this.__toReorder = false;
-				}
-				
-				var bitmapData:BitmapData = this.bitmapData;
-				var mouseEventsBitmapData:BitmapData = this._mouseEventsBitmapData;
-				var latestSlicer:ISlicer = this.latestSlicer;
-				var latestSlicerType:String = this.latestSlicerType;
-				
-				bitmapData.lock();
-				mouseEventsBitmapData.lock();
-				
-				bitmapData.fillRect(bitmapData.rect, 0);
-				mouseEventsBitmapData.fillRect(mouseEventsBitmapData.rect, 0);
-				
-				var children:Vector.<DisplayObject> = this.children;
-				var length:uint = this.numChildren;
-				var displayObject:DisplayObject;
-				var mouseEnabledObject:MouseEnabledObject;
-				
-				var initiallyChanged:Boolean;
-				var cacheObject:CacheObject;
-				var processFullCopy:Boolean;
-				
-				for (var i:uint = 0; i < length; ++i) {
-					displayObject = children[i];
-					initiallyChanged = displayObject.changed;
-					displayObject.hop(getTimer() - this.startTime);
-					this.__changed += displayObject.visible && displayObject.changed? 1 : 0;
+			try {
+				if (this.stage && this.bitmapData && this.isChanged) {
+					this.__changed = 0;
 					
-					mouseEnabledObject = this.__mouseEnabled[displayObject];
+					if (this.__toReorder) {
+						this.children = this.reorderedChildren;
+						this.__toReorder = false;
+					}
 					
-					if (displayObject.visible && displayObject.region) {
-						if (latestSlicerType != displayObject.region.type) {
-							latestSlicerType = displayObject.region.type;
-							latestSlicer = SlicerFactory.get(latestSlicerType);
-						}
+					var bitmapData:BitmapData = this.bitmapData;
+					var mouseEventsBitmapData:BitmapData = this._mouseEventsBitmapData;
+					var latestSlicer:ISlicer = this.latestSlicer;
+					var latestSlicerType:String = this.latestSlicerType;
+					
+					bitmapData.lock();
+					mouseEventsBitmapData.lock();
+					
+					bitmapData.fillRect(bitmapData.rect, 0);
+					mouseEventsBitmapData.fillRect(mouseEventsBitmapData.rect, 0);
+					
+					var children:Vector.<DisplayObject> = this.children;
+					var length:uint = this.numChildren;
+					var displayObject:DisplayObject;
+					var mouseEnabledObject:MouseEnabledObject;
+					
+					var initiallyChanged:Boolean;
+					var cacheObject:CacheObject;
+					var processFullCopy:Boolean;
+					
+					for (var i:uint = 0; i < length; ++i) {
+						displayObject = children[i];
+						initiallyChanged = displayObject.changed;
+						displayObject.hop(getTimer() - this.startTime);
+						this.__changed += displayObject.visible && displayObject.changed? 1 : 0;
 						
-						try {
-							displayObject.beforeDraw();
+						mouseEnabledObject = this.__mouseEnabled[displayObject];
+						
+						if (displayObject.visible && displayObject.region) {
+							if (latestSlicerType != displayObject.region.type) {
+								latestSlicerType = displayObject.region.type;
+								latestSlicer = SlicerFactory.get(latestSlicerType);
+							}
 							
-							processFullCopy = true;
-							if (!initiallyChanged) {
-								cacheObject = this.cacheHolder.get(displayObject);
-								if (cacheObject) {
-									processFullCopy = false;
-									
-									latestSlicer.directCopyPixels(
-										cacheObject.sourceBitmapData,
-										mouseEnabledObject != null? cacheObject.overExposedBitmapData : null,
+							try {
+								displayObject.beforeDraw();
+								
+								processFullCopy = true;
+								if (!initiallyChanged) {
+									cacheObject = this.cacheHolder.get(displayObject);
+									if (cacheObject && cacheObject.valid) {
+										processFullCopy = false;
+										
+										latestSlicer.directCopyPixels(
+											cacheObject.sourceBitmapData,
+											mouseEnabledObject != null? cacheObject.overExposedBitmapData : null,
+											bitmapData,
+											mouseEnabledObject != null? mouseEventsBitmapData : null,
+											cacheObject.sourceRectangle,
+											cacheObject.destinationPoint, cacheObject.overExposedDestinationPoint
+										);
+									}
+								}
+								
+								if (processFullCopy) {
+									this.cacheHolder.add(displayObject, latestSlicer.copyPixels(
+										displayObject,
 										bitmapData,
 										mouseEnabledObject != null? mouseEventsBitmapData : null,
-										cacheObject.sourceRectangle,
-										cacheObject.destinationPoint, cacheObject.overExposedDestinationPoint
-									);
+										mouseEnabledObject != null? mouseEnabledObject.rgba : null,
+										mouseEnabledObject != null && displayObject.shadowMode? this.cacheHolder.get(displayObject) : null
+									));
+								}
+								
+								displayObject.afterDraw();
+							} catch (ex1:Error) {
+								if (this.drawException != null) {
+									this.drawException.apply(null, [ ex1 ]);
 								}
 							}
-							
-							if (processFullCopy) {
-								this.cacheHolder.add(displayObject, latestSlicer.copyPixels(
-									displayObject,
-									bitmapData,
-									mouseEnabledObject != null? mouseEventsBitmapData : null,
-									mouseEnabledObject != null? mouseEnabledObject.rgba : null,
-									mouseEnabledObject != null && displayObject.shadowMode? this.cacheHolder.get(displayObject) : null
-								));
-							}
-							
-							displayObject.afterDraw();
-						} catch (e:Error) {
-							//
 						}
 					}
+					
+					if (this.latestSlicerType != latestSlicerType) {
+						this.latestSlicer = latestSlicer;
+						this.latestSlicerType = latestSlicerType;
+					}
+					
+					bitmapData.unlock();
+					mouseEventsBitmapData.unlock();
 				}
+			} catch (ex2:Error) {
+				this.__changed = 1;
 				
-				if (this.latestSlicerType != latestSlicerType) {
-					this.latestSlicer = latestSlicer;
-					this.latestSlicerType = latestSlicerType;
+				if (this.drawException != null) {
+					this.drawException.apply(null, [ ex2 ]);
 				}
-				
-				bitmapData.unlock();
-				mouseEventsBitmapData.unlock();
 			}
 		}
 		
@@ -333,15 +345,19 @@ package org.ranapat.flatflash {
 		
 		public function childMouseEnabledChanged(child:DisplayObject):void {
 			if (child.mouseEnabled && !this.__mouseEnabled[child]) {
+				var cacheObject:CacheObject = this.cacheHolder.get(child);
 				if (child.shadowMode) {
-					var cacheObject:CacheObject = this.cacheHolder.get(child);
-					if (cacheObject) {
+					if (cacheObject && cacheObject.rgba) {
 						this.__mouseEnabled[child] = new MouseEnabledObject(false, cacheObject.rgba);
 					} else {
 						this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
 					}
 				} else {
-					this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
+					if (cacheObject && cacheObject.rgba) {
+						this.__mouseEnabled[child] = new MouseEnabledObject(false, cacheObject.rgba);
+					} else {
+						this.__mouseEnabled[child] = new MouseEnabledObject(false, this.mouseMaskNextColor);
+					}
 				}
 			} else if (!child.mouseEnabled && this.__mouseEnabled[child]) {
 				this.__mouseEnabled[child] = null;

@@ -278,6 +278,8 @@ package org.ranapat.flatflash {
 		
 		public function set shadowMode(value:Boolean):void {
 			this._shadowMode = value;
+			
+			this.markChanged(true);
 		}
 		
 		public function get shadowMode():Boolean {
