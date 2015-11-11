@@ -457,8 +457,8 @@ package org.ranapat.flatflash {
 			var _child:Object;
 			var child:DisplayObject;
 			var mouseEnabledObject:MouseEnabledObject;
-			//var tasksTodo:uint;
 			for (_child in mouseEnabled) {
+				if (!this.mouseEnabled) { break; }
 				child = _child as DisplayObject;
 				mouseEnabledObject = mouseEnabled[child];
 				if (pixel == mouseEnabledObject.rgba.rgb) {
@@ -471,21 +471,13 @@ package org.ranapat.flatflash {
 						
 					}
 					child.mouseEvent(e);
-						
-					//++tasksTodo;
 				} else if (mouseEnabledObject.hovered) {
 					mouseEnabledObject.hovered = false;
 					child.mouseEvent(new MouseEvent(
 						MouseEvent.MOUSE_OUT,
 						e.bubbles, e.cancelable, e.localX, e.localY, e.relatedObject, e.ctrlKey, e.altKey, e.shiftKey, e.buttonDown, e.delta
 					));
-					//++tasksTodo;
 				}
-				/*
-				if (tasksTodo >= 2) {
-					break;
-				}
-				*/
 			}
 		}
 		
