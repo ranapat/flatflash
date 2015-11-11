@@ -304,7 +304,7 @@ package org.ranapat.flatflash {
 		}
 		
 		public function set fps(value:int):void {
-			this._fps = value < 0? 0 : value;
+			this._fps = value < 0? this.stage? this.stage.frameRate : -1 : value;
 		}
 		
 		public function get fps():int {
