@@ -39,6 +39,8 @@ package org.ranapat.flatflash {
 		private var __mouseEnabled:Dictionary;
 		private var __toReorder:Boolean;
 		
+		private var _mouseAreaContainer:flash.display.DisplayObjectContainer;
+		
 		private var _mouseMaskNextColor:RGBA;
 		private var _mouseEventsBitmapData:BitmapData;
 		
@@ -279,19 +281,27 @@ package org.ranapat.flatflash {
 			//return this.children.length;
 		}
 		
+		public function set mouseAreaContainer(value:flash.display.DisplayObjectContainer):void {
+			this._mouseAreaContainer = value =! null? value : this.stage;
+		}
+		
+		public function get mouseAreaContainer():flash.display.DisplayObjectContainer {
+			return this._mouseAreaContainer;
+		}
+		
 		public function set mouseEnabled(value:Boolean):void {
-			if (this.stage && value && !this.__mouseListenersSet) {
-				this.stage.addEventListener(MouseEvent.CLICK, this.handleClick, false, 0, true);
-				this.stage.addEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove, false, 0, true);
-				this.stage.addEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown, false, 0, true);
-				this.stage.addEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp, false, 0, true);
+			if (this._mouseAreaContainer && value && !this.__mouseListenersSet) {
+				this._mouseAreaContainer.addEventListener(MouseEvent.CLICK, this.handleClick, false, 0, true);
+				this._mouseAreaContainer.addEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove, false, 0, true);
+				this._mouseAreaContainer.addEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown, false, 0, true);
+				this._mouseAreaContainer.addEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp, false, 0, true);
 				
 				this.__mouseListenersSet = true;
-			} else if (this.stage && !value && this.__mouseListenersSet) {
-				this.stage.removeEventListener(MouseEvent.CLICK, this.handleClick);
-				this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove);
-				this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown);
-				this.stage.removeEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp);
+			} else if (this._mouseAreaContainer && !value && this.__mouseListenersSet) {
+				this._mouseAreaContainer.removeEventListener(MouseEvent.CLICK, this.handleClick);
+				this._mouseAreaContainer.removeEventListener(MouseEvent.MOUSE_MOVE, this.handleMouseMove);
+				this._mouseAreaContainer.removeEventListener(MouseEvent.MOUSE_DOWN, this.handleMouseDown);
+				this._mouseAreaContainer.removeEventListener(MouseEvent.MOUSE_UP, this.handleMouseUp);
 				
 				this.__mouseListenersSet = false;
 			}
@@ -523,6 +533,8 @@ package org.ranapat.flatflash {
 			
 			this.addEventListener(Event.REMOVED_FROM_STAGE, this._handleRemovedFromStage, false, 0, true);
 			
+			this._mouseAreaContainer = this._mouseAreaContainer != null? this._mouseAreaContainer : this.stage;
+			
 			this.mouseEnabled = this.mouseEnabled;
 			this._fps = this._fps == -1? this.stage.frameRate : this._fps;
 			
@@ -545,8 +557,9 @@ package org.ranapat.flatflash {
 			this.removeEventListener(Event.REMOVED_FROM_STAGE, this._handleRemovedFromStage);
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this._handleAddedToStage, false, 0, true);
-			
+
 			this.mouseEnabled = false;
+			this._mouseAreaContainer = null;
 			
 			if (this.render == Settings.RENDER_TYPE_ENTER_FRAME) {
 				this.removeEventListener(Event.ENTER_FRAME, this.handleEnterFrame);
