@@ -289,6 +289,10 @@ package org.ranapat.flatflash {
 			return this._mouseAreaContainer;
 		}
 		
+		public function get mouseEventsBitmapData():BitmapData {
+			return this._mouseEventsBitmapData;
+		}
+		
 		public function set mouseEnabled(value:Boolean):void {
 			if (this._mouseAreaContainer && value && !this.__mouseListenersSet) {
 				this._mouseAreaContainer.addEventListener(MouseEvent.CLICK, this.handleClick, false, 0, true);
