@@ -393,8 +393,13 @@ package org.ranapat.flatflash {
 					this._mouseEventsBitmapData.dispose();
 					this._mouseEventsBitmapData = null;
 				}
-				this.bitmapData = new BitmapData(this._width, this._height, true, 0x0);
-				this._mouseEventsBitmapData = new BitmapData(this._width, this._height, true, 0x0);
+				
+				try {
+					this.bitmapData = new BitmapData(this._width, this._height, true, 0x0);
+					this._mouseEventsBitmapData = new BitmapData(this._width, this._height, true, 0x0);
+				} catch (e:Error) {
+					FlatFlash.instance.dispatchEvent(new FlatFlashErrorEvent(FlatFlashErrorEvent.CREATE_BITMAP_CANVAS_ERROR));
+				}
 			}
 		}
 		
