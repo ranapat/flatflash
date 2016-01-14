@@ -577,11 +577,15 @@ package org.ranapat.flatflash {
 			this.latestSlicer = null;
 			this.latestSlicerType = null;
 			
-			this.bitmapData.dispose();
-			this.bitmapData = null;
-			
-			this._mouseEventsBitmapData.dispose();
-			this._mouseEventsBitmapData = null;
+			if (this.bitmapData) {
+				this.bitmapData.dispose();
+				this.bitmapData = null;
+			}
+
+			if (this._mouseEventsBitmapData) {
+				this._mouseEventsBitmapData.dispose();
+				this._mouseEventsBitmapData = null;
+			}
 			
 			clearTimeout(this.loopTimeout);
 			this.loopTimeout = 0;
